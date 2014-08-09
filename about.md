@@ -1,6 +1,7 @@
 ---
 layout: page
 title: About
+permalink: /about/
 ---
 
 Christian Weiss is working as a technical lead at Lyoness, a global loyalty rewards program. 
