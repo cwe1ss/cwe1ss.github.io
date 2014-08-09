@@ -3,12 +3,9 @@ layout: page
 title: About
 ---
 
-Some information about you!
-
-### More Information
-
-A place to include any other types of information that you'd like to include about yourself. 
+Christian Weiss is working as a technical lead at Lyoness, a global loyalty rewards program. 
+He lives in Austria and builds web-based software with Microsoft technologies since more than 10 years.
 
 ### Contact me
 
-[email@domain.com](mailto:email@domain.com)
+[christian@chwe.at](mailto:christian@chwe.at)
