@@ -2,6 +2,10 @@
 layout: post
 title: Don’t use Response.Cookies[string] to check if a cookie exists!
 date: 2009-01-26 15:57
+redirect_from: 
+  - /post/2009/01/26/Done28099t-use-ResponseCookiesstring-to-check-if-a-cookie-exists!
+  - /post/2009/01/26/Done28099t-use-ResponseCookiesstring-to-check-if-a-cookie-exists!.aspx
+  - /blog/post/2009/01/26/Done28099t-use-ResponseCookiesstring-to-check-if-a-cookie-exists!.aspx
 ---
 
   <h4>Update: Follow Up Posts</h4>  <ul>   <li><a href="/use-wrappers-to-access-your-cookies-sessions/">Use wrappers to access your cookies, sessions, …</a></li>    <li><a href="/testable-and-reusable-cookie-access-with-asp.net-mvc-rc/">Testable and reusable cookie access with ASP.Net MVC RC</a></li> </ul>  <h4>The short explanation, if you don’t like to read the entire story</h4>  <p>If you use code like “if (Response.Cookies[“mycookie”] != null) { … }”, ASP.Net automatically generates a new cookie with the name “mycookie” in the background and overwrites your old cookie! Always use the Request.Cookies-Collection to read cookies!</p>  <h4>The long explanation and some useful advices at the end</h4>  <p>You can access the Cookies-Collection in two different places in ASP.Net: </p>  <ul>   <li><a href="http://msdn.microsoft.com/en-us/library/system.web.httprequest.cookies.aspx"><strong>Request.Cookies</strong></a> gives you the cookies that are sent from the browser to your server. </li>    <li>With <strong><a href="http://msdn.microsoft.com/en-us/library/system.web.httpresponse.cookies.aspx">Response.Cookies</a></strong>, you can send cookies from your server to the browser. </li> </ul>  <h4>Storing cookies</h4>  <p>To make your life easier (or harder, as you will see later), ASP.Net gives you the possibility to add a cookie to the browser this way:</p>
