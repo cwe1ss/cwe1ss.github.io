@@ -1,0 +1,9 @@
+diff a/_config.yml b/_config.yml	(rejected hunks)
+@@ -50,7 +50,6 @@
+ #
+ 
+ markdown: kramdown
+-highlighter: pygments
+ permalink: /:title
+ 
+ # The release of Jekyll Now that you're using

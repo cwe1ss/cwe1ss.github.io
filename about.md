@@ -8,4 +8,4 @@ He lives in Austria and builds web-based software with Microsoft technologies si
 
 ### Contact me
 
-[christian@chwe.at](mailto:christian@chwe.at)
+<christian@chwe.at>
