@@ -29,6 +29,8 @@ In my implementation it's possible to store "objects" in cookies. I've implement
 
 Here’s the interface:
 
+{% highlight c# %}
+
     public interface ICookieContainer
     {
         bool Exists(string key);
@@ -39,39 +41,43 @@ Here’s the interface:
         void SetValue(string key, object value, DateTime expires);
     }
 
+{% endhighlight %}
+
 I will just show the fundamental code here. If you want to see the whole implementation, please take a look at the code sample. (see bottom)
 
 As you can see below, I've used the abstracted versions of HttpRequest and HttpResponse, which you get, if you use ASP.Net MVC. That's just one of thousand things I love about ASP.Net MVC. These classes can be used easily in unit tests. Notice that everything can be injected here. There’s no direct access to HttpContext.Current!
+
+{% highlight c# %}
 
     public class CookieContainer : ICookieContainer
     {
         private readonly HttpRequestBase _request;
         private readonly HttpResponseBase _response;
-
+        
         public CookieContainer(HttpRequestBase request, HttpResponseBase response)
         {
             // "Check" is a helper class, I've got from the "Kigg" project
             Check.IsNotNull(request, "request");
             Check.IsNotNull(response, "response");
-
+            
             _request = request;
             _response = response;
         }
-
+        
         public string GetValue(string key)
         {
             Check.IsNotEmpty(key, "key");
-
+            
             HttpCookie cookie = _request.Cookies[key];
             return cookie != null ? cookie.Value : null;
         }
-
+        
         public void SetValue(string key, object value, DateTime expires)
         {
             Check.IsNotEmpty(key, "key");
-
+            
             string strValue = CheckAndConvertValue(value);
-
+            
             HttpCookie cookie = new HttpCookie(key, strValue) {Expires = expires};
             _response.Cookies.Set(cookie);
         }
@@ -79,7 +85,11 @@ As you can see below, I've used the abstracted versions of HttpRequest and HttpR
         // ... see code sample for full implementation
     }
 
+{% endhighlight %}
+
 Here’s a sample unit tests that proves the testability of this code. I use [Moq](http://code.google.com/p/moq/) as my mocking framework.
+
+{% highlight c# %}
 
     public static class Mocks
     {
@@ -89,7 +99,7 @@ Here’s a sample unit tests that proves the testability of this code. I use [Mo
             httpRequest.Setup(x =&gt; x.Cookies).Returns(new HttpCookieCollection());
             return httpRequest;
         }
-
+        
         public static Mock&lt;HttpResponseBase&gt; HttpResponse()
         {
             var httpResponse = new Mock&lt;HttpResponseBase&gt;();
@@ -97,9 +107,9 @@ Here’s a sample unit tests that proves the testability of this code. I use [Mo
             return httpResponse;
         }
     }
-
+    
     // This method is from my CookieContainerTests class
-
+    
     [TestMethod]
     public void SetValue_UpdatesExistingCookie()
     {
@@ -107,14 +117,14 @@ Here’s a sample unit tests that proves the testability of this code. I use [Mo
         const string cookieName = "myCookie";
         const string cookieValue = "myValue";
         DateTime cookieExpires = new DateTime(2009, 1, 1, 0, 0, 0);
-
+        
         var httpRequest = Mocks.HttpRequest();
         var httpResponse = Mocks.HttpResponse();
         var cookieContainer = new CookieContainer(httpRequest.Object, httpResponse.Object);
         
         httpResponse.Object.Cookies.Add(new HttpCookie(cookieName, "oldValue"));
-
-            // Act
+        
+        // Act
         _cookieContainer.SetValue(cookieName, cookieValue, cookieExpires);
 
         // Assert
@@ -125,33 +135,37 @@ Here’s a sample unit tests that proves the testability of this code. I use [Mo
         Assert.AreEqual(cookie.Expires, cookieExpires);
     }
 
+{% endhighlight %}
+
 That’s it! Now you have a testable and reusable cookie container!
 
 ### How to use it in your application
 
 It's really easy to integrate this into your app! Just create an interface that defines all your application-specific properties you want to save in cookies and a concrete implementation of this interface that interacts with the cookie container.
 
+{% highlight c# %}
+
     public interface IAppCookies
     {
         string UserEmail { get; set; }
         DateTime? LastVisit { get; set; }
     }
-
+    
     public class AppCookies : IAppCookies
     {
         private readonly ICookieContainer _cookieContainer;
-
+        
         public AppCookies(ICookieContainer cookieContainer)
         {
             _cookieContainer = cookieContainer;
         }
-
+        
         public string UserEmail
         {
             get { return _cookieContainer.GetValue("UserEmail"); }
             set { _cookieContainer.SetValue("UserEmail", value, DateTime.Now.AddDays(10)); }
         }
-
+        
         public DateTime? LastVisit
         {
             get { return _cookieContainer.GetValue&lt;DateTime?&gt;("LastVisit"); }
@@ -159,7 +173,11 @@ It's really easy to integrate this into your app! Just create an interface that 
         }
     }
 
+{% endhighlight %}
+
 You can now inject this IAppCookies interface to your MVC Controller:
+
+{% highlight c# %}
 
     public class HomeController : Controller
     {
@@ -193,6 +211,8 @@ You can now inject this IAppCookies interface to your MVC Controller:
             public DateTime CurrentTime { get; set; }
         }
     }
+
+{% endhighlight %}
 
 Wow, you’re still reading :-)
 
