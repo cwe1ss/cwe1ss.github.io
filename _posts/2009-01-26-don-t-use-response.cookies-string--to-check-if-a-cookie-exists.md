@@ -29,8 +29,12 @@ You can access the Cookies-Collection in two different places in ASP.Net:
 ### Storing cookies
 To make your life easier (or harder, as you will see later), ASP.Net gives you the possibility to add a cookie to the browser this way:
 
+{% highlight c# %}
+
     Response.Cookies["mycookie"].Value = "some value";
     Response.Cookies["mycookie"].Expires = DateTime.Now.AddDays(10);
+
+{% endhighlight %}
 
 As you can see here, the .NET framework automatically generates the HttpCookie instance with the name "mycookie" in the background and adds it to the collection.
 
@@ -44,17 +48,25 @@ The important thing you have to know when reading cookies is, that the Response.
 
 If you use the following line to check the cookie, a new cookie with the name "mycookie" and an empty value gets added to the Response.Cookies Collection and *this overwrites your old cookie*! (See framework code above!)
 
+{% highlight c# %}
+
     if (Response.Cookies["mycookie"] != null)
     {
         // This automatically overwrites the existing cookie with an empty value!!!
     }
 
+{% endhighlight %}
+
 The correct way to access cookies is by using the Request.Cookies-Collection:
+
+{% highlight c# %}
 
     if (Request.Cookies["mycookie"] != null)
     {
         // This is fine
     }
+
+{% endhighlight %}
 
 ### So remember the following rules
 
