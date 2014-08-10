@@ -17,6 +17,8 @@ As described in my [previous post]({% post_url 2009-01-26-don-t-use-response.coo
 
 The simplest way to do this is by using a little wrapper class like this one:
 
+{% highlight c# %}
+
     using System;
     using System.Globalization;
     using System.Web;
@@ -63,6 +65,7 @@ The simplest way to do this is by using a little wrapper class like this one:
         }
     }
 
+{% highlight c# %}
 All you have to do is create a static property for every cookie that you would like to work with. As you can see you also have the Expires-times administrated in one single place!
 
 Now you can access the values as seen below and you don't have to worry about the cookie implementation-details in every place.
