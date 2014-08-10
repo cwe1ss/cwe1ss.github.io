@@ -65,13 +65,18 @@ The simplest way to do this is by using a little wrapper class like this one:
         }
     }
 
-{% highlight c# %}
+{% endhighlight %}
+
 All you have to do is create a static property for every cookie that you would like to work with. As you can see you also have the Expires-times administrated in one single place!
 
 Now you can access the values as seen below and you don't have to worry about the cookie implementation-details in every place.
 
+{% highlight c# %}
+
     tbLastVisit.Text = MyCookies.UserEmail;
     MyCookies.LastVisit = DateTime.Now;
+
+{% endhighlight %}
 
 Of course, you can also use this same approach for working with session data or any other key-based collection.
 
