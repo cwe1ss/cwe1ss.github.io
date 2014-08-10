@@ -42,6 +42,8 @@ To support this structure for Controllers, you don't have to change anything in 
 
 To support this structure for Views, you have to create a custom ViewEngine. As you can see in the following example, this can also be done very easily. Please note, that this code only supports *.cshtml-files. If you want to use *.vbhtml-files as well, you just have to duplicate the paths and change the extension to *.vbhtml.
 
+{% highlight c# linenos %}
+
     public class FeatureFolderViewEngine : RazorViewEngine
     {
         public FeatureFolderViewEngine()
@@ -95,6 +97,8 @@ To support this structure for Views, you have to create a custom ViewEngine. As 
                             };
         }
     }
+
+{% endhighlight %}
 
 Of course, if you use this new structure, you lose some of the built-in templating- and navigation-support in Visual Studio since VS does not recognize these folders as "Views"-folders. Therefore, the following things no longer work:
 
