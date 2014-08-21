@@ -31,8 +31,8 @@ To make your life easier (or harder, as you will see later), ASP.Net gives you t
 
 {% highlight c# %}
 
-    Response.Cookies["mycookie"].Value = "some value";
-    Response.Cookies["mycookie"].Expires = DateTime.Now.AddDays(10);
+Response.Cookies["mycookie"].Value = "some value";
+Response.Cookies["mycookie"].Expires = DateTime.Now.AddDays(10);
 
 {% endhighlight %}
 
@@ -50,10 +50,10 @@ If you use the following line to check the cookie, a new cookie with the name "m
 
 {% highlight c# %}
 
-    if (Response.Cookies["mycookie"] != null)
-    {
-        // This automatically overwrites the existing cookie with an empty value!!!
-    }
+if (Response.Cookies["mycookie"] != null)
+{
+  // This automatically overwrites the existing cookie with an empty value!!!
+}
 
 {% endhighlight %}
 
@@ -61,10 +61,10 @@ The correct way to access cookies is by using the Request.Cookies-Collection:
 
 {% highlight c# %}
 
-    if (Request.Cookies["mycookie"] != null)
-    {
-        // This is fine
-    }
+if (Request.Cookies["mycookie"] != null)
+{
+  // This is fine
+}
 
 {% endhighlight %}
 
