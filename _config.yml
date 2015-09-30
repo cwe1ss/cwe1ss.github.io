@@ -46,7 +46,7 @@ url: http://www.chwe.at
 # then add in the baseurl here, like this: "/repository-name"
 baseurl: ""
 
-excerpt_separator: <!--more-->
+excerpt_separator: "" #<!--more-->
 
 #
 # !! You don't need to change any of the configuration flags below !!
