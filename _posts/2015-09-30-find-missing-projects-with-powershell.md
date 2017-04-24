@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Find missing projects with powhershell
+title: Find missing projects with PowerShell
 ---
 
 In my last post, I showed you a C# script for finding projects which are not part of a SLN-file. 
