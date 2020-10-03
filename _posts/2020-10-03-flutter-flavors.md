@@ -22,7 +22,7 @@ I'm using `Flutter v1.22.0` for this tutorial.
 
 ## Create the Git repository and clone it locally
 
-Create a new Git repository. Mine is: https://github.com/cwe1ss/flutter-flavors-ci-cd
+Create a new Git repository. Mine is: [https://github.com/cwe1ss/flutter-flavors-ci-cd](https://github.com/cwe1ss/flutter-flavors-ci-cd)
 
 ```
 git clone https://github.com/cwe1ss/flutter-flavors-ci-cd.git
@@ -39,7 +39,7 @@ flutter create --project-name flutter_flavors .
 
 Run the app on an Android device/emulator to ensure it works.
 
-[See changes in my GitHub repository](https://github.com/cwe1ss/flutter-flavors-ci-cd/commit/0819ce8b51ddc39d8b7aebf71aea4f2da36a187c)
+[See all changes from this step in the Git commit.](https://github.com/cwe1ss/flutter-flavors-ci-cd/commit/0819ce8b51ddc39d8b7aebf71aea4f2da36a187c)
 
 ## Add a Flutter build configuration for each flavor in Android Studio
 
@@ -70,7 +70,7 @@ git add .idea/runConfigurations/live.xml -f
 git commit -m 'Persist flutter build configurations'
 ```
 
-[See changes in my GitHub repository](https://github.com/cwe1ss/flutter-flavors-ci-cd/commit/36e4eacccf68eb131cd1aa6ab1ac025df56aeb05)
+[See all changes from this step in the Git commit.](https://github.com/cwe1ss/flutter-flavors-ci-cd/commit/36e4eacccf68eb131cd1aa6ab1ac025df56aeb05)
 
 ## Set up flavors for Android
 
@@ -156,13 +156,13 @@ You'll now have both flavors of your app installed on your Android device!
 
 Our native Android configuration is now complete.
 
-[See all changes from this step in my Git commit.](https://github.com/cwe1ss/flutter-flavors-ci-cd/commit/099284216215e0a8578518399117d8e28db31b75)
+[See all changes from this step in the Git commit.](https://github.com/cwe1ss/flutter-flavors-ci-cd/commit/099284216215e0a8578518399117d8e28db31b75)
 
 ## Get the flavor in our Flutter code
 
 As described in our requirements, we want to target different API endpoints per flavor so we need a way to get the current flavor in our Flutter code.
 
-We'll first add a class called `FlavorSettings` in the file `lib/flavor_settings.dart` that will hold all of flavor-specific settings that don't need to be setup separately for each platform:
+We'll first add a class called `FlavorSettings` in a new file called `lib/flavor_settings.dart` that will hold all of our flavor-specific settings that we only need in our Flutter code:
 
 ```dart
 /// Contains the hard-coded settings per flavor.
@@ -233,7 +233,7 @@ That's it! We can now access the current flavor from within Flutter and we can h
 
 You can pass the `FlavorSettings`-instance down to your widgets manually, or you can use e.g. the `provider`-package to access it via dependency injection in your widgets.
 
-[See all changes from this step in my Git commit.](https://github.com/cwe1ss/flutter-flavors-ci-cd/commit/64ee8642551702dd4d36f15c5f788befe8c6bc9a)
+[See all changes from this step in the Git commit.](https://github.com/cwe1ss/flutter-flavors-ci-cd/commit/64ee8642551702dd4d36f15c5f788befe8c6bc9a)
 
 ## Set up flavors for iOS
 
@@ -373,10 +373,9 @@ You should now see similar console output like for the Android app:
 ```
 2020-10-03 14:44:05.525493+0200 Runner[26055:336596] flutter: STARTED WITH FLAVOR dev
 2020-10-03 14:44:05.526672+0200 Runner[26055:336596] flutter: API URL https://dev.flutter-flavors.chwe.at
-2020-10-03 14:44:10.120295+0200 Runner[26055:336599] [VERBOSE-2:profiler_metrics_ios.mm(184)] Error retrieving thread information: (ipc/send) invalid destination port
 ```
 
-[See all changes from this step in my Git commit.](https://github.com/cwe1ss/flutter-flavors-ci-cd/commit/608246ea5f948f2a63dc1d7450a77468428a4fc4)
+[See all changes from this step in the Git commit.](https://github.com/cwe1ss/flutter-flavors-ci-cd/commit/608246ea5f948f2a63dc1d7450a77468428a4fc4)
 
 Great, we now have set up our flavors for iOS as well!
 
@@ -386,7 +385,7 @@ You might have noticed that the app name on the iPhone still is "flutter_flavors
 
 ![wrong app name on iPhone](/images/posts/flutter_flavors_ios_wrong_appname.png)
 
-Remember, that for Android we've set those values in the `build.gradle`, so we have to do something similar for iOS.
+Remember, that for Android we've set those values in the `build.gradle` file.
 
 To make things flavor-specific in iOS, we need to do something similar like we've done for the flavor value itself, where we've configured a key in `Info.plist` and then set different values in the "TARGETS/Runner -> Build Settings" tab.
 
@@ -437,7 +436,7 @@ Delete the existing "flutter_flavors" app from your iPhone and run it again with
 
 ![app icons on the iPhone](/images/posts/flutter_flavors_ios_app_icons.png)
 
-[See all changes from this step in my Git commit.](https://github.com/cwe1ss/flutter-flavors-ci-cd/commit/6b4ead183f8b3f9128fa2b4d24b277056b747909)
+[See all changes from this step in the Git commit.](https://github.com/cwe1ss/flutter-flavors-ci-cd/commit/6b4ead183f8b3f9128fa2b4d24b277056b747909)
 
 ## Add your own flavor-specific settings
 
@@ -449,7 +448,7 @@ For settings that you only need in your Flutter-code, just add them to the `Flav
 
 ## Summary
 
-We've now set up our Flutter project to have multiple flavors. We use those flavors to separate our app environments (DEV & LIVE). This way we don't need to e.g. manually comment out code to switch our API URL or any other settings. We can also have both versions installed side by side, which makes development much easier (work on the DEV app while having the official LIVE app installed as well).
+We've now set up our Flutter project to have multiple flavors. We use those flavors to separate our app environments (DEV & LIVE). This way we don't need to e.g. manually comment out code to switch our API URL or any other settings. We can also have both versions installed side by side, which makes development and support much easier as we can develop on the DEV version while we still can use the LIVE version which is deployed to the stores.
 
 ## What's next
 
@@ -458,5 +457,4 @@ I'd also like to add another guide that sets up automated builds and single-clic
 
 Hopefully, it won't take as long as the time between my last blog post and this one.
 
-
-Please create an issue in the GitHub repo if you have any questions: https://github.com/cwe1ss/flutter-flavors-ci-cd
+Please create an issue in the GitHub repo if you have any questions: [https://github.com/cwe1ss/flutter-flavors-ci-cd](https://github.com/cwe1ss/flutter-flavors-ci-cd)
