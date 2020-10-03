@@ -456,5 +456,3 @@ I'd like to add a guide that shows how to set up Firebase for each flavor.
 I'd also like to add another guide that sets up automated builds and single-click deployments to the Google/Apple stores via Azure Pipelines.
 
 Hopefully, it won't take as long as the time between my last blog post and this one.
-
-Please create an issue in the GitHub repo if you have any questions: [https://github.com/cwe1ss/flutter-flavors-ci-cd](https://github.com/cwe1ss/flutter-flavors-ci-cd)
