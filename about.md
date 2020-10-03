@@ -4,8 +4,8 @@ title: About
 permalink: /about/
 ---
 
-Christian Weiss is working as a technical lead in Austria. 
-He builds web-based software with Microsoft technologies since more than 10 years.
+Christian Weiss is working as a technical lead in Austria.
+He builds websites since 2000, works with Azure since 2015 and creates Flutter apps since 2019.
 
 ### Contact me
 
