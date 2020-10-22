@@ -9,6 +9,8 @@ Does this result in a few failing requests until the load balancer has finally f
 
 If so, this blog post might be for you!
 
+<!--more-->
+
 ## Problem details
 
 We are hosting our ASP.NET Core applications in Azure Service Fabric and public traffic is routed into the cluster via Azure Application Gateway.

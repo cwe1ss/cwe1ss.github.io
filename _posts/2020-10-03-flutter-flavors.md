@@ -14,6 +14,8 @@ The best way to solve these requirements in Flutter is to use __flavors__. There
 
 The [code for this guide](https://github.com/cwe1ss/flutter-flavors-ci-cd) is stored on GitHub and changes for each section are separate commits that are linked in the section below.
 
+<!--more-->
+
 As we need to change settings in XCode, we need a Mac with Android Studio and XCode for this tutorial.
 
 You also need to have Flutter installed already. Follow the [Getting started-docs](https://flutter.dev/docs/get-started/install) if you still need to install it.
