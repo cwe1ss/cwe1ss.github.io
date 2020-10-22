@@ -451,10 +451,3 @@ For settings that you only need in your Flutter-code, just add them to the `Flav
 ## Summary
 
 We've now set up our Flutter project to have multiple flavors. We use those flavors to separate our app environments (DEV & LIVE). This way we don't need to e.g. manually comment out code to switch our API URL or any other settings. We can also have both versions installed side by side, which makes development and support much easier as we can develop on the DEV version while we still can use the LIVE version which is deployed to the stores.
-
-## What's next
-
-I'd like to add a guide that shows how to set up Firebase for each flavor.
-I'd also like to add another guide that sets up automated builds and single-click deployments to the Google/Apple stores via Azure Pipelines.
-
-Hopefully, it won't take as long as the time between my last blog post and this one.
