@@ -1,0 +1,1431 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title>Christian Weiss</title><link>https://www.chwe.at/</link><description>Christian Weiss</description><generator>Hugo -- gohugo.io</generator><language>en</language><managingEditor>christian@chwe.at (Christian Weiss)</managingEditor><webMaster>christian@chwe.at (Christian Weiss)</webMaster><lastBuildDate>Thu, 22 Oct 2020 00:00:00 +0100</lastBuildDate><atom:link href="https://www.chwe.at/index.xml" rel="self" type="application/rss+xml"/><item><title>Simple zero-downtime updates with ASP.NET Core and health checks</title><link>https://www.chwe.at/2020/10/zero-downtime-updates-with-aspnet-core/</link><pubDate>Thu, 22 Oct 2020 00:00:00 +0100</pubDate><author>Author</author><guid>https://www.chwe.at/2020/10/zero-downtime-updates-with-aspnet-core/</guid><description><![CDATA[<p>Do you use a load balancer that isn&rsquo;t tightly integrated with your orchestrator and therefore doesn&rsquo;t know upfront when the orchestrator has to stop an instance of your ASP.NET Core application for an upgrade / a scaling action / a restart?</p>
+<p>Does this result in a few failing requests until the load balancer has finally figured out that the instance is gone?</p>
+<p>If so, this blog post might be for you!</p>
+<h2 id="problem-details">Problem details</h2>
+<p>We are hosting our ASP.NET Core applications in Azure Service Fabric and public traffic is routed into the cluster via Azure Application Gateway.</p>
+<p>Application Gateway doesn&rsquo;t have a direct integration with Service Fabric&rsquo;s naming resolution, so it can&rsquo;t automatically forward traffic to the dynamic ports &amp; nodes of a service in the cluster. Instead, we need to use fixed ports for our ASP.NET Core applications in Service Fabric and we use simple port based routing rules in Application Gateway.</p>
+<p>Example: A stateless ASP.NET Core application <code>fabric:/MyBlog/MyBlogWebsite</code> is running in our Service Fabric cluster with a fixed port of <code>5000</code> and with <code>InstanceCount=-1</code> (so it runs on each node). To expose this application, Application Gateway is configured to forward all requests targeting <code>www.chwe.at</code> to the fixed <code>5000</code>-port on each node in the Service Fabric VMSS (virtual machine scale set).</p>
+<p>This works great. However, during application updates, Service Fabric will stop the existing process before it starts the new application version. This is required because the port <code>5000</code> has to be released before it can be bound again to the new version. Application Gateway isn&rsquo;t aware of this short termination, so any requests it forwards to the node during that time will fail.</p>
+<h2 id="health-checks-to-the-rescue">Health checks to the rescue</h2>
+<p>Azure Application Gateway (and probably any other load balancer) supports <a href="https://docs.microsoft.com/en-us/azure/application-gateway/application-gateway-probe-overview" target="_blank" rel="noopener noreffer">health probes</a> to decide if it should forward a request to a given node. In the simplest case, it will just periodically do a HTTP request to the root of your application and if it doesn&rsquo;t receive a response or if the response returns a server error, it will take the instance out of rotation after a few failed attempts.</p>
+<p>So if one of your application instances gets shut down, the load balancer will stop forwarding traffic to it <strong>after some time</strong>.</p>
+<p><em>However, this still means that there will be failed requests until that has happened.</em></p>
+<p>How can we improve this?</p>
+<p><em>Should we change our deployment process and call an API of our load balancer to actively take the instance out of rotation before we do the update and call another API of the load balancer to take it back in once the new instance is running?</em> This would definitely work, but unfortunately Azure Application Gateway doesn&rsquo;t have such an API. We would also have to integrate this into every other orchestration action that results in instance shutdowns (scale down, move to another node, &hellip;).</p>
+<p><em>Wouldn&rsquo;t it be nice if we could just <strong>delay the shutdown</strong> of our instance and keep serving requests until the load balancer has figured out that it should take the instance out of rotation?</em></p>
+<p>We can do this in ASP.NET Core by combining the following ideas:</p>
+<ul>
+<li>We need to expose the health status of the application on it&rsquo;s own URL - e.g. <code>/health</code></li>
+<li>With this separate URL, we can switch the health to <code>Unhealthy</code>, once the application receives a shutdown signal from the orchestrator (e.g. <code>CTRL+C</code>).</li>
+<li>We can now delay the shutdown until the load balancer health-timeout has been reached.</li>
+<li>Until then, we&rsquo;ll just continue to serve any incoming requests.</li>
+</ul>
+<p><em>You can find the finished code for this post here: <a href="https://github.com/cwe1ss/blog-zero-downtime-with-health-checks" target="_blank" rel="noopener noreffer">https://github.com/cwe1ss/blog-zero-downtime-with-health-checks</a>. If you want to follow along step by step, look at the separate commits. They area also linked in each step below.</em></p>
+<h2 id="set-up-the-health-endpoint-in-aspnet-core">Set up the <code>/health</code>-endpoint in ASP.NET Core</h2>
+<p>ASP.NET Core has <a href="https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-3.1" target="_blank" rel="noopener noreffer">a built-in feature for health checks</a>.</p>
+<p>To enable it, we need to register the feature with the DI container by calling <code>services.AddHealhChecks()</code> in <code>Startup.ConfigureServices()</code> and we need to enable the endpoint on the request pipeline by calling <code>endpoints.MapHealthChecks(&quot;/health&quot;);</code> in the <code>app.UseEndpoints(...)</code>-block of <code>Startup.Configure()</code>.</p>
+<p>After this, we can run the app and navigate to <code>http://localhost:5000/health</code>. This will return the text &ldquo;Healthy&rdquo; and the status code 200.</p>
+<p><a href="https://github.com/cwe1ss/blog-zero-downtime-with-health-checks/commit/0014c70e68ac97e735572be12174d0f9ab3ff7c8" target="_blank" rel="noopener noreffer">See all changes from this step in the Git commit.</a></p>
+<h2 id="add-a-health-check-that-switches-to-unhealthy-once-the-application-shuts-down">Add a health check that switches to Unhealthy, once the application shuts down</h2>
+<p>We can <a href="https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-3.1#create-health-checks" target="_blank" rel="noopener noreffer">add our own health checks</a> to the ASP.NET Core health system by implementing the interface <code>Microsoft.Extensions.Diagnostics.HealthChecks.IHealthCheck</code>.</p>
+<p>To get notified when the application is being shut down, we can use <code>Microsoft.Extensions.Hosting.IHostApplicationLifetime</code>. This interface provides a <code>ApplicationStopping</code>-hook that is triggered when the shutdown signal is received but before the application stops processing requests!</p>
+<p>When combined, we get the following first simple version of our <code>ShuttingDownHealthCheck</code>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="k">public</span> <span class="k">class</span> <span class="nc">ShuttingDownHealthCheck</span> <span class="p">:</span> <span class="n">IHealthCheck</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="n">HealthStatus</span> <span class="m">_</span><span class="n">status</span> <span class="p">=</span> <span class="n">HealthStatus</span><span class="p">.</span><span class="n">Healthy</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="n">ShuttingDownHealthCheck</span><span class="p">(</span><span class="n">IHostApplicationLifetime</span> <span class="n">appLifetime</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">appLifetime</span><span class="p">.</span><span class="n">ApplicationStopping</span><span class="p">.</span><span class="n">Register</span><span class="p">(()</span> <span class="p">=&gt;</span>
+        <span class="p">{</span>
+            <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">&#34;Shutting down&#34;</span><span class="p">);</span>
+            <span class="m">_</span><span class="n">status</span> <span class="p">=</span> <span class="n">HealthStatus</span><span class="p">.</span><span class="n">Unhealthy</span><span class="p">;</span>
+        <span class="p">});</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="n">Task</span><span class="p">&lt;</span><span class="n">HealthCheckResult</span><span class="p">&gt;</span> <span class="n">CheckHealthAsync</span><span class="p">(</span>
+        <span class="n">HealthCheckContext</span> <span class="n">context</span><span class="p">,</span>
+        <span class="n">CancellationToken</span> <span class="n">cancellationToken</span> <span class="p">=</span> <span class="k">default</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="kt">var</span> <span class="n">result</span> <span class="p">=</span> <span class="k">new</span> <span class="n">HealthCheckResult</span><span class="p">(</span><span class="m">_</span><span class="n">status</span><span class="p">);</span>
+        <span class="k">return</span> <span class="n">Task</span><span class="p">.</span><span class="n">FromResult</span><span class="p">(</span><span class="n">result</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>Our class also needs to be registered with the DI container by calling <code>.AddCheck&lt;ShuttingDownHealthCheck&gt;(&quot;shutting_down&quot;)</code> on the return object of <code>services.AddHealthChecks()</code>.</p>
+<p>However, it&rsquo;s important to know that <strong>by default, ASP.NET Core initializes the class for every request</strong> to the health endpoint. This doesn&rsquo;t work for our scenario as we need the global <code>_status</code> variable and just a single <code>ApplicationStopping</code>-registration.</p>
+<p>To ensure the class is created only once, we have to add it as a singleton to the DI framework via <code>services.AddSingleton&lt;ShuttingDownHealthCheck&gt;();</code>.</p>
+<p>It&rsquo;s also important to know, that our <code>ShuttingDownHealthCheck</code>-class will only be initialized, when it is requested for the first time. So if we just run the app, navigate to http://localhost:5000 and press <code>CTRL+C</code>, our &ldquo;Shutting down&rdquo; message will NOT appear in the console.</p>
+<p>If we navigate to http://localhost:5000/health and press <code>CTRL+C</code> afterwards, the &ldquo;Shutting down&rdquo; message will appear on the console!</p>
+<p>This behavior is fine for our scenario as the load balancer will continuously invoke this endpoint anyway!</p>
+<p><a href="https://github.com/cwe1ss/blog-zero-downtime-with-health-checks/commit/bafd315f72a4555074db2bb4a4e5f15c8c1f0a9b" target="_blank" rel="noopener noreffer">See all changes from this step in the Git commit.</a></p>
+<h2 id="delay-the-shutdown">Delay the shutdown</h2>
+<p>If you&rsquo;ve followed the steps so far, you will have noticed that the application still shuts down immediately after &ldquo;Shutting down&rdquo; has been printed to the console.</p>
+<p>To delay the shutdown, we can simply add a <code>Thread.Sleep()</code> to the code in our <code>ApplicationStopping</code>-handler. With this, the main thread is blocked but regular requests will still be processed on other threads.</p>
+<p>Let&rsquo;s add <code>Thread.Sleep(TimeSpan.FromSeconds(15));</code> after our <code>_status = HealthStatus.Unhealthy;</code> statement and run the app again.</p>
+<p>If we now navigate to http://localhost:5000/health and press <code>CTRL+C</code> afterwards, our &ldquo;Shutting down&rdquo; message will appear on the console and the application will keep running!</p>
+<p>Any request to the <code>/health</code>-endpoint during that time will now return &ldquo;Unhealthy&rdquo; with a status code 503 (Service unavailable).</p>
+<p>When deployed, the load balancer will now receive this <code>Unhealthy</code> response and take the instance out of rotation after a few attempts. Until then, any regular requests it sends to the instance will still be processed!</p>
+<h2 id="improve-the-health-check">Improve the health check</h2>
+<p>There&rsquo;s still a few issues with our custom health check:</p>
+<ul>
+<li>ASP.NET Core has a default shutdown timeout of 5 seconds. After this, it will throw an <code>OperationCanceledException</code> and therefore not gracefully shutdown other background services etc.</li>
+<li>The shutdown delay is annoying during development as we now can&rsquo;t quickly close the app.</li>
+<li>Our &ldquo;Shutting down&rdquo; message is just printed to the console. It would be nice if it were sent to the regular logging system.</li>
+</ul>
+<p>To increase the <a href="https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/generic-host?view=aspnetcore-3.1#shutdowntimeout-1" target="_blank" rel="noopener noreffer">ASP.NET Core ShutdownTimeout</a>, we need to configure the <code>HostOptions</code> class in <code>Startup.ConfigureServices()</code>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="n">services</span><span class="p">.</span><span class="n">Configure</span><span class="p">&lt;</span><span class="n">HostOptions</span><span class="p">&gt;(</span><span class="n">option</span> <span class="p">=&gt;</span>
+<span class="p">{</span>
+    <span class="n">option</span><span class="p">.</span><span class="n">ShutdownTimeout</span> <span class="p">=</span> <span class="n">System</span><span class="p">.</span><span class="n">TimeSpan</span><span class="p">.</span><span class="n">FromSeconds</span><span class="p">(</span><span class="m">30</span><span class="p">);</span>
+<span class="p">});</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>To improve our health check, we&rsquo;ll introduce <code>IHostEnvironment</code> to detect if we&rsquo;re running in <code>Production</code>-mode and an <code>ILogger</code>. Our <code>ApplicationStopping</code>-registration will now look like this:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="n">appLifetime</span><span class="p">.</span><span class="n">ApplicationStopping</span><span class="p">.</span><span class="n">Register</span><span class="p">(()</span> <span class="p">=&gt;</span>
+<span class="p">{</span>
+    <span class="m">_</span><span class="n">status</span> <span class="p">=</span> <span class="n">HealthStatus</span><span class="p">.</span><span class="n">Unhealthy</span><span class="p">;</span>
+
+    <span class="kt">bool</span> <span class="n">delayShutdown</span> <span class="p">=</span> <span class="m">_</span><span class="n">hostEnvironment</span><span class="p">.</span><span class="n">IsProduction</span><span class="p">();</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">delayShutdown</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="kt">var</span> <span class="n">shutdownDelay</span> <span class="p">=</span> <span class="n">TimeSpan</span><span class="p">.</span><span class="n">FromSeconds</span><span class="p">(</span><span class="m">25</span><span class="p">);</span>
+
+        <span class="m">_l</span><span class="n">ogger</span><span class="p">.</span><span class="n">LogInformation</span><span class="p">(</span>
+            <span class="s">&#34;Delaying shutdown for {Seconds} seconds&#34;</span><span class="p">,</span>
+            <span class="n">shutdownDelay</span><span class="p">.</span><span class="n">TotalSeconds</span><span class="p">);</span>
+
+        <span class="c1">// ASP.NET Core requests are processed on separate threads,
+</span><span class="c1"></span>        <span class="c1">// so we can just put the main thread on sleep.
+</span><span class="c1"></span>        <span class="n">Thread</span><span class="p">.</span><span class="n">Sleep</span><span class="p">(</span><span class="n">shutdownDelay</span><span class="p">);</span>
+
+        <span class="m">_l</span><span class="n">ogger</span><span class="p">.</span><span class="n">LogInformation</span><span class="p">(</span><span class="s">&#34;Shutdown delay completed&#34;</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>Of course, it would also be possible to just skip the registration ouf our health check in the <code>Startup.ConfigureServices()</code>-method.</p>
+<p>The logic in our ASP.NET Core application is now finished!</p>
+<p><a href="https://github.com/cwe1ss/blog-zero-downtime-with-health-checks/commit/bb5dcecc68d20d5179b8d36fa22f468162e928b8" target="_blank" rel="noopener noreffer">See all changes from this step in the Git commit.</a></p>
+<h2 id="set-the-load-balancer-settings">Set the load balancer settings</h2>
+<p>It&rsquo;s important to understand that we&rsquo;ve set a 25 second shutdown delay. This means, the load balancer must take the instance out of rotation before that time. If it fails to do so, there will be failed requests again.</p>
+<p>We therefore need to set up our load balancing probes e.g. in the following way:</p>
+<ul>
+<li><strong>Target URL: /health</strong>
+<ul>
+<li><em>Our custom health endpoint</em></li>
+</ul>
+</li>
+<li><strong>Interval: 5 seconds</strong>
+<ul>
+<li><em>Run the probe every 5 seconds</em></li>
+</ul>
+</li>
+<li><strong>Timeout: 4 seconds</strong>
+<ul>
+<li><em>If the service doesn&rsquo;t respond, fail after 4 seconds</em></li>
+</ul>
+</li>
+<li><strong>Attempts: 3</strong>
+<ul>
+<li><em>Take the service out of rotation after 3 failed attempts</em></li>
+</ul>
+</li>
+</ul>
+<p>With these settings, the load balancer will take the service out of rotation after 15-20 seconds!</p>
+<p>Of course, you can change these settings to whatever fits your scenario best.</p>
+<h2 id="summary">Summary</h2>
+<p>This post is quite long as it tries to explain everything step by step, but in general, the idea is very simple:</p>
+<ul>
+<li>We use a custom health check to mark the instance as Unhealthy once the shutdown has been requested</li>
+<li>We delay the shutdown for 25 seconds. Any regular requests will still be processed during that time.</li>
+<li>We make sure the load balancer takes the instance out of rotation before these 25 seconds are over.</li>
+</ul>
+<p>You can find the code for this blog here: <a href="https://github.com/cwe1ss/blog-zero-downtime-with-health-checks" target="_blank" rel="noopener noreffer">https://github.com/cwe1ss/blog-zero-downtime-with-health-checks</a>.</p>
+<p>Follow the commits to see the separate steps we&rsquo;ve taken.</p>]]></description></item><item><title>Using Flutter flavors to separate the DEV and LIVE environment</title><link>https://www.chwe.at/2020/10/flutter-flavors/</link><pubDate>Sat, 03 Oct 2020 00:00:00 +0100</pubDate><author>Author</author><guid>https://www.chwe.at/2020/10/flutter-flavors/</guid><description><![CDATA[<p>These are the requirements for our app:</p>
+<ul>
+<li>Our Flutter app should target iOS and Android.</li>
+<li>We want a DEV version and a LIVE version of our app, each targeting a different API URL.</li>
+<li>Developers should never have to manually change any code to switch between the environments.</li>
+<li>We want to be able to have the DEV app and the LIVE app installed on the same device at the same time.</li>
+</ul>
+<p>The best way to solve these requirements in Flutter is to use <strong>flavors</strong>. There are also some other tutorials for this linked on the official <a href="https://flutter.dev/docs/deployment/flavors" target="_blank" rel="noopener noreffer">Flutter docs</a> which might be helpful.</p>
+<p>The <a href="https://github.com/cwe1ss/flutter-flavors-ci-cd" target="_blank" rel="noopener noreffer">code for this guide</a> is stored on GitHub and changes for each section are separate commits that are linked in the section below.</p>
+<p>As we need to change settings in XCode, we need a Mac with Android Studio and XCode for this tutorial.</p>
+<p>You also need to have Flutter installed already. Follow the <a href="https://flutter.dev/docs/get-started/install" target="_blank" rel="noopener noreffer">Getting started-docs</a> if you still need to install it.</p>
+<p>I&rsquo;m using <code>Flutter v1.22.0</code> for this tutorial.</p>
+<h2 id="create-the-git-repository-and-clone-it-locally">Create the Git repository and clone it locally</h2>
+<p>Create a new Git repository. Mine is: <a href="https://github.com/cwe1ss/flutter-flavors-ci-cd" target="_blank" rel="noopener noreffer">https://github.com/cwe1ss/flutter-flavors-ci-cd</a></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cmd" data-lang="cmd">git clone https://github.com/cwe1ss/flutter-flavors-ci-cd.git
+<span class="k">cd</span> flutter-flavors-ci-cd/
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="create-the-flutter-app">Create the Flutter app</h2>
+<p>Let&rsquo;s get started by creating the Flutter app, named <code>flutter_flavors</code> via the Flutter CLI directly in the root folder of our repository:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cmd" data-lang="cmd">flutter create --project-name flutter_flavors .
+</code></pre></td></tr></table>
+</div>
+</div><p>Run the app on an Android device/emulator to ensure it works.</p>
+<p><a href="https://github.com/cwe1ss/flutter-flavors-ci-cd/commit/0819ce8b51ddc39d8b7aebf71aea4f2da36a187c" target="_blank" rel="noopener noreffer">See all changes from this step in the Git commit.</a></p>
+<h2 id="add-a-flutter-build-configuration-for-each-flavor-in-android-studio">Add a Flutter build configuration for each flavor in Android Studio</h2>
+<p>We want to have two flavors called <code>dev</code> and <code>live</code>.</p>
+<p>If you want to launch a flutter app with a flavor, you have to use the <code>--flavor NAME</code> parameter in the <em>Flutter CLI</em>. To automatically start the app with a flavor in <em>Android Studio</em> we need to change the build configurations:</p>
+<ul>
+<li>Find <code>main.dart</code> in the Android Studio top toolbar and select <code>Edit Configurations...</code>. This opens the &ldquo;Run/Debug Configurations&rdquo; window.</li>
+<li>Change the <code>Name:</code> field to <code>dev</code></li>
+<li>For <code>Build flavor:</code> set <code>dev</code> as well.</li>
+<li>Make sure &ldquo;Share through VCS&rdquo; is selected.</li>
+<li>Copy the dev configuration (It&rsquo;s an icon in the top left of the window)</li>
+<li>Change the <code>Name:</code> and <code>Build flavor:</code> values to <code>live</code></li>
+<li>Make sure &ldquo;Share through VCS&rdquo; is selected as well</li>
+<li>Close the dialog. Instead of &ldquo;main.dart&rdquo;, it will now display &ldquo;dev&rdquo; in the top toolbar.</li>
+</ul>
+<p><em>IMPORTANT: Flavor names may not start with &ldquo;test&rdquo; as that&rsquo;s not allowed by Android.</em></p>
+<h3 id="add-the-build-configurations-to-git">Add the build configurations to Git</h3>
+<p>When you select &ldquo;Share through VCS&rdquo;, Android studio will create files in the <code>.idea/runConfigurations</code> folder, however they&rsquo;ll be ignored by the existing .gitignore file.</p>
+<p>We&rsquo;ll therefore add these files manually to Git, so that other users in the team can use it as well:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cmd" data-lang="cmd">git add .idea/runConfigurations/dev.xml -f
+git add .idea/runConfigurations/live.xml -f
+git commit -m &#39;Persist flutter build configurations&#39;
+</code></pre></td></tr></table>
+</div>
+</div><p><a href="https://github.com/cwe1ss/flutter-flavors-ci-cd/commit/36e4eacccf68eb131cd1aa6ab1ac025df56aeb05" target="_blank" rel="noopener noreffer">See all changes from this step in the Git commit.</a></p>
+<h2 id="set-up-flavors-for-android">Set up flavors for Android</h2>
+<p>In order to actually use different flavors, we need to set them up in the <code>lib</code>-folder and in each platform (<code>android</code>, <code>ios</code>).</p>
+<p>We&rsquo;ll start with the <code>android</code> part.</p>
+<h3 id="add-the-method-channel-in-android-code">Add the method channel in Android code</h3>
+<p>When the app starts, Flutter needs a way to ask the native platform which flavor it has been started with. To communicate with native code, Flutter uses <code>method channels</code>.</p>
+<p>Go to <code>android/app/src/main/kotlin/com.example.flutter_flavors</code> and replace everything except the first line (the package import) with the following code. This will set up the method channel that returns the <code>BuildConfig.FLAVOR</code> value, which is a built-in value of Android.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-kotlin" data-lang="kotlin"><span class="k">import</span> <span class="nn">androidx.annotation.NonNull;</span>
+<span class="k">import</span> <span class="nn">io.flutter.embedding.android.FlutterActivity</span>
+<span class="k">import</span> <span class="nn">io.flutter.embedding.engine.FlutterEngine</span>
+<span class="k">import</span> <span class="nn">io.flutter.plugin.common.MethodChannel</span>
+<span class="k">import</span> <span class="nn">io.flutter.plugins.GeneratedPluginRegistrant</span>
+
+<span class="k">class</span> <span class="nc">MainActivity</span><span class="p">:</span> <span class="n">FlutterActivity</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">override</span> <span class="k">fun</span> <span class="nf">configureFlutterEngine</span><span class="p">(</span><span class="nd">@NonNull</span> <span class="n">flutterEngine</span><span class="p">:</span> <span class="n">FlutterEngine</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">GeneratedPluginRegistrant</span><span class="p">.</span><span class="n">registerWith</span><span class="p">(</span><span class="n">flutterEngine</span><span class="p">);</span>
+
+        <span class="n">MethodChannel</span><span class="p">(</span><span class="n">flutterEngine</span><span class="p">.</span><span class="n">dartExecutor</span><span class="p">.</span><span class="n">binaryMessenger</span><span class="p">,</span> <span class="s2">&#34;flavor&#34;</span><span class="p">).</span><span class="n">setMethodCallHandler</span> <span class="p">{</span>
+            <span class="n">call</span><span class="p">,</span> <span class="n">result</span> <span class="o">-&gt;</span> <span class="n">result</span><span class="p">.</span><span class="n">success</span><span class="p">(</span><span class="n">BuildConfig</span><span class="p">.</span><span class="n">FLAVOR</span><span class="p">)</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="add-the-flavor-settings-to-the-android-build-config">Add the flavor-settings to the Android build config</h3>
+<p>In Android, the native flavor-specific values are stored in <code>android/app/src/build.gradle</code> via the <code>android.flavorDimensions</code> and <code>android.productFlavors</code> keys.</p>
+<p>We&rsquo;ll use these keys to set up the flavor-specific <code>applicationId</code> and the flavor-specific display name for the app. This is important because we want to be able to have both flavors of the app installed at the same time.</p>
+<p>The <code>applicationId</code> is the unique app id for each flavor in the Google Play store. Once deployed to Google Play, this can not be changed anymore!</p>
+<p>Therefore, add the following two things within the <code>android { ... }</code> section:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gradle" data-lang="gradle"><span class="n">android</span> <span class="o">{</span>
+    <span class="c1">// ... all existing things like `sourceSets`, ...
+</span><span class="c1"></span>
+    <span class="n">flavorDimensions</span> <span class="s2">&#34;app&#34;</span>
+
+    <span class="n">productFlavors</span> <span class="o">{</span>
+        <span class="n">dev</span> <span class="o">{</span>
+            <span class="n">dimension</span> <span class="s2">&#34;app&#34;</span>
+            <span class="n">applicationId</span> <span class="s2">&#34;at.chwe.flutterflavors.dev&#34;</span>
+            <span class="n">resValue</span> <span class="s2">&#34;string&#34;</span><span class="o">,</span> <span class="s2">&#34;app_name&#34;</span><span class="o">,</span> <span class="s2">&#34;DEV Flutter Flavors&#34;</span>
+        <span class="o">}</span>
+        <span class="n">live</span> <span class="o">{</span>
+            <span class="n">dimension</span> <span class="s2">&#34;app&#34;</span>
+            <span class="n">applicationId</span> <span class="s2">&#34;at.chwe.flutterflavors&#34;</span>
+            <span class="n">resValue</span> <span class="s2">&#34;string&#34;</span><span class="o">,</span> <span class="s2">&#34;app_name&#34;</span><span class="o">,</span> <span class="s2">&#34;Flutter Flavors&#34;</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="use-the-app_name-in-the-androidmanifestxml">Use the app_name in the AndroidManifest.xml</h3>
+<p>The <code>applicationId</code> is a well-known key that will already be used when the app is launched with a given flavor.</p>
+<p>However, we&rsquo;ll need to do some more work to get the app_name working: Open <code>android/app/src/main/AndroidManifest.xml</code> and replace the <code>&lt;application android:label=&quot;flutter_flavors&quot; /&gt;</code> key with <code>&lt;application android:label=&quot;@string/app_name&quot; /&gt;</code>.</p>
+<h3 id="run-the-app-again-on-android">Run the app again on Android</h3>
+<p>As we&rsquo;re now using new applicationIds, make sure the existing &ldquo;flutter_flavors&rdquo;-app is uninstalled from your device.</p>
+<p>Now, launch the app in Android Studio with the &ldquo;dev&rdquo; build configuration.</p>
+<p>Close the app in the device and check your application list, the app name will now display &ldquo;DEV Flutter Flavors&rdquo;!</p>
+<p>Stop the app in Android Studio, change the build configuration to &ldquo;live&rdquo; and launch the app again.</p>
+<p>You&rsquo;ll now have both flavors of your app installed on your Android device!</p>
+<p></p>
+<p>Our native Android configuration is now complete.</p>
+<p><a href="https://github.com/cwe1ss/flutter-flavors-ci-cd/commit/099284216215e0a8578518399117d8e28db31b75" target="_blank" rel="noopener noreffer">See all changes from this step in the Git commit.</a></p>
+<h2 id="get-the-flavor-in-our-flutter-code">Get the flavor in our Flutter code</h2>
+<p>As described in our requirements, we want to target different API endpoints per flavor so we need a way to get the current flavor in our Flutter code.</p>
+<p>We&rsquo;ll first add a class called <code>FlavorSettings</code> in a new file called <code>lib/flavor_settings.dart</code> that will hold all of our flavor-specific settings that we only need in our Flutter code:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-dart" data-lang="dart"><span class="c1">/// Contains the hard-coded settings per flavor.
+</span><span class="c1"></span><span class="kd">class</span> <span class="nc">FlavorSettings</span> <span class="p">{</span>
+  <span class="kd">final</span> <span class="kt">String</span> <span class="n">apiBaseUrl</span><span class="p">;</span>
+  <span class="c1">// TODO Add any additional flavor-specific settings here.
+</span><span class="c1"></span>
+  <span class="n">FlavorSettings</span><span class="p">.</span><span class="n">dev</span><span class="p">()</span>
+    <span class="o">:</span> <span class="n">apiBaseUrl</span> <span class="o">=</span> <span class="s1">&#39;https://dev.flutter-flavors.chwe.at&#39;</span><span class="p">;</span>
+
+  <span class="n">FlavorSettings</span><span class="p">.</span><span class="n">live</span><span class="p">()</span>
+    <span class="o">:</span> <span class="n">apiBaseUrl</span> <span class="o">=</span> <span class="s1">&#39;https://flutter-flavors.chwe.at&#39;</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>Next, we&rsquo;ll use this in <code>main.dart</code>, where we&rsquo;ll read the flavor via our method channel from the native platform and we&rsquo;ll create the corresponding <code>FlavorSettings</code>-object. We&rsquo;ll also have to make our <code>main</code>-method async for that.</p>
+<p>When done, your <code>main.dart</code> should contain the following code before the <code>class MyApp extends StatelessWidget {</code> line:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-dart" data-lang="dart"><span class="k">import</span> <span class="s1">&#39;package:flutter/material.dart&#39;</span><span class="p">;</span>
+<span class="k">import</span> <span class="s1">&#39;package:flutter/services.dart&#39;</span><span class="p">;</span>
+
+<span class="k">import</span> <span class="s1">&#39;flavor_settings.dart&#39;</span><span class="p">;</span>
+
+<span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span> <span class="n">main</span><span class="p">()</span> <span class="kd">async</span> <span class="p">{</span>
+  <span class="c1">// NOTE: This is required for accessing the method channel before runApp().
+</span><span class="c1"></span>  <span class="n">WidgetsFlutterBinding</span><span class="p">.</span><span class="n">ensureInitialized</span><span class="p">();</span>
+
+  <span class="kd">final</span> <span class="n">settings</span> <span class="o">=</span> <span class="kd">await</span> <span class="n">_getFlavorSettings</span><span class="p">();</span>
+  <span class="n">print</span><span class="p">(</span><span class="s1">&#39;API URL </span><span class="si">${</span><span class="n">settings</span><span class="p">.</span><span class="n">apiBaseUrl</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">);</span>
+
+  <span class="n">runApp</span><span class="p">(</span><span class="n">MyApp</span><span class="p">());</span>
+<span class="p">}</span>
+
+<span class="n">Future</span><span class="o">&lt;</span><span class="n">FlavorSettings</span><span class="o">&gt;</span> <span class="n">_getFlavorSettings</span><span class="p">()</span> <span class="kd">async</span> <span class="p">{</span>
+  <span class="kt">String</span> <span class="n">flavor</span> <span class="o">=</span> <span class="kd">await</span> <span class="kd">const</span> <span class="n">MethodChannel</span><span class="p">(</span><span class="s1">&#39;flavor&#39;</span><span class="p">)</span>
+        <span class="p">.</span><span class="n">invokeMethod</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">(</span><span class="s1">&#39;getFlavor&#39;</span><span class="p">);</span>
+
+  <span class="n">print</span><span class="p">(</span><span class="s1">&#39;STARTED WITH FLAVOR </span><span class="si">$</span><span class="n">flavor</span><span class="s1">&#39;</span><span class="p">);</span>
+
+  <span class="k">if</span> <span class="p">(</span><span class="n">flavor</span> <span class="o">==</span> <span class="s1">&#39;dev&#39;</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">FlavorSettings</span><span class="p">.</span><span class="n">dev</span><span class="p">();</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">flavor</span> <span class="o">==</span> <span class="s1">&#39;live&#39;</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">FlavorSettings</span><span class="p">.</span><span class="n">live</span><span class="p">();</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="k">throw</span> <span class="n">Exception</span><span class="p">(</span><span class="s2">&#34;Unknown flavor: </span><span class="si">$</span><span class="n">flavor</span><span class="s2">&#34;</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// ... class MyApp extends StatelessWidget {
+</span></code></pre></td></tr></table>
+</div>
+</div><p>Run the app with <code>dev</code> build configuration and look at the console output. It will display the following statements:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">I/flutter ( 4458): STARTED WITH FLAVOR dev
+I/flutter ( 4458): API URL https://dev.flutter-flavors.chwe.at
+</code></pre></td></tr></table>
+</div>
+</div><p>Switch to the <code>live</code> build configuration and run your app again. This time, the console will display the following statements:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">I/flutter ( 4615): STARTED WITH FLAVOR live
+I/flutter ( 4615): API URL https://flutter-flavors.chwe.at
+</code></pre></td></tr></table>
+</div>
+</div><p>That&rsquo;s it! We can now access the current flavor from within Flutter and we can have flavor-specific settings.</p>
+<p>You can pass the <code>FlavorSettings</code>-instance down to your widgets manually, or you can use e.g. the <code>provider</code>-package to access it via dependency injection in your widgets.</p>
+<p><a href="https://github.com/cwe1ss/flutter-flavors-ci-cd/commit/64ee8642551702dd4d36f15c5f788befe8c6bc9a" target="_blank" rel="noopener noreffer">See all changes from this step in the Git commit.</a></p>
+<h2 id="set-up-flavors-for-ios">Set up flavors for iOS</h2>
+<p>Unfortunately, setting up flavors in iOS is more complex and we&rsquo;ll have to use XCode and its UI for most of the steps.</p>
+<p>Let&rsquo;s try building our app with a flavor for iOS now to see, what kind of error we get:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">flutter build ios --flavor dev
+
+The Xcode project does not define custom schemes. You cannot use the --flavor option.
+</code></pre></td></tr></table>
+</div>
+</div><p>This means, that on iOS we have to rely on a feature called &ldquo;custom schemes&rdquo; to represent our flutter flavors. Setting them up requires multiple steps.</p>
+<h3 id="create-custom-build-configurations-for-the-flavors">Create custom build configurations for the flavors</h3>
+<p>Let&rsquo;s open our <code>ios</code>-folder in XCode and start by creating our custom build configurations:</p>
+<ul>
+<li>Make sure the root &ldquo;Runner&rdquo; node is selected in XCode</li>
+<li>In the main window, select the &ldquo;Runner&rdquo; node below &ldquo;PROJECT&rdquo; (NOT below TARGETS)</li>
+<li>Select the &ldquo;Info&rdquo; tab</li>
+<li>In the &ldquo;Configurations&rdquo; section, do the following:
+<ul>
+<li>Rename &ldquo;Debug&rdquo; to &ldquo;Debug-dev&rdquo;</li>
+<li>Rename &ldquo;Release&rdquo; to &ldquo;Release-dev&rdquo;</li>
+<li>Rename &ldquo;Profile&rdquo; to &ldquo;Profile-dev&rdquo;</li>
+<li>Duplicate &ldquo;Debug-dev&rdquo; and rename it to &ldquo;Debug-live&rdquo;</li>
+<li>Duplicate &ldquo;Release-dev&rdquo; and rename it to &ldquo;Release-live&rdquo;</li>
+<li>Duplicate &ldquo;Profile-dev&rdquo; and rename it to &ldquo;Profile-live&rdquo;</li>
+</ul>
+</li>
+</ul>
+<p>This means, for every flavor, we need a separate &ldquo;Debug&rdquo;, &ldquo;Release&rdquo; &amp; &ldquo;Profile&rdquo; configuration.</p>
+<p></p>
+<h3 id="assign-build-configurations-to-custom-schemes">Assign build configurations to custom schemes</h3>
+<p>Now we can set up the actual &ldquo;custom schemes&rdquo; by doing the following:</p>
+<ul>
+<li>Make sure the root &ldquo;Runner&rdquo; node is selected in XCode</li>
+<li>Select &ldquo;Product -&gt; Scheme -&gt; Manage Schemes&hellip;&rdquo; in the main toolbar.</li>
+<li>To get the &ldquo;dev&rdquo; scheme:
+<ul>
+<li>Select the &ldquo;Runner&rdquo; scheme, click on the settings-icon in the top left and select &ldquo;Duplicate&rdquo;</li>
+<li>Rename the scheme to &ldquo;dev&rdquo;</li>
+<li>Make sure &ldquo;Shared&rdquo; is selected</li>
+<li>Close the dialog</li>
+</ul>
+</li>
+<li>To get the &ldquo;live&rdquo; scheme:
+<ul>
+<li>Select the &ldquo;Runner&rdquo; scheme again, click on the settings-icon in the top left and select &ldquo;Duplicate&rdquo;</li>
+<li>Rename the scheme to &ldquo;live&rdquo;</li>
+<li>For each of the sections (&ldquo;Run&rdquo;, &ldquo;Test&rdquo;, &ldquo;Profile&rdquo;, &ldquo;Analyze&rdquo;, &ldquo;Archive&rdquo;) on the left, change the build configuration to the corresponding &ldquo;-live&rdquo; version.</li>
+<li>Make sure &ldquo;Shared&rdquo; is selected</li>
+<li>Close the dialog</li>
+</ul>
+</li>
+</ul>
+<p></p>
+<p>Back in the &ldquo;schemes&rdquo; list, you can now delete the existing &ldquo;Runner&rdquo; scheme. This should result in the list looking like this:</p>
+<p></p>
+<h3 id="adding-the-method-channel-for-ios">Adding the method channel for iOS</h3>
+<p>Building the app now shoud succeed, however when you try to run it, it will fail with the following error:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">[VERBOSE-2:ui_dart_state.cc(177)] Unhandled Exception: MissingPluginException(No implementation found for method getFlavor on channel flavor)
+</code></pre></td></tr></table>
+</div>
+</div><p>That&rsquo;s because we haven&rsquo;t yet implemented the method channel that Flutter uses to get the current flavor from the native platform.</p>
+<p>To add this, we need to add some code to the <code>application()</code>-function of the <code>Runner/AppDelegate.swift</code>-file in XCode. The finished file should look like this:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">import</span> <span class="nc">UIKit</span>
+<span class="kd">import</span> <span class="nc">Flutter</span>
+
+<span class="kr">@UIApplicationMain</span>
+<span class="kr">@objc</span> <span class="kd">class</span> <span class="nc">AppDelegate</span><span class="p">:</span> <span class="n">FlutterAppDelegate</span> <span class="p">{</span>
+  <span class="kr">override</span> <span class="kd">func</span> <span class="nf">application</span><span class="p">(</span>
+    <span class="kc">_</span> <span class="n">application</span><span class="p">:</span> <span class="n">UIApplication</span><span class="p">,</span>
+    <span class="n">didFinishLaunchingWithOptions</span> <span class="n">launchOptions</span><span class="p">:</span> <span class="p">[</span><span class="n">UIApplication</span><span class="p">.</span><span class="n">LaunchOptionsKey</span><span class="p">:</span> <span class="nb">Any</span><span class="p">]?</span>
+  <span class="p">)</span> <span class="p">-&gt;</span> <span class="nb">Bool</span> <span class="p">{</span>
+    <span class="n">GeneratedPluginRegistrant</span><span class="p">.</span><span class="n">register</span><span class="p">(</span><span class="n">with</span><span class="p">:</span> <span class="kc">self</span><span class="p">)</span>
+
+    <span class="kd">let</span> <span class="nv">controller</span> <span class="p">=</span> <span class="n">window</span><span class="p">.</span><span class="n">rootViewController</span> <span class="k">as</span><span class="p">!</span> <span class="n">FlutterViewController</span>
+
+    <span class="kd">let</span> <span class="nv">flavorChannel</span> <span class="p">=</span> <span class="n">FlutterMethodChannel</span><span class="p">(</span>
+        <span class="n">name</span><span class="p">:</span> <span class="s">&#34;flavor&#34;</span><span class="p">,</span>
+        <span class="n">binaryMessenger</span><span class="p">:</span> <span class="n">controller</span><span class="p">.</span><span class="n">binaryMessenger</span><span class="p">)</span>
+
+    <span class="n">flavorChannel</span><span class="p">.</span><span class="n">setMethodCallHandler</span><span class="p">({(</span><span class="n">call</span><span class="p">:</span> <span class="n">FlutterMethodCall</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="p">@</span><span class="n">escaping</span> <span class="n">FlutterResult</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="nb">Void</span> <span class="k">in</span>
+        <span class="c1">// Note: this method is invoked on the UI thread</span>
+        <span class="kd">let</span> <span class="nv">flavor</span> <span class="p">=</span> <span class="n">Bundle</span><span class="p">.</span><span class="n">main</span><span class="p">.</span><span class="n">infoDictionary</span><span class="p">?[</span><span class="s">&#34;App - Flavor&#34;</span><span class="p">]</span>
+        <span class="n">result</span><span class="p">(</span><span class="n">flavor</span><span class="p">)</span>
+    <span class="p">})</span>
+
+    <span class="k">return</span> <span class="kc">super</span><span class="p">.</span><span class="n">application</span><span class="p">(</span><span class="n">application</span><span class="p">,</span> <span class="n">didFinishLaunchingWithOptions</span><span class="p">:</span> <span class="n">launchOptions</span><span class="p">)</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>This will set up a method channel handler that reads the current flavor from a <code>Bundle.main.infoDictionary</code> with a key called <code>App - Flavor</code>.</p>
+<h3 id="set-up-the-flavor-value-per-scheme">Set up the flavor value per scheme</h3>
+<p>The <code>Bundle.main.infoDictionary</code> from before refers to the <code>Runner/Info.plist</code> file and <code>App - Flavor</code> is a custom key that we have to add there manually next.</p>
+<p>So open the <code>Runner/Info.plist</code> file in XCode and and add a new row with the following settings:</p>
+<ul>
+<li>Key: <code>App - Flavor</code></li>
+<li>Type: <code>String</code></li>
+<li>Value <code>$(APP_FLAVOR)</code></li>
+</ul>
+<p>We now have the key but we still don&rsquo;t have the actual flavor-specific values per scheme. To add them, we now have to do the following:</p>
+<ul>
+<li>Select the root &ldquo;Runner&rdquo; node in your XCode project structure</li>
+<li>Select &ldquo;Runner&rdquo; below <strong>TARGETS</strong></li>
+<li>Select the &ldquo;Build settings&rdquo; tab</li>
+<li>Click on the + to add a new User-defined setting</li>
+<li>Name it <code>APP_FLAVOR</code></li>
+<li>Expand the node by clicking on the little arrow on the left of the row and add the actual flavor value to each build configuration:
+<ul>
+<li>Debug-dev: <code>dev</code></li>
+<li>Debug-live: <code>live</code></li>
+<li>Profile-dev: <code>dev</code></li>
+<li>Profile-live: <code>live</code></li>
+<li>Release-dev: <code>dev</code></li>
+<li>Release-live: <code>live</code></li>
+</ul>
+</li>
+</ul>
+<p>When done, it should look like this:
+</p>
+<h3 id="run-the-ios-app">Run the iOS app</h3>
+<p>We should now be able to select the &ldquo;dev&rdquo;-scheme in the top navigation bar of XCode and run the app.</p>
+<p><em>NOTE: If you get weird build errors from XCode, try switching between the dev/live schemes or try restarting XCode or running the iOS app from Android Studio.</em></p>
+<p>You should now see similar console output like for the Android app:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">2020-10-03 14:44:05.525493+0200 Runner[26055:336596] flutter: STARTED WITH FLAVOR dev
+2020-10-03 14:44:05.526672+0200 Runner[26055:336596] flutter: API URL https://dev.flutter-flavors.chwe.at
+</code></pre></td></tr></table>
+</div>
+</div><p><a href="https://github.com/cwe1ss/flutter-flavors-ci-cd/commit/608246ea5f948f2a63dc1d7450a77468428a4fc4" target="_blank" rel="noopener noreffer">See all changes from this step in the Git commit.</a></p>
+<p>Great, we now have set up our flavors for iOS as well!</p>
+<h2 id="set-the-bundle-id-and-app-name-per-flavor-for-ios">Set the bundle id and app name per flavor for iOS</h2>
+<p>You might have noticed that the app name on the iPhone still is &ldquo;flutter_flavors&rdquo;. Also, when you run both flavors, you still only have one app on your phone:</p>
+<p></p>
+<p>Remember, that for Android we&rsquo;ve set those values in the <code>build.gradle</code> file.</p>
+<p>To make things flavor-specific in iOS, we need to do something similar like we&rsquo;ve done for the flavor value itself, where we&rsquo;ve configured a key in <code>Info.plist</code> and then set different values in the &ldquo;TARGETS/Runner -&gt; Build Settings&rdquo; tab.</p>
+<h3 id="set-the-flavor-specific-bundle-identifier">Set the flavor-specific bundle identifier</h3>
+<p>The <code>Info.plist</code> file already contains a key named <code>Bundle identifier</code> that already contains a dynamic value <code>$(PRODUCT_BUNDLE_IDENTIFIER)</code>, so we don&rsquo;t have to create another entry in this file.</p>
+<p>Instead, we just have to modify this key in the the build settings:</p>
+<ul>
+<li>In XCode, select the root &ldquo;Runner&rdquo; node in the project explorer</li>
+<li>Select &ldquo;Runner&rdquo; below <strong>TARGETS</strong></li>
+<li>Go to the &ldquo;Build Settings&rdquo; tab</li>
+<li>In the &ldquo;Packaging&rdquo; section, find the &ldquo;Product Bundle Identifier&rdquo; key</li>
+<li>Expand the key by clicking on the small arrow on the left</li>
+<li>Set the value per build configuration:
+<ul>
+<li>Debug-dev: <code>at.chwe.flutterflavors.dev</code></li>
+<li>Debug-live: <code>at.chwe.flutterflavors</code></li>
+<li>Profile-dev: <code>at.chwe.flutterflavors.dev</code></li>
+<li>Profile-live: <code>at.chwe.flutterflavors</code></li>
+<li>Release-dev: <code>at.chwe.flutterflavors.dev</code></li>
+<li>Release-live: <code>at.chwe.flutterflavors</code></li>
+</ul>
+</li>
+</ul>
+<p></p>
+<h3 id="set-the-app-name">Set the app name</h3>
+<p>To have separate display names per flavor, do the following:</p>
+<ul>
+<li>In XCode, select the root &ldquo;Runner&rdquo; node in the project explorer</li>
+<li>Select &ldquo;Runner&rdquo; below <strong>TARGETS</strong></li>
+<li>Select the &ldquo;Info&rdquo; tab</li>
+<li>Change the value of the key <code>Bundle name</code> to <code>$(APP_NAME)</code>.</li>
+<li>Go to the &ldquo;Build Settings&rdquo; tab</li>
+<li>Add a new User-Defined setting</li>
+<li>Name it <code>APP_NAME</code></li>
+<li>Expand the APP_NAME-node by clicking on the small arrow on the left side of the node.</li>
+<li>Set the value per build configuration:
+<ul>
+<li>Debug-dev: <code>DEV Flutter Flavors</code></li>
+<li>Debug-live: <code>Flutter Flavors</code></li>
+<li>Profile-dev: <code>DEV Flutter Flavors</code></li>
+<li>Profile-live: <code>Flutter Flavors</code></li>
+<li>Release-dev: <code>DEV Flutter Flavors</code></li>
+<li>Release-live: <code>Flutter Flavors</code></li>
+</ul>
+</li>
+</ul>
+<p></p>
+<h3 id="run-the-app-again-with-the-dev-and-live-flavors">Run the app again with the dev and live flavors</h3>
+<p>Delete the existing &ldquo;flutter_flavors&rdquo; app from your iPhone and run it again with each flavor. You should now have both apps with the correct name on your phone:</p>
+<p></p>
+<p><a href="https://github.com/cwe1ss/flutter-flavors-ci-cd/commit/6b4ead183f8b3f9128fa2b4d24b277056b747909" target="_blank" rel="noopener noreffer">See all changes from this step in the Git commit.</a></p>
+<h2 id="add-your-own-flavor-specific-settings">Add your own flavor-specific settings</h2>
+<p>If you need another flavor-specific setting, you have to know if it is a platform-specific setting, that needs to be integrated directly into the <code>android</code> and <code>ios</code> folders or if it is a setting that is only required in your Flutter code.</p>
+<p>For platform-specific settings, the above guides for setting the app name and bundle id should help.</p>
+<p>For settings that you only need in your Flutter-code, just add them to the <code>FlavorSettings</code>-class that we&rsquo;ve created above.</p>
+<h2 id="summary">Summary</h2>
+<p>We&rsquo;ve now set up our Flutter project to have multiple flavors. We use those flavors to separate our app environments (DEV &amp; LIVE). This way we don&rsquo;t need to e.g. manually comment out code to switch our API URL or any other settings. We can also have both versions installed side by side, which makes development and support much easier as we can develop on the DEV version while we still can use the LIVE version which is deployed to the stores.</p>]]></description></item><item><title>Find missing projects with PowerShell</title><link>https://www.chwe.at/2015/09/find-missing-projects-with-powershell/</link><pubDate>Wed, 30 Sep 2015 00:00:00 +0100</pubDate><author>Author</author><guid>https://www.chwe.at/2015/09/find-missing-projects-with-powershell/</guid><description><![CDATA[<p>In my last post, I showed you a C# script for finding projects which are not part of a SLN-file.
+Since having to compile it is a bit of an overhead, I decided to migrate this code to a powershell script,
+which you can find here:</p>
+<p><a href="https://gist.github.com/cwe1ss/c1d623a24a8b7841b785" target="_blank" rel="noopener noreffer">ProjectsMissingInSolution.ps1</a></p>
+]]></description></item><item><title>Find projects which are missing in your "All Projects" solution</title><link>https://www.chwe.at/2014/08/find-projects-missing-in-visual-studio-solution/</link><pubDate>Thu, 21 Aug 2014 00:00:00 +0100</pubDate><author>Author</author><guid>https://www.chwe.at/2014/08/find-projects-missing-in-visual-studio-solution/</guid><description><![CDATA[<p>Do you use a Visual Studio solution which contains all of your projects to do daily builds? If you have lots of projects and if many people are involved it&rsquo;s very likely that somebody forgets to add his project to this solution.</p>
+<p>This small program helps you by showing you all csproj-files that are not part of your solution file!</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c#" data-lang="c#"><span class="k">class</span> <span class="nc">Program</span>
+<span class="p">{</span>
+    <span class="k">static</span> <span class="k">void</span> <span class="n">Main</span><span class="p">(</span><span class="kt">string</span><span class="p">[]</span> <span class="n">args</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// Parameters
+</span><span class="c1"></span>        <span class="kt">string</span> <span class="n">baseFolder</span> <span class="p">=</span> <span class="s">@&#34;C:\path\to\solution\&#34;</span><span class="p">;</span>
+        <span class="kt">string</span> <span class="n">slnFile</span> <span class="p">=</span> <span class="s">&#34;AllProjects.sln&#34;</span><span class="p">;</span>
+        <span class="kt">string</span> <span class="n">outputFile</span> <span class="p">=</span> <span class="s">&#34;MissingProjects.txt&#34;</span><span class="p">;</span>
+
+        <span class="kt">string</span> <span class="n">slnContent</span> <span class="p">=</span> <span class="n">File</span><span class="p">.</span><span class="n">ReadAllText</span><span class="p">(</span><span class="n">Path</span><span class="p">.</span><span class="n">Combine</span><span class="p">(</span><span class="n">baseFolder</span><span class="p">,</span> <span class="n">slnFile</span><span class="p">));</span>
+
+        <span class="kt">string</span><span class="p">[]</span> <span class="n">projectFiles</span> <span class="p">=</span> <span class="n">Directory</span><span class="p">.</span><span class="n">GetFiles</span><span class="p">(</span><span class="n">baseFolder</span><span class="p">,</span> <span class="s">&#34;*.csproj&#34;</span><span class="p">,</span> <span class="n">SearchOption</span><span class="p">.</span><span class="n">AllDirectories</span><span class="p">);</span>
+
+        <span class="n">List</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">&gt;</span> <span class="n">missingProjects</span> <span class="p">=</span> <span class="n">projectFiles</span>
+            <span class="p">.</span><span class="n">Where</span><span class="p">(</span><span class="n">fullPath</span> <span class="p">=&gt;</span> <span class="n">slnContent</span><span class="p">.</span><span class="n">IndexOf</span><span class="p">(</span><span class="n">fullPath</span><span class="p">.</span><span class="n">Replace</span><span class="p">(</span><span class="n">baseFolder</span><span class="p">,</span> <span class="s">&#34;&#34;</span><span class="p">),</span> <span class="n">StringComparison</span><span class="p">.</span><span class="n">OrdinalIgnoreCase</span><span class="p">)</span> <span class="p">&lt;</span> <span class="m">0</span><span class="p">)</span>
+            <span class="p">.</span><span class="n">ToList</span><span class="p">();</span>
+
+        <span class="n">File</span><span class="p">.</span><span class="n">WriteAllLines</span><span class="p">(</span><span class="n">outputFile</span><span class="p">,</span> <span class="n">missingProjects</span><span class="p">);</span>
+
+        <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">&#34;Projects missing in solution: &#34;</span> <span class="p">+</span> <span class="n">missingProjects</span><span class="p">.</span><span class="n">Count</span><span class="p">);</span>
+        <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">&#34;Details: &#34;</span> <span class="p">+</span> <span class="n">outputFile</span><span class="p">);</span>
+        <span class="n">Console</span><span class="p">.</span><span class="n">ReadLine</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div>]]></description></item><item><title>Feature Folders: Controllers and Views</title><link>https://www.chwe.at/2014/07/feature-folders-controllers-and-views/</link><pubDate>Wed, 02 Jul 2014 00:00:00 +0100</pubDate><author>Author</author><guid>https://www.chwe.at/2014/07/feature-folders-controllers-and-views/</guid><description><![CDATA[<p>The first step in our process to <a href="https://www.chwe.at/2014/04/introducing-the-asp.net-mvc-feature-folders-project-structure/" rel="">a better folder structure for our MVC projects</a> is to make sure, MVC can resolve our Controllers and Views. This is our target structure:</p>
+<ul>
+<li>(Project Root)
+<ul>
+<li>Areas
+<ul>
+<li>(AreaName)
+<ul>
+<li>(FeatureName)
+<ul>
+<li>(FeatureName)Controller.cs</li>
+<li>Index.cshtml</li>
+<li>Edit.cshtml</li>
+</ul>
+</li>
+<li>&hellip; (other features)</li>
+<li>Shared
+<ul>
+<li>&hellip; (area specific shared views like EditorTemplates, Layout-pages, &hellip;)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>&hellip; (other areas)</li>
+<li>Shared
+<ul>
+<li>&hellip; (area independent shared views like EditorTemplates, Layout-pages, &hellip;)</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Features
+<ul>
+<li>(Feature2Name)
+<ul>
+<li>(Feature2Name)Controller.cs</li>
+<li>Index.cshtml</li>
+<li>Edit.cshtml</li>
+</ul>
+</li>
+<li>&hellip; (other features)</li>
+<li>Shared
+<ul>
+<li>&hellip; (feature independent shared views like EditorTemplates, Layout-pages, &hellip;)</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>Of course, if you don&rsquo;t want to use &ldquo;areas&rdquo; you only need the &ldquo;Features&rdquo; folder in your project. This also means, that if you move to this new structure, you can completely remove the old &ldquo;Controllers&rdquo; and &ldquo;Views&rdquo; folders.</p>
+<h3 id="controllers">Controllers</h3>
+<p>To support this structure for Controllers, you don&rsquo;t have to change anything in MVC since it does not force you to place them in a special folder! You can put Controllers into whatever folder you want. Resolving them is purely depended on your RouteConfig.</p>
+<h3 id="views">Views</h3>
+<p>To support this structure for Views, you have to create a custom ViewEngine. As you can see in the following example, this can also be done very easily. Please note, that this code only supports *.cshtml-files. If you want to use *.vbhtml-files as well, you just have to duplicate the paths and change the extension to *.vbhtml.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c#" data-lang="c#"><span class="k">public</span> <span class="k">class</span> <span class="nc">FeatureFolderViewEngine</span> <span class="p">:</span> <span class="n">RazorViewEngine</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="n">FeatureFolderViewEngine</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="c1">// {0} ActionName
+</span><span class="c1"></span>        <span class="c1">// {1} ControllerName
+</span><span class="c1"></span>        <span class="c1">// {2} AreaName
+</span><span class="c1"></span>
+        <span class="n">AreaViewLocationFormats</span> <span class="p">=</span> <span class="k">new</span><span class="p">[]</span>
+                                <span class="p">{</span>
+                                    <span class="s">&#34;~/Areas/{2}/{1}/{0}.cshtml&#34;</span><span class="p">,</span>
+                                    <span class="s">&#34;~/Areas/{2}/Shared/{0}.cshtml&#34;</span><span class="p">,</span>
+                                    <span class="s">&#34;~/Areas/Shared/{0}.cshtml&#34;</span><span class="p">,</span>
+                                <span class="p">};</span>
+
+        <span class="n">AreaMasterLocationFormats</span> <span class="p">=</span> <span class="k">new</span><span class="p">[]</span>
+                                    <span class="p">{</span>
+                                        <span class="s">&#34;~/Areas/{2}/{1}/{0}.cshtml&#34;</span><span class="p">,</span>
+                                        <span class="s">&#34;~/Areas/{2}/Shared/{0}.cshtml&#34;</span><span class="p">,</span>
+                                        <span class="s">&#34;~/Areas/Shared/{0}.cshtml&#34;</span><span class="p">,</span>
+                                    <span class="p">};</span>
+
+        <span class="n">AreaPartialViewLocationFormats</span> <span class="p">=</span> <span class="k">new</span><span class="p">[]</span>
+                                        <span class="p">{</span>
+                                            <span class="s">&#34;~/Areas/{2}/{1}/{0}.cshtml&#34;</span><span class="p">,</span>
+                                            <span class="s">&#34;~/Areas/{2}/Shared/{0}.cshtml&#34;</span><span class="p">,</span>
+                                            <span class="s">&#34;~/Areas/Shared/{0}.cshtml&#34;</span><span class="p">,</span>
+                                        <span class="p">};</span>
+
+        <span class="n">ViewLocationFormats</span> <span class="p">=</span> <span class="k">new</span><span class="p">[]</span>
+                            <span class="p">{</span>
+                                <span class="s">&#34;~/Features/{1}/{0}.cshtml&#34;</span><span class="p">,</span>
+                                <span class="s">&#34;~/Features/Shared/{0}.cshtml&#34;</span><span class="p">,</span>
+                            <span class="p">};</span>
+
+        <span class="n">MasterLocationFormats</span> <span class="p">=</span> <span class="k">new</span><span class="p">[]</span>
+                                <span class="p">{</span>
+                                    <span class="s">&#34;~/Features/{1}/{0}.cshtml&#34;</span><span class="p">,</span>
+                                    <span class="s">&#34;~/Features/Shared/{0}.cshtml&#34;</span><span class="p">,</span>
+                                <span class="p">};</span>
+
+        <span class="n">PartialViewLocationFormats</span> <span class="p">=</span> <span class="k">new</span><span class="p">[]</span>
+                                    <span class="p">{</span>
+                                        <span class="s">&#34;~/Features/{1}/{0}.cshtml&#34;</span><span class="p">,</span>
+                                        <span class="s">&#34;~/Features/Shared/{0}.cshtml&#34;</span><span class="p">,</span>
+                                    <span class="p">};</span>
+
+        <span class="n">FileExtensions</span> <span class="p">=</span> <span class="k">new</span><span class="p">[]</span>
+                        <span class="p">{</span>
+                            <span class="s">&#34;cshtml&#34;</span><span class="p">,</span>
+                        <span class="p">};</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>Of course, if you use this new structure, you lose some of the built-in templating- and navigation-support in Visual Studio since VS does not recognize these folders as &ldquo;Views&rdquo;-folders. Therefore, the following things no longer work:</p>
+<ul>
+<li>&ldquo;Go To View&rdquo; throws an error.</li>
+<li>&ldquo;Add View&rdquo; adds the view to the old &ldquo;Views&rdquo;-folder.</li>
+</ul>
+<p>Fortunately, ReSharper helps you with these issues since it contains built-in templates for views and also <a href="http://blog.jetbrains.com/dotnet/2013/01/29/resharper-and-custom-aspnet-mvc-view-location/" target="_blank" rel="noopener noreffer">supports our custom ViewEngine</a>!</p>]]></description></item><item><title>Introducing the ASP.NET MVC “Feature Folders” Project Structure</title><link>https://www.chwe.at/2014/04/introducing-the-asp.net-mvc-feature-folders-project-structure/</link><pubDate>Mon, 07 Apr 2014 00:00:00 +0100</pubDate><author>Author</author><guid>https://www.chwe.at/2014/04/introducing-the-asp.net-mvc-feature-folders-project-structure/</guid><description><![CDATA[<h3 id="whats-the-problem-with-the-default-aspnet-mvc-folder-structure">What’s the problem with the default ASP.NET MVC folder structure?</h3>
+<p>Which of these requirements is more common?</p>
+<ul>
+<li>Change something in every view, controller or model of your project</li>
+<li>Add a new field to your model X, show this field to the user, make it editable, the value must be validated against some fancy rules, &hellip;</li>
+</ul>
+<p>I guess we are on the same page if we see the second one as more common. I would go as far as to say that if you have the first requirement you&rsquo;re either working on a major relaunch or you&rsquo;re not using layout pages, css, abstract classes, [insert random reusability gadget here] correctly.</p>
+<p>By default, the ASP.NET MVC project structure advices you to keep every <em>concept</em> in its own area – you therefore might end up with a structure like this:</p>
+<ul>
+<li>Content
+<ul>
+<li>CustomerImages
+<ul>
+<li>AnIconSpecialToCustomers.png</li>
+</ul>
+</li>
+<li>Customers.css</li>
+</ul>
+</li>
+<li>Controllers
+<ul>
+<li>CustomersController.cs</li>
+</ul>
+</li>
+<li>Models
+<ul>
+<li>Customer.cs</li>
+</ul>
+</li>
+<li>Repositories
+<ul>
+<li>CustomerRepository.cs</li>
+</ul>
+</li>
+<li>Scripts
+<ul>
+<li>Customers.js</li>
+</ul>
+</li>
+<li>Views
+<ul>
+<li>Customers
+<ul>
+<li>Create.cshtml</li>
+<li>Index.cshtml</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>ViewModels
+<ul>
+<li>Customers
+<ul>
+<li>IndexViewModel.cs</li>
+<li>CreateViewModel.cs</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>As soon as you have more than 3 controllers, this becomes hard to navigate. ASP.NET MVC&rsquo;s solution for having a better structure is to use &ldquo;Areas&rdquo;, however in my opinion they do not solve the problem I&rsquo;m talking about. To complete the second requirement I&rsquo;ve mentioned, you still have to navigate through many folders, because most probably, you don&rsquo;t have a distinct views-guy, a distinct model-guy, a distinct controller-guy, &hellip; in your company. It&rsquo;s a lot more common that e.g. only one or two people are working on all of these mentioned files.</p>
+<h3 id="grouping-files-by-feature">Grouping files by feature</h3>
+<p>When I&rsquo;m talking about a feature, I understand it as a sum of files that are needed to create a user benefit. Therefore, with structuring files by feature, the project structure could look like this:</p>
+<ul>
+<li>Customers
+<ul>
+<li>Images
+<ul>
+<li>AnIconSpecialToCustomers.png</li>
+</ul>
+</li>
+<li>Create.cshtml</li>
+<li>CreateViewModel.cs</li>
+<li>Customer.cs</li>
+<li>CustomerRepository.cs</li>
+<li>Customers.css</li>
+<li>Customers.js</li>
+<li>CustomersController.cs</li>
+<li>Index.cshtml</li>
+<li>IndexViewModel.cs</li>
+</ul>
+</li>
+</ul>
+<p>Think again of our second requirement and of some of the advantages with this structure:</p>
+<ul>
+<li>You immediately get an overview about how the feature might be implemented.</li>
+<li>You immediately see which files <em>might</em> be affected by the requirement. You don’t have to check every concept folder to see if there even is a corresponding file. (there might not be a js-file for every feature, &hellip;)</li>
+<li>Every affected file is in one folder. The required navigation in the Solution Explorer is kept to a minimum.</li>
+<li>In your source control system, you can look at the entire change history of this feature on one folder.</li>
+<li>If you have to implement a new similar feature, you can copy this one folder and use it as a starting point.</li>
+<li>&hellip;</li>
+</ul>
+<h3 id="why-is-there-a-m-in-aspnet-mvc">Why is there a M in ASP.NET MVC?</h3>
+<p>I would like to make an exception of my previous structure: It&rsquo;s important to understand that the ASP.NET MVC framework itself (System.Web.Mvc) does NOT give you any built-in support for &ldquo;models&rdquo;. If you require persistent data, you are allowed to use whatever technology you want (Entity Framework, NHibernate, raw ADO.NET, &hellip;). Yes, the project templates by default already reference Entity Framework, but again, this is a separate library and ASP.NET MVC has no dependency on it.</p>
+<p>In my opinion this is a very good thing! The traditional three-tier architecture (data, business logic, presentation) still is one of the most important concepts for structuring software systems. ASP.NET MVC clearly targets the presentation tier and shouldn&rsquo;t cover responsibilities from other tiers.</p>
+<p>For this reason, we have to move the files &ldquo;Customer.cs&rdquo; and &ldquo;CustomerRepository.cs&rdquo; into a separate library. However, everything else in our folder belongs to the presentation layer.</p>
+<h3 id="whats-next">What’s next?</h3>
+<p>I plan to do follow-up posts that address the challenges and also possible solutions for this structure, so stay tuned!</p>]]></description></item><item><title>Moving my BlogEngine.NET blog to Microsoft Azure</title><link>https://www.chwe.at/2014/03/moving-my-blogengine.net-blog-to-microsoft-azure/</link><pubDate>Sat, 29 Mar 2014 00:00:00 +0100</pubDate><author>Author</author><guid>https://www.chwe.at/2014/03/moving-my-blogengine.net-blog-to-microsoft-azure/</guid><description><![CDATA[<p>I thought, after 5 years since my last post it might be time to write a new one! But that&rsquo;s not so easy! When you login to the backend after such a long time, everything feels just wrong: The design is ugly, the blog engine is outdated, I&rsquo;m not sure if my hosting provider still is the best choice for me and I don&rsquo;t like my domain anymore! So, instead of just writing a post about something, I decided to change all of these things first and tell you about this process!</p>
+<h3 id="get-a-running-blogenginenet-instance-within-minutes">Get a running BlogEngine.NET instance within minutes</h3>
+<p>I was always interested in <strike>Windows Azure</strike> <a href="http://blogs.msdn.com/b/windowsazure/archive/2014/03/25/upcoming-name-change-for-windows-azure.aspx" target="_blank" rel="noopener noreffer">Microsoft Azure</a> but never really had the time to do something useful with it. Therefore I decided to take this opportunity and move my blog to it. I already had access to the Azure Management Portal, so I didn&rsquo;t have to go through some registration process. Since I also wanted to update my blog to the latest version of BlogEngine.NET I decided to start with a new installation and migrate my data afterwards (moving data from 6 posts is not so hard :-) ). Luckily, with Azure&rsquo;s Gallery, it&rsquo;s extremely easy to setup an instance of BlogEngine.Net. I just followed these instructions: <a href="http://blogs.msdn.com/b/webdev/archive/2012/10/12/blogengine-net-and-windows-azure-web-sites.aspx" target="_blank" rel="noopener noreffer">http://blogs.msdn.com/b/webdev/archive/2012/10/12/blogengine-net-and-windows-azure-web-sites.aspx</a></p>
+<p>After that, I just had to go through a quick export/import process to move my data from my old blog to the new one. I started with a &ldquo;free&rdquo; web site but quickly scaled it up to a &ldquo;shared&rdquo; one because I wanted the site to be running on my custom domain.</p>
+<h3 id="deployment-with-git-and-the-app_data-folder">Deployment with Git and the App_Data folder</h3>
+<p>The default template of BlogEngine.NET 2.9 is quite nice, however I wanted to make some minor changes. Sounds like a good opportunity to test another great feature of Microsoft Azure: Git deployment.</p>
+<p><a href="http://www.windowsazure.com/en-us/documentation/articles/web-sites-publish-source-control/" target="_blank" rel="noopener noreffer">According to this tutorial</a>, I setup a Git repository for my web site within the Azure portal and cloned the repository to my notebook. Again, this was very straightforward and worked immediately. This also has the advantage that you now have a backup of your remote files on your home network.</p>
+<p>But there&rsquo;s one important thing to take care of when you use Git deployment with BlogEngine.NET. BlogEngine.NET by default stores data in files within the App_Data folder. This is quite nice since you don&rsquo;t have to pay for a SQL Server database! However, if you use Git deployment it overwrites this folder, since it&rsquo;s now under source control. Therefore I added the &ldquo;App_Data&rdquo; folder to the .gitignore file. Unfortunately, the deployment still did overwrite changes. I guess this happened, because on the server, the App_Data folder was still a part of the git folder.</p>
+<p>To overcome this, I tried a different way: First, I copied my local App_Data folder to some backup directory on my notebook. Then I removed the .gitignore file and really deleted the App_Data folder from my local and remote repository (so if you do this as well, please note that you will have a downtime!). After that, I manually copied the App_Data folder back to Azure with FTP. As a last step, I re-created the .gitignore file with the App_Data-exclusion and also moved the App_Data folder back on my machine.</p>
+<p>As a result, the &ldquo;App_Data&rdquo; folder is no longer monitored by Git and will not be touched when Azure does a deployment. Of course, whenever you need a up-to-date version of your App_Data folder on your PC for development purposes, you have to manually download it from Azure.</p>
+<h3 id="some-warnings-about-this">Some warnings about this</h3>
+<ul>
+<li>I&rsquo;m pretty sure this is not the best way to handle this. As far as I know, you shouldn&rsquo;t store user generated content on your server but instead use an Azure Storage account for it. Having user files on your server has several disadvantages: you can&rsquo;t scale out your servers, you don&rsquo;t have any replication or backups and so on.</li>
+<li>I&rsquo;m not sure if the current deployment behavior, which does not touch untracked folders will stay that way forever. I wouldn&rsquo;t be surprised if they do a real sync someday because actually, the git repository should be 100% consistent with the web folder.</li>
+</ul>
+<p>This means, <em>I do not recommend this for anything else than completely uncritical things</em>! If you want to do this, make sure you regularly backup your App_Data folder by e.g. doing a scheduled FTP download every day.</p>
+<p>For this blog, I&rsquo;m fine with those risks for now but if I happen to need a storage account anyway or if I will blog more in the future I will definitely move the data to a storage account.</p>]]></description></item><item><title>ASP.Net MVC 1.0 has been released!</title><link>https://www.chwe.at/2009/03/asp.net-mvc-1.0-has-been-released/</link><pubDate>Wed, 18 Mar 2009 00:00:00 +0100</pubDate><author>Author</author><guid>https://www.chwe.at/2009/03/asp.net-mvc-1.0-has-been-released/</guid><description><![CDATA[<p>The months of waiting are over! ASP.Net MVC 1.0 has finally been released. Get it while it&rsquo;s HOT!!</p>
+<p><a href="http://www.microsoft.com/downloads/details.aspx?FamilyID=53289097-73ce-43bf-b6a6-35e00103cb4b&amp;amp;displaylang=en" target="_blank" rel="noopener noreffer">http://www.microsoft.com/downloads/details.aspx?FamilyID=53289097-73ce-43bf-b6a6-35e00103cb4b&amp;displaylang=en</a></p>
+]]></description></item><item><title>Meet me @ BASTA! Spring 2009</title><link>https://www.chwe.at/2009/02/meet-me-at-basta-spring-2009/</link><pubDate>Fri, 20 Feb 2009 00:00:00 +0100</pubDate><author>Author</author><guid>https://www.chwe.at/2009/02/meet-me-at-basta-spring-2009/</guid><description><![CDATA[<p>Hello everyone!</p>
+<p>Next week, I will attend the biggest German .NET conference <a href="http://it-republik.de/dotnet/basta/" target="_blank" rel="noopener noreffer">BASTA! Spring 2009</a>. Feel free to contact me, if you’d like to chat with me &ldquo;offline&rdquo; there!</p>
+<h3 id="whats-next-on-my-blog">What’s next on my blog?</h3>
+<p>I&rsquo;m working on an ASP.Net MVC application right now and I plan to post about some of the techniques I&rsquo;ve used, so expect to read from me after the conference!</p>
+<p>Thanks for reading,<br>
+Christian Weiss</p>
+]]></description></item><item><title>Testable and reusable cookie access with ASP.Net MVC RC</title><link>https://www.chwe.at/2009/01/testable-and-reusable-cookie-access-with-asp.net-mvc-rc/</link><pubDate>Wed, 28 Jan 2009 18:35:00 +0100</pubDate><author>Author</author><guid>https://www.chwe.at/2009/01/testable-and-reusable-cookie-access-with-asp.net-mvc-rc/</guid><description><![CDATA[<p>All good things come in threes, so I&rsquo;m writing another post about how to access cookie or sessions. I got inspired by a comment from <a href="http://www.marisic.net/" target="_blank" rel="noopener noreffer">Chris Marisic</a>, who suggested to use a more testable way for this stuff!</p>
+<p>Previous posts about this topic:</p>
+<ul>
+<li><a href="https://www.chwe.at/2009/01/don-t-use-response.cookies-string-to-check-if-a-cookie-exists/" rel="">Don&rsquo;t use Response.Cookies[string] to check if a cookie exists!</a></li>
+<li><a href="https://www.chwe.at/2009/01/use-wrappers-to-access-your-cookies-sessions/" rel="">Use wrappers to access your cookies, sessions, &hellip;</a></li>
+</ul>
+<h3 id="intro">Intro</h3>
+<p>Using static wrapper properties is a quick and easy way, but you can&rsquo;t unit test them because they access HttpContext.Current directly. This time I will show you, how you can build a fully unit testable and strongly typed way to access your cookies. As there has been Christmas time 2 days ago (<a href="http://weblogs.asp.net/scottgu/archive/2009/01/27/asp-net-mvc-1-0-release-candidate-now-available.aspx" target="_blank" rel="noopener noreffer">ASP.Net MVC RC1 was released</a> *g*) I’m using the latest MVC bits for my example!</p>
+<h3 id="a-reusable-cookie-container">A Reusable Cookie Container</h3>
+<p>The cookie container is responsible for getting values out of and into the cookie collections. It does not know which concrete values I&rsquo;m using in my application! This is implemented in a different level, so you can use this class for all of your applications!</p>
+<p>In my implementation it&rsquo;s possible to store &ldquo;objects&rdquo; in cookies. I&rsquo;ve implemented it this way because I don&rsquo;t want to convert all my DateTime, int, &hellip; cookies every time! But I also don&rsquo;t want someone to save Lists or any other complex types, so my SetValue() method validates the type of the value and throws an exception, if it&rsquo;s not a value type or nullable value type. That&rsquo;s a little type checking, but I think it is worth it because cookies are set quite rarely!</p>
+<p>Here’s the interface:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c#" data-lang="c#"><span class="k">public</span> <span class="k">interface</span> <span class="n">ICookieContainer</span>
+<span class="p">{</span>
+    <span class="kt">bool</span> <span class="n">Exists</span><span class="p">(</span><span class="kt">string</span> <span class="n">key</span><span class="p">);</span>
+        
+    <span class="kt">string</span> <span class="n">GetValue</span><span class="p">(</span><span class="kt">string</span> <span class="n">key</span><span class="p">);</span>
+    <span class="n">T</span> <span class="n">GetValue</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;(</span><span class="kt">string</span> <span class="n">key</span><span class="p">);</span>
+        
+    <span class="k">void</span> <span class="n">SetValue</span><span class="p">(</span><span class="kt">string</span> <span class="n">key</span><span class="p">,</span> <span class="kt">object</span> <span class="k">value</span><span class="p">,</span> <span class="n">DateTime</span> <span class="n">expires</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>I will just show the fundamental code here. If you want to see the whole implementation, please take a look at the code sample. (see bottom)</p>
+<p>As you can see below, I&rsquo;ve used the abstracted versions of HttpRequest and HttpResponse, which you get, if you use ASP.Net MVC. That&rsquo;s just one of thousand things I love about ASP.Net MVC. These classes can be used easily in unit tests. Notice that everything can be injected here. There’s no direct access to HttpContext.Current!</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c#" data-lang="c#"><span class="k">public</span> <span class="k">class</span> <span class="nc">CookieContainer</span> <span class="p">:</span> <span class="n">ICookieContainer</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="k">readonly</span> <span class="n">HttpRequestBase</span> <span class="m">_</span><span class="n">request</span><span class="p">;</span>
+    <span class="k">private</span> <span class="k">readonly</span> <span class="n">HttpResponseBase</span> <span class="m">_</span><span class="n">response</span><span class="p">;</span>
+    
+    <span class="k">public</span> <span class="n">CookieContainer</span><span class="p">(</span><span class="n">HttpRequestBase</span> <span class="n">request</span><span class="p">,</span> <span class="n">HttpResponseBase</span> <span class="n">response</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// &#34;Check&#34; is a helper class, I&#39;ve got from the &#34;Kigg&#34; project
+</span><span class="c1"></span>        <span class="n">Check</span><span class="p">.</span><span class="n">IsNotNull</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">&#34;request&#34;</span><span class="p">);</span>
+        <span class="n">Check</span><span class="p">.</span><span class="n">IsNotNull</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="s">&#34;response&#34;</span><span class="p">);</span>
+        
+        <span class="m">_</span><span class="n">request</span> <span class="p">=</span> <span class="n">request</span><span class="p">;</span>
+        <span class="m">_</span><span class="n">response</span> <span class="p">=</span> <span class="n">response</span><span class="p">;</span>
+    <span class="p">}</span>
+    
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">GetValue</span><span class="p">(</span><span class="kt">string</span> <span class="n">key</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">Check</span><span class="p">.</span><span class="n">IsNotEmpty</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s">&#34;key&#34;</span><span class="p">);</span>
+        
+        <span class="n">HttpCookie</span> <span class="n">cookie</span> <span class="p">=</span> <span class="m">_</span><span class="n">request</span><span class="p">.</span><span class="n">Cookies</span><span class="p">[</span><span class="n">key</span><span class="p">];</span>
+        <span class="k">return</span> <span class="n">cookie</span> <span class="p">!=</span> <span class="k">null</span> <span class="p">?</span> <span class="n">cookie</span><span class="p">.</span><span class="n">Value</span> <span class="p">:</span> <span class="k">null</span><span class="p">;</span>
+    <span class="p">}</span>
+    
+    <span class="k">public</span> <span class="k">void</span> <span class="n">SetValue</span><span class="p">(</span><span class="kt">string</span> <span class="n">key</span><span class="p">,</span> <span class="kt">object</span> <span class="k">value</span><span class="p">,</span> <span class="n">DateTime</span> <span class="n">expires</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">Check</span><span class="p">.</span><span class="n">IsNotEmpty</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s">&#34;key&#34;</span><span class="p">);</span>
+        
+        <span class="kt">string</span> <span class="n">strValue</span> <span class="p">=</span> <span class="n">CheckAndConvertValue</span><span class="p">(</span><span class="k">value</span><span class="p">);</span>
+        
+        <span class="n">HttpCookie</span> <span class="n">cookie</span> <span class="p">=</span> <span class="k">new</span> <span class="n">HttpCookie</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">strValue</span><span class="p">)</span> <span class="p">{</span><span class="n">Expires</span> <span class="p">=</span> <span class="n">expires</span><span class="p">};</span>
+        <span class="m">_</span><span class="n">response</span><span class="p">.</span><span class="n">Cookies</span><span class="p">.</span><span class="n">Set</span><span class="p">(</span><span class="n">cookie</span><span class="p">);</span>
+    <span class="p">}</span>
+    
+    <span class="c1">// ... see code sample for full implementation
+</span><span class="c1"></span><span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>Here’s a sample unit tests that proves the testability of this code. I use <a href="http://code.google.com/p/moq/" target="_blank" rel="noopener noreffer">Moq</a> as my mocking framework.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c#" data-lang="c#"><span class="k">public</span> <span class="k">static</span> <span class="k">class</span> <span class="nc">Mocks</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="n">Mock</span><span class="p">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="n">HttpRequestBase</span><span class="p">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="n">HttpRequest</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="kt">var</span> <span class="n">httpRequest</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Mock</span><span class="p">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="n">HttpRequestBase</span><span class="p">&amp;</span><span class="n">gt</span><span class="p">;();</span>
+        <span class="n">httpRequest</span><span class="p">.</span><span class="n">Setup</span><span class="p">(</span><span class="n">x</span> <span class="p">=&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="n">x</span><span class="p">.</span><span class="n">Cookies</span><span class="p">).</span><span class="n">Returns</span><span class="p">(</span><span class="k">new</span> <span class="n">HttpCookieCollection</span><span class="p">());</span>
+        <span class="k">return</span> <span class="n">httpRequest</span><span class="p">;</span>
+    <span class="p">}</span>
+    
+    <span class="k">public</span> <span class="k">static</span> <span class="n">Mock</span><span class="p">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="n">HttpResponseBase</span><span class="p">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="n">HttpResponse</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="kt">var</span> <span class="n">httpResponse</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Mock</span><span class="p">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="n">HttpResponseBase</span><span class="p">&amp;</span><span class="n">gt</span><span class="p">;();</span>
+        <span class="n">httpResponse</span><span class="p">.</span><span class="n">Setup</span><span class="p">(</span><span class="n">x</span> <span class="p">=&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="n">x</span><span class="p">.</span><span class="n">Cookies</span><span class="p">).</span><span class="n">Returns</span><span class="p">(</span><span class="k">new</span> <span class="n">HttpCookieCollection</span><span class="p">());</span>
+        <span class="k">return</span> <span class="n">httpResponse</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// This method is from my CookieContainerTests class
+</span><span class="c1"></span><span class="na">
+</span><span class="na">[TestMethod]</span>
+<span class="k">public</span> <span class="k">void</span> <span class="n">SetValue_UpdatesExistingCookie</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="c1">// Arrange
+</span><span class="c1"></span>    <span class="k">const</span> <span class="kt">string</span> <span class="n">cookieName</span> <span class="p">=</span> <span class="s">&#34;myCookie&#34;</span><span class="p">;</span>
+    <span class="k">const</span> <span class="kt">string</span> <span class="n">cookieValue</span> <span class="p">=</span> <span class="s">&#34;myValue&#34;</span><span class="p">;</span>
+    <span class="n">DateTime</span> <span class="n">cookieExpires</span> <span class="p">=</span> <span class="k">new</span> <span class="n">DateTime</span><span class="p">(</span><span class="m">2009</span><span class="p">,</span> <span class="m">1</span><span class="p">,</span> <span class="m">1</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">);</span>
+    
+    <span class="kt">var</span> <span class="n">httpRequest</span> <span class="p">=</span> <span class="n">Mocks</span><span class="p">.</span><span class="n">HttpRequest</span><span class="p">();</span>
+    <span class="kt">var</span> <span class="n">httpResponse</span> <span class="p">=</span> <span class="n">Mocks</span><span class="p">.</span><span class="n">HttpResponse</span><span class="p">();</span>
+    <span class="kt">var</span> <span class="n">cookieContainer</span> <span class="p">=</span> <span class="k">new</span> <span class="n">CookieContainer</span><span class="p">(</span><span class="n">httpRequest</span><span class="p">.</span><span class="n">Object</span><span class="p">,</span> <span class="n">httpResponse</span><span class="p">.</span><span class="n">Object</span><span class="p">);</span>
+    
+    <span class="n">httpResponse</span><span class="p">.</span><span class="n">Object</span><span class="p">.</span><span class="n">Cookies</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="k">new</span> <span class="n">HttpCookie</span><span class="p">(</span><span class="n">cookieName</span><span class="p">,</span> <span class="s">&#34;oldValue&#34;</span><span class="p">));</span>
+    
+    <span class="c1">// Act
+</span><span class="c1"></span>    <span class="m">_</span><span class="n">cookieContainer</span><span class="p">.</span><span class="n">SetValue</span><span class="p">(</span><span class="n">cookieName</span><span class="p">,</span> <span class="n">cookieValue</span><span class="p">,</span> <span class="n">cookieExpires</span><span class="p">);</span>
+
+    <span class="c1">// Assert
+</span><span class="c1"></span>    <span class="n">HttpCookie</span> <span class="n">cookie</span> <span class="p">=</span> <span class="n">httpResponse</span><span class="p">.</span><span class="n">Object</span><span class="p">.</span><span class="n">Cookies</span><span class="p">[</span><span class="s">&#34;myCookie&#34;</span><span class="p">];</span>
+    <span class="n">Assert</span><span class="p">.</span><span class="n">IsNotNull</span><span class="p">(</span><span class="n">cookie</span><span class="p">);</span>
+    <span class="n">Assert</span><span class="p">.</span><span class="n">AreEqual</span><span class="p">(</span><span class="n">cookie</span><span class="p">.</span><span class="n">Name</span><span class="p">,</span> <span class="n">cookieName</span><span class="p">);</span>
+    <span class="n">Assert</span><span class="p">.</span><span class="n">AreEqual</span><span class="p">(</span><span class="n">cookie</span><span class="p">.</span><span class="n">Value</span><span class="p">,</span> <span class="n">cookieValue</span><span class="p">);</span>
+    <span class="n">Assert</span><span class="p">.</span><span class="n">AreEqual</span><span class="p">(</span><span class="n">cookie</span><span class="p">.</span><span class="n">Expires</span><span class="p">,</span> <span class="n">cookieExpires</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>That’s it! Now you have a testable and reusable cookie container!</p>
+<h3 id="how-to-use-it-in-your-application">How to use it in your application</h3>
+<p>It&rsquo;s really easy to integrate this into your app! Just create an interface that defines all your application-specific properties you want to save in cookies and a concrete implementation of this interface that interacts with the cookie container.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c#" data-lang="c#"><span class="k">public</span> <span class="k">interface</span> <span class="n">IAppCookies</span>
+<span class="p">{</span>
+    <span class="kt">string</span> <span class="n">UserEmail</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+    <span class="n">DateTime</span><span class="p">?</span> <span class="n">LastVisit</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">public</span> <span class="k">class</span> <span class="nc">AppCookies</span> <span class="p">:</span> <span class="n">IAppCookies</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="k">readonly</span> <span class="n">ICookieContainer</span> <span class="m">_</span><span class="n">cookieContainer</span><span class="p">;</span>
+    
+    <span class="k">public</span> <span class="n">AppCookies</span><span class="p">(</span><span class="n">ICookieContainer</span> <span class="n">cookieContainer</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="m">_</span><span class="n">cookieContainer</span> <span class="p">=</span> <span class="n">cookieContainer</span><span class="p">;</span>
+    <span class="p">}</span>
+    
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">UserEmail</span>
+    <span class="p">{</span>
+        <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="m">_</span><span class="n">cookieContainer</span><span class="p">.</span><span class="n">GetValue</span><span class="p">(</span><span class="s">&#34;UserEmail&#34;</span><span class="p">);</span> <span class="p">}</span>
+        <span class="k">set</span> <span class="p">{</span> <span class="m">_</span><span class="n">cookieContainer</span><span class="p">.</span><span class="n">SetValue</span><span class="p">(</span><span class="s">&#34;UserEmail&#34;</span><span class="p">,</span> <span class="k">value</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">.</span><span class="n">Now</span><span class="p">.</span><span class="n">AddDays</span><span class="p">(</span><span class="m">10</span><span class="p">));</span> <span class="p">}</span>
+    <span class="p">}</span>
+    
+    <span class="k">public</span> <span class="n">DateTime</span><span class="p">?</span> <span class="n">LastVisit</span>
+    <span class="p">{</span>
+        <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="m">_</span><span class="n">cookieContainer</span><span class="p">.</span><span class="n">GetValue</span><span class="p">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="n">DateTime</span><span class="p">?&amp;</span><span class="n">gt</span><span class="p">;(</span><span class="s">&#34;LastVisit&#34;</span><span class="p">);</span> <span class="p">}</span>
+        <span class="k">set</span> <span class="p">{</span> <span class="m">_</span><span class="n">cookieContainer</span><span class="p">.</span><span class="n">SetValue</span><span class="p">(</span><span class="s">&#34;LastVisit&#34;</span><span class="p">,</span> <span class="k">value</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">.</span><span class="n">Now</span><span class="p">.</span><span class="n">AddDays</span><span class="p">(</span><span class="m">10</span><span class="p">));</span> <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>You can now inject this IAppCookies interface to your MVC Controller:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c#" data-lang="c#"><span class="k">public</span> <span class="k">class</span> <span class="nc">HomeController</span> <span class="p">:</span> <span class="n">Controller</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="k">readonly</span> <span class="n">IAppCookies</span> <span class="m">_</span><span class="n">cookies</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="n">HomeController</span><span class="p">(</span><span class="n">IAppCookies</span> <span class="n">cookies</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="m">_</span><span class="n">cookies</span> <span class="p">=</span> <span class="n">cookies</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="n">ActionResult</span> <span class="n">Index</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="n">DateTime</span> <span class="n">currentTime</span> <span class="p">=</span> <span class="n">DateTime</span><span class="p">.</span><span class="n">Now</span><span class="p">;</span>
+
+        <span class="n">IndexViewModel</span> <span class="n">viewModel</span> <span class="p">=</span> <span class="k">new</span> <span class="n">IndexViewModel</span>
+        <span class="p">{</span>
+            <span class="n">CurrentTime</span> <span class="p">=</span> <span class="n">currentTime</span><span class="p">,</span>
+            <span class="n">LastVisit</span> <span class="p">=</span> <span class="p">(</span><span class="m">_</span><span class="n">cookies</span><span class="p">.</span><span class="n">LastVisit</span> <span class="p">??</span> <span class="n">currentTime</span><span class="p">),</span>
+            <span class="n">UserEmail</span> <span class="p">=</span> <span class="m">_</span><span class="n">cookies</span><span class="p">.</span><span class="n">UserEmail</span>
+        <span class="p">};</span>
+
+        <span class="m">_</span><span class="n">cookies</span><span class="p">.</span><span class="n">LastVisit</span> <span class="p">=</span> <span class="n">currentTime</span><span class="p">;</span>
+
+        <span class="k">return</span> <span class="n">View</span><span class="p">(</span><span class="n">viewModel</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">class</span> <span class="nc">IndexViewModel</span>
+    <span class="p">{</span>
+        <span class="k">public</span> <span class="kt">string</span> <span class="n">UserEmail</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+        <span class="k">public</span> <span class="n">DateTime</span> <span class="n">LastVisit</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+        <span class="k">public</span> <span class="n">DateTime</span> <span class="n">CurrentTime</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>Wow, you’re still reading :-)</p>
+<p>That’s all I want to show here! If you want to see more about how the IOC is set up (I’m using <a href="http://structuremap.sourceforge.net/Default.htm" target="_blank" rel="noopener noreffer">StructureMap</a>) or anything else, take a look at the full code:</p>
+<ul>
+<li><a href="http://cid-16ce9c120fa181c9.skydrive.live.com/self.aspx/chwe.at%20blog/090129%7C_CookieContainerApp.zip" target="_blank" rel="noopener noreffer">Download full code sample</a></li>
+</ul>
+<p>I look forward to hearing your feedback on this!</p>
+<p>Thanks for reading,<br>
+Christian Weiss</p>]]></description></item></channel></rss>
