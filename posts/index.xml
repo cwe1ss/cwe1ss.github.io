@@ -55,28 +55,28 @@
 </span><span class="lnt">21
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="k">public</span> <span class="k">class</span> <span class="nc">ShuttingDownHealthCheck</span> <span class="p">:</span> <span class="n">IHealthCheck</span>
-<span class="p">{</span>
-    <span class="k">private</span> <span class="n">HealthStatus</span> <span class="m">_</span><span class="n">status</span> <span class="p">=</span> <span class="n">HealthStatus</span><span class="p">.</span><span class="n">Healthy</span><span class="p">;</span>
-
-    <span class="k">public</span> <span class="n">ShuttingDownHealthCheck</span><span class="p">(</span><span class="n">IHostApplicationLifetime</span> <span class="n">appLifetime</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="n">appLifetime</span><span class="p">.</span><span class="n">ApplicationStopping</span><span class="p">.</span><span class="n">Register</span><span class="p">(()</span> <span class="p">=&gt;</span>
-        <span class="p">{</span>
-            <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">&#34;Shutting down&#34;</span><span class="p">);</span>
-            <span class="m">_</span><span class="n">status</span> <span class="p">=</span> <span class="n">HealthStatus</span><span class="p">.</span><span class="n">Unhealthy</span><span class="p">;</span>
-        <span class="p">});</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="n">Task</span><span class="p">&lt;</span><span class="n">HealthCheckResult</span><span class="p">&gt;</span> <span class="n">CheckHealthAsync</span><span class="p">(</span>
-        <span class="n">HealthCheckContext</span> <span class="n">context</span><span class="p">,</span>
-        <span class="n">CancellationToken</span> <span class="n">cancellationToken</span> <span class="p">=</span> <span class="k">default</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="kt">var</span> <span class="n">result</span> <span class="p">=</span> <span class="k">new</span> <span class="n">HealthCheckResult</span><span class="p">(</span><span class="m">_</span><span class="n">status</span><span class="p">);</span>
-        <span class="k">return</span> <span class="n">Task</span><span class="p">.</span><span class="n">FromResult</span><span class="p">(</span><span class="n">result</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="k">public</span> <span class="k">class</span> <span class="nc">ShuttingDownHealthCheck</span> <span class="p">:</span> <span class="n">IHealthCheck</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">private</span> <span class="n">HealthStatus</span> <span class="m">_</span><span class="n">status</span> <span class="p">=</span> <span class="n">HealthStatus</span><span class="p">.</span><span class="n">Healthy</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">public</span> <span class="n">ShuttingDownHealthCheck</span><span class="p">(</span><span class="n">IHostApplicationLifetime</span> <span class="n">appLifetime</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">appLifetime</span><span class="p">.</span><span class="n">ApplicationStopping</span><span class="p">.</span><span class="n">Register</span><span class="p">(()</span> <span class="p">=&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">&#34;Shutting down&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">            <span class="m">_</span><span class="n">status</span> <span class="p">=</span> <span class="n">HealthStatus</span><span class="p">.</span><span class="n">Unhealthy</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">});</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">public</span> <span class="n">Task</span><span class="p">&lt;</span><span class="n">HealthCheckResult</span><span class="p">&gt;</span> <span class="n">CheckHealthAsync</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">        <span class="n">HealthCheckContext</span> <span class="n">context</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">CancellationToken</span> <span class="n">cancellationToken</span> <span class="p">=</span> <span class="k">default</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">var</span> <span class="n">result</span> <span class="p">=</span> <span class="k">new</span> <span class="n">HealthCheckResult</span><span class="p">(</span><span class="m">_</span><span class="n">status</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">Task</span><span class="p">.</span><span class="n">FromResult</span><span class="p">(</span><span class="n">result</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>Our class also needs to be registered with the DI container by calling <code>.AddCheck&lt;ShuttingDownHealthCheck&gt;(&quot;shutting_down&quot;)</code> on the return object of <code>services.AddHealthChecks()</code>.</p>
 <p>However, it&rsquo;s important to know that <strong>by default, ASP.NET Core initializes the class for every request</strong> to the health endpoint. This doesn&rsquo;t work for our scenario as we need the global <code>_status</code> variable and just a single <code>ApplicationStopping</code>-registration.</p>
@@ -108,11 +108,11 @@
 </span><span class="lnt">4
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="n">services</span><span class="p">.</span><span class="n">Configure</span><span class="p">&lt;</span><span class="n">HostOptions</span><span class="p">&gt;(</span><span class="n">option</span> <span class="p">=&gt;</span>
-<span class="p">{</span>
-    <span class="n">option</span><span class="p">.</span><span class="n">ShutdownTimeout</span> <span class="p">=</span> <span class="n">System</span><span class="p">.</span><span class="n">TimeSpan</span><span class="p">.</span><span class="n">FromSeconds</span><span class="p">(</span><span class="m">30</span><span class="p">);</span>
-<span class="p">});</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="n">services</span><span class="p">.</span><span class="n">Configure</span><span class="p">&lt;</span><span class="n">HostOptions</span><span class="p">&gt;(</span><span class="n">option</span> <span class="p">=&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">option</span><span class="p">.</span><span class="n">ShutdownTimeout</span> <span class="p">=</span> <span class="n">System</span><span class="p">.</span><span class="n">TimeSpan</span><span class="p">.</span><span class="n">FromSeconds</span><span class="p">(</span><span class="m">30</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">});</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>To improve our health check, we&rsquo;ll introduce <code>IHostEnvironment</code> to detect if we&rsquo;re running in <code>Production</code>-mode and an <code>ILogger</code>. Our <code>ApplicationStopping</code>-registration will now look like this:</p>
 <div class="highlight"><div class="chroma">
@@ -139,27 +139,27 @@
 </span><span class="lnt">20
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="n">appLifetime</span><span class="p">.</span><span class="n">ApplicationStopping</span><span class="p">.</span><span class="n">Register</span><span class="p">(()</span> <span class="p">=&gt;</span>
-<span class="p">{</span>
-    <span class="m">_</span><span class="n">status</span> <span class="p">=</span> <span class="n">HealthStatus</span><span class="p">.</span><span class="n">Unhealthy</span><span class="p">;</span>
-
-    <span class="kt">bool</span> <span class="n">delayShutdown</span> <span class="p">=</span> <span class="m">_</span><span class="n">hostEnvironment</span><span class="p">.</span><span class="n">IsProduction</span><span class="p">();</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">delayShutdown</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="kt">var</span> <span class="n">shutdownDelay</span> <span class="p">=</span> <span class="n">TimeSpan</span><span class="p">.</span><span class="n">FromSeconds</span><span class="p">(</span><span class="m">25</span><span class="p">);</span>
-
-        <span class="m">_l</span><span class="n">ogger</span><span class="p">.</span><span class="n">LogInformation</span><span class="p">(</span>
-            <span class="s">&#34;Delaying shutdown for {Seconds} seconds&#34;</span><span class="p">,</span>
-            <span class="n">shutdownDelay</span><span class="p">.</span><span class="n">TotalSeconds</span><span class="p">);</span>
-
-        <span class="c1">// ASP.NET Core requests are processed on separate threads,
-</span><span class="c1"></span>        <span class="c1">// so we can just put the main thread on sleep.
-</span><span class="c1"></span>        <span class="n">Thread</span><span class="p">.</span><span class="n">Sleep</span><span class="p">(</span><span class="n">shutdownDelay</span><span class="p">);</span>
-
-        <span class="m">_l</span><span class="n">ogger</span><span class="p">.</span><span class="n">LogInformation</span><span class="p">(</span><span class="s">&#34;Shutdown delay completed&#34;</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">});</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="n">appLifetime</span><span class="p">.</span><span class="n">ApplicationStopping</span><span class="p">.</span><span class="n">Register</span><span class="p">(()</span> <span class="p">=&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="m">_</span><span class="n">status</span> <span class="p">=</span> <span class="n">HealthStatus</span><span class="p">.</span><span class="n">Unhealthy</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kt">bool</span> <span class="n">delayShutdown</span> <span class="p">=</span> <span class="m">_</span><span class="n">hostEnvironment</span><span class="p">.</span><span class="n">IsProduction</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">delayShutdown</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">var</span> <span class="n">shutdownDelay</span> <span class="p">=</span> <span class="n">TimeSpan</span><span class="p">.</span><span class="n">FromSeconds</span><span class="p">(</span><span class="m">25</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="m">_l</span><span class="n">ogger</span><span class="p">.</span><span class="n">LogInformation</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">            <span class="s">&#34;Delaying shutdown for {Seconds} seconds&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="n">shutdownDelay</span><span class="p">.</span><span class="n">TotalSeconds</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="c1">// ASP.NET Core requests are processed on separate threads,</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// so we can just put the main thread on sleep.</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Thread</span><span class="p">.</span><span class="n">Sleep</span><span class="p">(</span><span class="n">shutdownDelay</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="m">_l</span><span class="n">ogger</span><span class="p">.</span><span class="n">LogInformation</span><span class="p">(</span><span class="s">&#34;Shutdown delay completed&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">});</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>Of course, it would also be possible to just skip the registration ouf our health check in the <code>Startup.ConfigureServices()</code>-method.</p>
 <p>The logic in our ASP.NET Core application is now finished!</p>
@@ -219,9 +219,9 @@
 </span><span class="lnt">2
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-cmd" data-lang="cmd">git clone https://github.com/cwe1ss/flutter-flavors-ci-cd.git
-<span class="k">cd</span> flutter-flavors-ci-cd/
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-cmd" data-lang="cmd"><span class="line"><span class="cl">git clone https://github.com/cwe1ss/flutter-flavors-ci-cd.git
+</span></span><span class="line"><span class="cl"><span class="k">cd</span> flutter-flavors-ci-cd/
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h2 id="create-the-flutter-app">Create the Flutter app</h2>
 <p>Let&rsquo;s get started by creating the Flutter app, named <code>flutter_flavors</code> via the Flutter CLI directly in the root folder of our repository:</p>
@@ -230,8 +230,8 @@
 <pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-cmd" data-lang="cmd">flutter create --project-name flutter_flavors .
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-cmd" data-lang="cmd"><span class="line"><span class="cl">flutter create --project-name flutter_flavors .
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>Run the app on an Android device/emulator to ensure it works.</p>
 <p><a href="https://github.com/cwe1ss/flutter-flavors-ci-cd/commit/0819ce8b51ddc39d8b7aebf71aea4f2da36a187c" target="_blank" rel="noopener noreffer">See all changes from this step in the Git commit.</a></p>
@@ -259,10 +259,10 @@
 </span><span class="lnt">3
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-cmd" data-lang="cmd">git add .idea/runConfigurations/dev.xml -f
-git add .idea/runConfigurations/live.xml -f
-git commit -m &#39;Persist flutter build configurations&#39;
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-cmd" data-lang="cmd"><span class="line"><span class="cl">git add .idea/runConfigurations/dev.xml -f
+</span></span><span class="line"><span class="cl">git add .idea/runConfigurations/live.xml -f
+</span></span><span class="line"><span class="cl">git commit -m &#39;Persist flutter build configurations&#39;
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><a href="https://github.com/cwe1ss/flutter-flavors-ci-cd/commit/36e4eacccf68eb131cd1aa6ab1ac025df56aeb05" target="_blank" rel="noopener noreffer">See all changes from this step in the Git commit.</a></p>
 <h2 id="set-up-flavors-for-android">Set up flavors for Android</h2>
@@ -290,22 +290,22 @@ git commit -m &#39;Persist flutter build configurations&#39;
 </span><span class="lnt">15
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-kotlin" data-lang="kotlin"><span class="k">import</span> <span class="nn">androidx.annotation.NonNull;</span>
-<span class="k">import</span> <span class="nn">io.flutter.embedding.android.FlutterActivity</span>
-<span class="k">import</span> <span class="nn">io.flutter.embedding.engine.FlutterEngine</span>
-<span class="k">import</span> <span class="nn">io.flutter.plugin.common.MethodChannel</span>
-<span class="k">import</span> <span class="nn">io.flutter.plugins.GeneratedPluginRegistrant</span>
-
-<span class="k">class</span> <span class="nc">MainActivity</span><span class="p">:</span> <span class="n">FlutterActivity</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">override</span> <span class="k">fun</span> <span class="nf">configureFlutterEngine</span><span class="p">(</span><span class="nd">@NonNull</span> <span class="n">flutterEngine</span><span class="p">:</span> <span class="n">FlutterEngine</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">GeneratedPluginRegistrant</span><span class="p">.</span><span class="n">registerWith</span><span class="p">(</span><span class="n">flutterEngine</span><span class="p">);</span>
-
-        <span class="n">MethodChannel</span><span class="p">(</span><span class="n">flutterEngine</span><span class="p">.</span><span class="n">dartExecutor</span><span class="p">.</span><span class="n">binaryMessenger</span><span class="p">,</span> <span class="s2">&#34;flavor&#34;</span><span class="p">).</span><span class="n">setMethodCallHandler</span> <span class="p">{</span>
-            <span class="n">call</span><span class="p">,</span> <span class="n">result</span> <span class="o">-&gt;</span> <span class="n">result</span><span class="p">.</span><span class="n">success</span><span class="p">(</span><span class="n">BuildConfig</span><span class="p">.</span><span class="n">FLAVOR</span><span class="p">)</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-kotlin" data-lang="kotlin"><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">androidx.annotation.NonNull;</span>
+</span></span><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">io.flutter.embedding.android.FlutterActivity</span>
+</span></span><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">io.flutter.embedding.engine.FlutterEngine</span>
+</span></span><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">io.flutter.plugin.common.MethodChannel</span>
+</span></span><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">io.flutter.plugins.GeneratedPluginRegistrant</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">MainActivity</span><span class="p">:</span> <span class="n">FlutterActivity</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">override</span> <span class="k">fun</span> <span class="nf">configureFlutterEngine</span><span class="p">(</span><span class="nd">@NonNull</span> <span class="n">flutterEngine</span><span class="p">:</span> <span class="n">FlutterEngine</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">GeneratedPluginRegistrant</span><span class="p">.</span><span class="n">registerWith</span><span class="p">(</span><span class="n">flutterEngine</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">MethodChannel</span><span class="p">(</span><span class="n">flutterEngine</span><span class="p">.</span><span class="n">dartExecutor</span><span class="p">.</span><span class="n">binaryMessenger</span><span class="p">,</span> <span class="s2">&#34;flavor&#34;</span><span class="p">).</span><span class="n">setMethodCallHandler</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">call</span><span class="p">,</span> <span class="n">result</span> <span class="o">-&gt;</span> <span class="n">result</span><span class="p">.</span><span class="n">success</span><span class="p">(</span><span class="n">BuildConfig</span><span class="p">.</span><span class="n">FLAVOR</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h3 id="add-the-flavor-settings-to-the-android-build-config">Add the flavor-settings to the Android build config</h3>
 <p>In Android, the native flavor-specific values are stored in <code>android/app/src/build.gradle</code> via the <code>android.flavorDimensions</code> and <code>android.productFlavors</code> keys.</p>
@@ -334,25 +334,25 @@ git commit -m &#39;Persist flutter build configurations&#39;
 </span><span class="lnt">18
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-gradle" data-lang="gradle"><span class="n">android</span> <span class="o">{</span>
-    <span class="c1">// ... all existing things like `sourceSets`, ...
-</span><span class="c1"></span>
-    <span class="n">flavorDimensions</span> <span class="s2">&#34;app&#34;</span>
-
-    <span class="n">productFlavors</span> <span class="o">{</span>
-        <span class="n">dev</span> <span class="o">{</span>
-            <span class="n">dimension</span> <span class="s2">&#34;app&#34;</span>
-            <span class="n">applicationId</span> <span class="s2">&#34;at.chwe.flutterflavors.dev&#34;</span>
-            <span class="n">resValue</span> <span class="s2">&#34;string&#34;</span><span class="o">,</span> <span class="s2">&#34;app_name&#34;</span><span class="o">,</span> <span class="s2">&#34;DEV Flutter Flavors&#34;</span>
-        <span class="o">}</span>
-        <span class="n">live</span> <span class="o">{</span>
-            <span class="n">dimension</span> <span class="s2">&#34;app&#34;</span>
-            <span class="n">applicationId</span> <span class="s2">&#34;at.chwe.flutterflavors&#34;</span>
-            <span class="n">resValue</span> <span class="s2">&#34;string&#34;</span><span class="o">,</span> <span class="s2">&#34;app_name&#34;</span><span class="o">,</span> <span class="s2">&#34;Flutter Flavors&#34;</span>
-        <span class="o">}</span>
-    <span class="o">}</span>
-<span class="o">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-gradle" data-lang="gradle"><span class="line"><span class="cl"><span class="n">android</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// ... all existing things like `sourceSets`, ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">    <span class="n">flavorDimensions</span> <span class="s2">&#34;app&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">productFlavors</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">dev</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">dimension</span> <span class="s2">&#34;app&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="n">applicationId</span> <span class="s2">&#34;at.chwe.flutterflavors.dev&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="n">resValue</span> <span class="s2">&#34;string&#34;</span><span class="o">,</span> <span class="s2">&#34;app_name&#34;</span><span class="o">,</span> <span class="s2">&#34;DEV Flutter Flavors&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="o">}</span>
+</span></span><span class="line"><span class="cl">        <span class="n">live</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">dimension</span> <span class="s2">&#34;app&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="n">applicationId</span> <span class="s2">&#34;at.chwe.flutterflavors&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="n">resValue</span> <span class="s2">&#34;string&#34;</span><span class="o">,</span> <span class="s2">&#34;app_name&#34;</span><span class="o">,</span> <span class="s2">&#34;Flutter Flavors&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="o">}</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h3 id="use-the-app_name-in-the-androidmanifestxml">Use the app_name in the AndroidManifest.xml</h3>
 <p>The <code>applicationId</code> is a well-known key that will already be used when the app is launched with a given flavor.</p>
@@ -384,18 +384,18 @@ git commit -m &#39;Persist flutter build configurations&#39;
 </span><span class="lnt">11
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-dart" data-lang="dart"><span class="c1">/// Contains the hard-coded settings per flavor.
-</span><span class="c1"></span><span class="kd">class</span> <span class="nc">FlavorSettings</span> <span class="p">{</span>
-  <span class="kd">final</span> <span class="kt">String</span> <span class="n">apiBaseUrl</span><span class="p">;</span>
-  <span class="c1">// TODO Add any additional flavor-specific settings here.
-</span><span class="c1"></span>
-  <span class="n">FlavorSettings</span><span class="p">.</span><span class="n">dev</span><span class="p">()</span>
-    <span class="o">:</span> <span class="n">apiBaseUrl</span> <span class="o">=</span> <span class="s1">&#39;https://dev.flutter-flavors.chwe.at&#39;</span><span class="p">;</span>
-
-  <span class="n">FlavorSettings</span><span class="p">.</span><span class="n">live</span><span class="p">()</span>
-    <span class="o">:</span> <span class="n">apiBaseUrl</span> <span class="o">=</span> <span class="s1">&#39;https://flutter-flavors.chwe.at&#39;</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-dart" data-lang="dart"><span class="line"><span class="cl"><span class="c1">/// Contains the hard-coded settings per flavor.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">class</span> <span class="nc">FlavorSettings</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kd">final</span> <span class="kt">String</span> <span class="n">apiBaseUrl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// TODO Add any additional flavor-specific settings here.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">  <span class="n">FlavorSettings</span><span class="p">.</span><span class="n">dev</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="o">:</span> <span class="n">apiBaseUrl</span> <span class="o">=</span> <span class="s1">&#39;https://dev.flutter-flavors.chwe.at&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">FlavorSettings</span><span class="p">.</span><span class="n">live</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="o">:</span> <span class="n">apiBaseUrl</span> <span class="o">=</span> <span class="s1">&#39;https://flutter-flavors.chwe.at&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>Next, we&rsquo;ll use this in <code>main.dart</code>, where we&rsquo;ll read the flavor via our method channel from the native platform and we&rsquo;ll create the corresponding <code>FlavorSettings</code>-object. We&rsquo;ll also have to make our <code>main</code>-method async for that.</p>
 <p>When done, your <code>main.dart</code> should contain the following code before the <code>class MyApp extends StatelessWidget {</code> line:</p>
@@ -434,38 +434,38 @@ git commit -m &#39;Persist flutter build configurations&#39;
 </span><span class="lnt">31
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-dart" data-lang="dart"><span class="k">import</span> <span class="s1">&#39;package:flutter/material.dart&#39;</span><span class="p">;</span>
-<span class="k">import</span> <span class="s1">&#39;package:flutter/services.dart&#39;</span><span class="p">;</span>
-
-<span class="k">import</span> <span class="s1">&#39;flavor_settings.dart&#39;</span><span class="p">;</span>
-
-<span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span> <span class="n">main</span><span class="p">()</span> <span class="kd">async</span> <span class="p">{</span>
-  <span class="c1">// NOTE: This is required for accessing the method channel before runApp().
-</span><span class="c1"></span>  <span class="n">WidgetsFlutterBinding</span><span class="p">.</span><span class="n">ensureInitialized</span><span class="p">();</span>
-
-  <span class="kd">final</span> <span class="n">settings</span> <span class="o">=</span> <span class="kd">await</span> <span class="n">_getFlavorSettings</span><span class="p">();</span>
-  <span class="n">print</span><span class="p">(</span><span class="s1">&#39;API URL </span><span class="si">${</span><span class="n">settings</span><span class="p">.</span><span class="n">apiBaseUrl</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">);</span>
-
-  <span class="n">runApp</span><span class="p">(</span><span class="n">MyApp</span><span class="p">());</span>
-<span class="p">}</span>
-
-<span class="n">Future</span><span class="o">&lt;</span><span class="n">FlavorSettings</span><span class="o">&gt;</span> <span class="n">_getFlavorSettings</span><span class="p">()</span> <span class="kd">async</span> <span class="p">{</span>
-  <span class="kt">String</span> <span class="n">flavor</span> <span class="o">=</span> <span class="kd">await</span> <span class="kd">const</span> <span class="n">MethodChannel</span><span class="p">(</span><span class="s1">&#39;flavor&#39;</span><span class="p">)</span>
-        <span class="p">.</span><span class="n">invokeMethod</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">(</span><span class="s1">&#39;getFlavor&#39;</span><span class="p">);</span>
-
-  <span class="n">print</span><span class="p">(</span><span class="s1">&#39;STARTED WITH FLAVOR </span><span class="si">$</span><span class="n">flavor</span><span class="s1">&#39;</span><span class="p">);</span>
-
-  <span class="k">if</span> <span class="p">(</span><span class="n">flavor</span> <span class="o">==</span> <span class="s1">&#39;dev&#39;</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="n">FlavorSettings</span><span class="p">.</span><span class="n">dev</span><span class="p">();</span>
-  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">flavor</span> <span class="o">==</span> <span class="s1">&#39;live&#39;</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="n">FlavorSettings</span><span class="p">.</span><span class="n">live</span><span class="p">();</span>
-  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-    <span class="k">throw</span> <span class="n">Exception</span><span class="p">(</span><span class="s2">&#34;Unknown flavor: </span><span class="si">$</span><span class="n">flavor</span><span class="s2">&#34;</span><span class="p">);</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="c1">// ... class MyApp extends StatelessWidget {
-</span></code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-dart" data-lang="dart"><span class="line"><span class="cl"><span class="k">import</span> <span class="s1">&#39;package:flutter/material.dart&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">import</span> <span class="s1">&#39;package:flutter/services.dart&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">import</span> <span class="s1">&#39;flavor_settings.dart&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span> <span class="n">main</span><span class="p">()</span> <span class="kd">async</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// NOTE: This is required for accessing the method channel before runApp().
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">WidgetsFlutterBinding</span><span class="p">.</span><span class="n">ensureInitialized</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="kd">final</span> <span class="n">settings</span> <span class="o">=</span> <span class="kd">await</span> <span class="n">_getFlavorSettings</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="n">print</span><span class="p">(</span><span class="s1">&#39;API URL </span><span class="si">${</span><span class="n">settings</span><span class="p">.</span><span class="n">apiBaseUrl</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">runApp</span><span class="p">(</span><span class="n">MyApp</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">Future</span><span class="o">&lt;</span><span class="n">FlavorSettings</span><span class="o">&gt;</span> <span class="n">_getFlavorSettings</span><span class="p">()</span> <span class="kd">async</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">String</span> <span class="n">flavor</span> <span class="o">=</span> <span class="kd">await</span> <span class="kd">const</span> <span class="n">MethodChannel</span><span class="p">(</span><span class="s1">&#39;flavor&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="p">.</span><span class="n">invokeMethod</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">(</span><span class="s1">&#39;getFlavor&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">print</span><span class="p">(</span><span class="s1">&#39;STARTED WITH FLAVOR </span><span class="si">$</span><span class="n">flavor</span><span class="s1">&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span><span class="n">flavor</span> <span class="o">==</span> <span class="s1">&#39;dev&#39;</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">FlavorSettings</span><span class="p">.</span><span class="n">dev</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">flavor</span> <span class="o">==</span> <span class="s1">&#39;live&#39;</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">FlavorSettings</span><span class="p">.</span><span class="n">live</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">throw</span> <span class="n">Exception</span><span class="p">(</span><span class="s2">&#34;Unknown flavor: </span><span class="si">$</span><span class="n">flavor</span><span class="s2">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// ... class MyApp extends StatelessWidget {
+</span></span></span></code></pre></td></tr></table>
 </div>
 </div><p>Run the app with <code>dev</code> build configuration and look at the console output. It will display the following statements:</p>
 <div class="highlight"><div class="chroma">
@@ -474,9 +474,9 @@ git commit -m &#39;Persist flutter build configurations&#39;
 </span><span class="lnt">2
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">I/flutter ( 4458): STARTED WITH FLAVOR dev
-I/flutter ( 4458): API URL https://dev.flutter-flavors.chwe.at
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">I/flutter ( 4458): STARTED WITH FLAVOR dev
+</span></span><span class="line"><span class="cl">I/flutter ( 4458): API URL https://dev.flutter-flavors.chwe.at
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>Switch to the <code>live</code> build configuration and run your app again. This time, the console will display the following statements:</p>
 <div class="highlight"><div class="chroma">
@@ -485,9 +485,9 @@ I/flutter ( 4458): API URL https://dev.flutter-flavors.chwe.at
 </span><span class="lnt">2
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">I/flutter ( 4615): STARTED WITH FLAVOR live
-I/flutter ( 4615): API URL https://flutter-flavors.chwe.at
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">I/flutter ( 4615): STARTED WITH FLAVOR live
+</span></span><span class="line"><span class="cl">I/flutter ( 4615): API URL https://flutter-flavors.chwe.at
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>That&rsquo;s it! We can now access the current flavor from within Flutter and we can have flavor-specific settings.</p>
 <p>You can pass the <code>FlavorSettings</code>-instance down to your widgets manually, or you can use e.g. the <code>provider</code>-package to access it via dependency injection in your widgets.</p>
@@ -502,10 +502,10 @@ I/flutter ( 4615): API URL https://flutter-flavors.chwe.at
 </span><span class="lnt">3
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">flutter build ios --flavor dev
-
-The Xcode project does not define custom schemes. You cannot use the --flavor option.
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">flutter build ios --flavor dev
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">The Xcode project does not define custom schemes. You cannot use the --flavor option.
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>This means, that on iOS we have to rely on a feature called &ldquo;custom schemes&rdquo; to represent our flutter flavors. Setting them up requires multiple steps.</p>
 <h3 id="create-custom-build-configurations-for-the-flavors">Create custom build configurations for the flavors</h3>
@@ -560,8 +560,8 @@ The Xcode project does not define custom schemes. You cannot use the --flavor op
 <pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">[VERBOSE-2:ui_dart_state.cc(177)] Unhandled Exception: MissingPluginException(No implementation found for method getFlavor on channel flavor)
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">[VERBOSE-2:ui_dart_state.cc(177)] Unhandled Exception: MissingPluginException(No implementation found for method getFlavor on channel flavor)
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>That&rsquo;s because we haven&rsquo;t yet implemented the method channel that Flutter uses to get the current flavor from the native platform.</p>
 <p>To add this, we need to add some code to the <code>application()</code>-function of the <code>Runner/AppDelegate.swift</code>-file in XCode. The finished file should look like this:</p>
@@ -595,33 +595,33 @@ The Xcode project does not define custom schemes. You cannot use the --flavor op
 </span><span class="lnt">26
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">import</span> <span class="nc">UIKit</span>
-<span class="kd">import</span> <span class="nc">Flutter</span>
-
-<span class="kr">@UIApplicationMain</span>
-<span class="kr">@objc</span> <span class="kd">class</span> <span class="nc">AppDelegate</span><span class="p">:</span> <span class="n">FlutterAppDelegate</span> <span class="p">{</span>
-  <span class="kr">override</span> <span class="kd">func</span> <span class="nf">application</span><span class="p">(</span>
-    <span class="kc">_</span> <span class="n">application</span><span class="p">:</span> <span class="n">UIApplication</span><span class="p">,</span>
-    <span class="n">didFinishLaunchingWithOptions</span> <span class="n">launchOptions</span><span class="p">:</span> <span class="p">[</span><span class="n">UIApplication</span><span class="p">.</span><span class="n">LaunchOptionsKey</span><span class="p">:</span> <span class="nb">Any</span><span class="p">]?</span>
-  <span class="p">)</span> <span class="p">-&gt;</span> <span class="nb">Bool</span> <span class="p">{</span>
-    <span class="n">GeneratedPluginRegistrant</span><span class="p">.</span><span class="n">register</span><span class="p">(</span><span class="n">with</span><span class="p">:</span> <span class="kc">self</span><span class="p">)</span>
-
-    <span class="kd">let</span> <span class="nv">controller</span> <span class="p">=</span> <span class="n">window</span><span class="p">.</span><span class="n">rootViewController</span> <span class="k">as</span><span class="p">!</span> <span class="n">FlutterViewController</span>
-
-    <span class="kd">let</span> <span class="nv">flavorChannel</span> <span class="p">=</span> <span class="n">FlutterMethodChannel</span><span class="p">(</span>
-        <span class="n">name</span><span class="p">:</span> <span class="s">&#34;flavor&#34;</span><span class="p">,</span>
-        <span class="n">binaryMessenger</span><span class="p">:</span> <span class="n">controller</span><span class="p">.</span><span class="n">binaryMessenger</span><span class="p">)</span>
-
-    <span class="n">flavorChannel</span><span class="p">.</span><span class="n">setMethodCallHandler</span><span class="p">({(</span><span class="n">call</span><span class="p">:</span> <span class="n">FlutterMethodCall</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="p">@</span><span class="n">escaping</span> <span class="n">FlutterResult</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="nb">Void</span> <span class="k">in</span>
-        <span class="c1">// Note: this method is invoked on the UI thread</span>
-        <span class="kd">let</span> <span class="nv">flavor</span> <span class="p">=</span> <span class="n">Bundle</span><span class="p">.</span><span class="n">main</span><span class="p">.</span><span class="n">infoDictionary</span><span class="p">?[</span><span class="s">&#34;App - Flavor&#34;</span><span class="p">]</span>
-        <span class="n">result</span><span class="p">(</span><span class="n">flavor</span><span class="p">)</span>
-    <span class="p">})</span>
-
-    <span class="k">return</span> <span class="kc">super</span><span class="p">.</span><span class="n">application</span><span class="p">(</span><span class="n">application</span><span class="p">,</span> <span class="n">didFinishLaunchingWithOptions</span><span class="p">:</span> <span class="n">launchOptions</span><span class="p">)</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-swift" data-lang="swift"><span class="line"><span class="cl"><span class="kd">import</span> <span class="nc">UIKit</span>
+</span></span><span class="line"><span class="cl"><span class="kd">import</span> <span class="nc">Flutter</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kr">@UIApplicationMain</span>
+</span></span><span class="line"><span class="cl"><span class="kr">@objc</span> <span class="kd">class</span> <span class="nc">AppDelegate</span><span class="p">:</span> <span class="n">FlutterAppDelegate</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kr">override</span> <span class="kd">func</span> <span class="nf">application</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="kc">_</span> <span class="n">application</span><span class="p">:</span> <span class="n">UIApplication</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">didFinishLaunchingWithOptions</span> <span class="n">launchOptions</span><span class="p">:</span> <span class="p">[</span><span class="n">UIApplication</span><span class="p">.</span><span class="n">LaunchOptionsKey</span><span class="p">:</span> <span class="nb">Any</span><span class="p">]?</span>
+</span></span><span class="line"><span class="cl">  <span class="p">)</span> <span class="p">-&gt;</span> <span class="nb">Bool</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">GeneratedPluginRegistrant</span><span class="p">.</span><span class="n">register</span><span class="p">(</span><span class="n">with</span><span class="p">:</span> <span class="kc">self</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kd">let</span> <span class="nv">controller</span> <span class="p">=</span> <span class="n">window</span><span class="p">.</span><span class="n">rootViewController</span> <span class="k">as</span><span class="p">!</span> <span class="n">FlutterViewController</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kd">let</span> <span class="nv">flavorChannel</span> <span class="p">=</span> <span class="n">FlutterMethodChannel</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">        <span class="n">name</span><span class="p">:</span> <span class="s">&#34;flavor&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">binaryMessenger</span><span class="p">:</span> <span class="n">controller</span><span class="p">.</span><span class="n">binaryMessenger</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">flavorChannel</span><span class="p">.</span><span class="n">setMethodCallHandler</span><span class="p">({(</span><span class="n">call</span><span class="p">:</span> <span class="n">FlutterMethodCall</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="p">@</span><span class="n">escaping</span> <span class="n">FlutterResult</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="nb">Void</span> <span class="k">in</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// Note: this method is invoked on the UI thread</span>
+</span></span><span class="line"><span class="cl">        <span class="kd">let</span> <span class="nv">flavor</span> <span class="p">=</span> <span class="n">Bundle</span><span class="p">.</span><span class="n">main</span><span class="p">.</span><span class="n">infoDictionary</span><span class="p">?[</span><span class="s">&#34;App - Flavor&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="n">result</span><span class="p">(</span><span class="n">flavor</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">})</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="kc">super</span><span class="p">.</span><span class="n">application</span><span class="p">(</span><span class="n">application</span><span class="p">,</span> <span class="n">didFinishLaunchingWithOptions</span><span class="p">:</span> <span class="n">launchOptions</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>This will set up a method channel handler that reads the current flavor from a <code>Bundle.main.infoDictionary</code> with a key called <code>App - Flavor</code>.</p>
 <h3 id="set-up-the-flavor-value-per-scheme">Set up the flavor value per scheme</h3>
@@ -662,9 +662,9 @@ The Xcode project does not define custom schemes. You cannot use the --flavor op
 </span><span class="lnt">2
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">2020-10-03 14:44:05.525493+0200 Runner[26055:336596] flutter: STARTED WITH FLAVOR dev
-2020-10-03 14:44:05.526672+0200 Runner[26055:336596] flutter: API URL https://dev.flutter-flavors.chwe.at
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">2020-10-03 14:44:05.525493+0200 Runner[26055:336596] flutter: STARTED WITH FLAVOR dev
+</span></span><span class="line"><span class="cl">2020-10-03 14:44:05.526672+0200 Runner[26055:336596] flutter: API URL https://dev.flutter-flavors.chwe.at
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><a href="https://github.com/cwe1ss/flutter-flavors-ci-cd/commit/608246ea5f948f2a63dc1d7450a77468428a4fc4" target="_blank" rel="noopener noreffer">See all changes from this step in the Git commit.</a></p>
 <p>Great, we now have set up our flavors for iOS as well!</p>
@@ -760,31 +760,31 @@ which you can find here:</p>
 </span><span class="lnt">24
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c#" data-lang="c#"><span class="k">class</span> <span class="nc">Program</span>
-<span class="p">{</span>
-    <span class="k">static</span> <span class="k">void</span> <span class="n">Main</span><span class="p">(</span><span class="kt">string</span><span class="p">[]</span> <span class="n">args</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="c1">// Parameters
-</span><span class="c1"></span>        <span class="kt">string</span> <span class="n">baseFolder</span> <span class="p">=</span> <span class="s">@&#34;C:\path\to\solution\&#34;</span><span class="p">;</span>
-        <span class="kt">string</span> <span class="n">slnFile</span> <span class="p">=</span> <span class="s">&#34;AllProjects.sln&#34;</span><span class="p">;</span>
-        <span class="kt">string</span> <span class="n">outputFile</span> <span class="p">=</span> <span class="s">&#34;MissingProjects.txt&#34;</span><span class="p">;</span>
-
-        <span class="kt">string</span> <span class="n">slnContent</span> <span class="p">=</span> <span class="n">File</span><span class="p">.</span><span class="n">ReadAllText</span><span class="p">(</span><span class="n">Path</span><span class="p">.</span><span class="n">Combine</span><span class="p">(</span><span class="n">baseFolder</span><span class="p">,</span> <span class="n">slnFile</span><span class="p">));</span>
-
-        <span class="kt">string</span><span class="p">[]</span> <span class="n">projectFiles</span> <span class="p">=</span> <span class="n">Directory</span><span class="p">.</span><span class="n">GetFiles</span><span class="p">(</span><span class="n">baseFolder</span><span class="p">,</span> <span class="s">&#34;*.csproj&#34;</span><span class="p">,</span> <span class="n">SearchOption</span><span class="p">.</span><span class="n">AllDirectories</span><span class="p">);</span>
-
-        <span class="n">List</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">&gt;</span> <span class="n">missingProjects</span> <span class="p">=</span> <span class="n">projectFiles</span>
-            <span class="p">.</span><span class="n">Where</span><span class="p">(</span><span class="n">fullPath</span> <span class="p">=&gt;</span> <span class="n">slnContent</span><span class="p">.</span><span class="n">IndexOf</span><span class="p">(</span><span class="n">fullPath</span><span class="p">.</span><span class="n">Replace</span><span class="p">(</span><span class="n">baseFolder</span><span class="p">,</span> <span class="s">&#34;&#34;</span><span class="p">),</span> <span class="n">StringComparison</span><span class="p">.</span><span class="n">OrdinalIgnoreCase</span><span class="p">)</span> <span class="p">&lt;</span> <span class="m">0</span><span class="p">)</span>
-            <span class="p">.</span><span class="n">ToList</span><span class="p">();</span>
-
-        <span class="n">File</span><span class="p">.</span><span class="n">WriteAllLines</span><span class="p">(</span><span class="n">outputFile</span><span class="p">,</span> <span class="n">missingProjects</span><span class="p">);</span>
-
-        <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">&#34;Projects missing in solution: &#34;</span> <span class="p">+</span> <span class="n">missingProjects</span><span class="p">.</span><span class="n">Count</span><span class="p">);</span>
-        <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">&#34;Details: &#34;</span> <span class="p">+</span> <span class="n">outputFile</span><span class="p">);</span>
-        <span class="n">Console</span><span class="p">.</span><span class="n">ReadLine</span><span class="p">();</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c#" data-lang="c#"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Program</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">static</span> <span class="k">void</span> <span class="n">Main</span><span class="p">(</span><span class="kt">string</span><span class="p">[]</span> <span class="n">args</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// Parameters</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">string</span> <span class="n">baseFolder</span> <span class="p">=</span> <span class="s">@&#34;C:\path\to\solution\&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">string</span> <span class="n">slnFile</span> <span class="p">=</span> <span class="s">&#34;AllProjects.sln&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">string</span> <span class="n">outputFile</span> <span class="p">=</span> <span class="s">&#34;MissingProjects.txt&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="kt">string</span> <span class="n">slnContent</span> <span class="p">=</span> <span class="n">File</span><span class="p">.</span><span class="n">ReadAllText</span><span class="p">(</span><span class="n">Path</span><span class="p">.</span><span class="n">Combine</span><span class="p">(</span><span class="n">baseFolder</span><span class="p">,</span> <span class="n">slnFile</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="kt">string</span><span class="p">[]</span> <span class="n">projectFiles</span> <span class="p">=</span> <span class="n">Directory</span><span class="p">.</span><span class="n">GetFiles</span><span class="p">(</span><span class="n">baseFolder</span><span class="p">,</span> <span class="s">&#34;*.csproj&#34;</span><span class="p">,</span> <span class="n">SearchOption</span><span class="p">.</span><span class="n">AllDirectories</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">List</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">&gt;</span> <span class="n">missingProjects</span> <span class="p">=</span> <span class="n">projectFiles</span>
+</span></span><span class="line"><span class="cl">            <span class="p">.</span><span class="n">Where</span><span class="p">(</span><span class="n">fullPath</span> <span class="p">=&gt;</span> <span class="n">slnContent</span><span class="p">.</span><span class="n">IndexOf</span><span class="p">(</span><span class="n">fullPath</span><span class="p">.</span><span class="n">Replace</span><span class="p">(</span><span class="n">baseFolder</span><span class="p">,</span> <span class="s">&#34;&#34;</span><span class="p">),</span> <span class="n">StringComparison</span><span class="p">.</span><span class="n">OrdinalIgnoreCase</span><span class="p">)</span> <span class="p">&lt;</span> <span class="m">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="p">.</span><span class="n">ToList</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">File</span><span class="p">.</span><span class="n">WriteAllLines</span><span class="p">(</span><span class="n">outputFile</span><span class="p">,</span> <span class="n">missingProjects</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">&#34;Projects missing in solution: &#34;</span> <span class="p">+</span> <span class="n">missingProjects</span><span class="p">.</span><span class="n">Count</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">&#34;Details: &#34;</span> <span class="p">+</span> <span class="n">outputFile</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Console</span><span class="p">.</span><span class="n">ReadLine</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div>]]></description></item><item><title>Feature Folders: Controllers and Views</title><link>https://www.chwe.at/2014/07/feature-folders-controllers-and-views/</link><pubDate>Wed, 02 Jul 2014 00:00:00 +0100</pubDate><author>Author</author><guid>https://www.chwe.at/2014/07/feature-folders-controllers-and-views/</guid><description><![CDATA[<p>The first step in our process to <a href="https://www.chwe.at/2014/04/introducing-the-asp.net-mvc-feature-folders-project-structure/" rel="">a better folder structure for our MVC projects</a> is to make sure, MVC can resolve our Controllers and Views. This is our target structure:</p>
 <ul>
@@ -899,60 +899,60 @@ which you can find here:</p>
 </span><span class="lnt">53
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c#" data-lang="c#"><span class="k">public</span> <span class="k">class</span> <span class="nc">FeatureFolderViewEngine</span> <span class="p">:</span> <span class="n">RazorViewEngine</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="n">FeatureFolderViewEngine</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="c1">// {0} ActionName
-</span><span class="c1"></span>        <span class="c1">// {1} ControllerName
-</span><span class="c1"></span>        <span class="c1">// {2} AreaName
-</span><span class="c1"></span>
-        <span class="n">AreaViewLocationFormats</span> <span class="p">=</span> <span class="k">new</span><span class="p">[]</span>
-                                <span class="p">{</span>
-                                    <span class="s">&#34;~/Areas/{2}/{1}/{0}.cshtml&#34;</span><span class="p">,</span>
-                                    <span class="s">&#34;~/Areas/{2}/Shared/{0}.cshtml&#34;</span><span class="p">,</span>
-                                    <span class="s">&#34;~/Areas/Shared/{0}.cshtml&#34;</span><span class="p">,</span>
-                                <span class="p">};</span>
-
-        <span class="n">AreaMasterLocationFormats</span> <span class="p">=</span> <span class="k">new</span><span class="p">[]</span>
-                                    <span class="p">{</span>
-                                        <span class="s">&#34;~/Areas/{2}/{1}/{0}.cshtml&#34;</span><span class="p">,</span>
-                                        <span class="s">&#34;~/Areas/{2}/Shared/{0}.cshtml&#34;</span><span class="p">,</span>
-                                        <span class="s">&#34;~/Areas/Shared/{0}.cshtml&#34;</span><span class="p">,</span>
-                                    <span class="p">};</span>
-
-        <span class="n">AreaPartialViewLocationFormats</span> <span class="p">=</span> <span class="k">new</span><span class="p">[]</span>
-                                        <span class="p">{</span>
-                                            <span class="s">&#34;~/Areas/{2}/{1}/{0}.cshtml&#34;</span><span class="p">,</span>
-                                            <span class="s">&#34;~/Areas/{2}/Shared/{0}.cshtml&#34;</span><span class="p">,</span>
-                                            <span class="s">&#34;~/Areas/Shared/{0}.cshtml&#34;</span><span class="p">,</span>
-                                        <span class="p">};</span>
-
-        <span class="n">ViewLocationFormats</span> <span class="p">=</span> <span class="k">new</span><span class="p">[]</span>
-                            <span class="p">{</span>
-                                <span class="s">&#34;~/Features/{1}/{0}.cshtml&#34;</span><span class="p">,</span>
-                                <span class="s">&#34;~/Features/Shared/{0}.cshtml&#34;</span><span class="p">,</span>
-                            <span class="p">};</span>
-
-        <span class="n">MasterLocationFormats</span> <span class="p">=</span> <span class="k">new</span><span class="p">[]</span>
-                                <span class="p">{</span>
-                                    <span class="s">&#34;~/Features/{1}/{0}.cshtml&#34;</span><span class="p">,</span>
-                                    <span class="s">&#34;~/Features/Shared/{0}.cshtml&#34;</span><span class="p">,</span>
-                                <span class="p">};</span>
-
-        <span class="n">PartialViewLocationFormats</span> <span class="p">=</span> <span class="k">new</span><span class="p">[]</span>
-                                    <span class="p">{</span>
-                                        <span class="s">&#34;~/Features/{1}/{0}.cshtml&#34;</span><span class="p">,</span>
-                                        <span class="s">&#34;~/Features/Shared/{0}.cshtml&#34;</span><span class="p">,</span>
-                                    <span class="p">};</span>
-
-        <span class="n">FileExtensions</span> <span class="p">=</span> <span class="k">new</span><span class="p">[]</span>
-                        <span class="p">{</span>
-                            <span class="s">&#34;cshtml&#34;</span><span class="p">,</span>
-                        <span class="p">};</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c#" data-lang="c#"><span class="line"><span class="cl"><span class="k">public</span> <span class="k">class</span> <span class="nc">FeatureFolderViewEngine</span> <span class="p">:</span> <span class="n">RazorViewEngine</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">public</span> <span class="n">FeatureFolderViewEngine</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// {0} ActionName</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// {1} ControllerName</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// {2} AreaName</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">AreaViewLocationFormats</span> <span class="p">=</span> <span class="k">new</span><span class="p">[]</span>
+</span></span><span class="line"><span class="cl">                                <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                                    <span class="s">&#34;~/Areas/{2}/{1}/{0}.cshtml&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                                    <span class="s">&#34;~/Areas/{2}/Shared/{0}.cshtml&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                                    <span class="s">&#34;~/Areas/Shared/{0}.cshtml&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                                <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">AreaMasterLocationFormats</span> <span class="p">=</span> <span class="k">new</span><span class="p">[]</span>
+</span></span><span class="line"><span class="cl">                                    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                                        <span class="s">&#34;~/Areas/{2}/{1}/{0}.cshtml&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                                        <span class="s">&#34;~/Areas/{2}/Shared/{0}.cshtml&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                                        <span class="s">&#34;~/Areas/Shared/{0}.cshtml&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                                    <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">AreaPartialViewLocationFormats</span> <span class="p">=</span> <span class="k">new</span><span class="p">[]</span>
+</span></span><span class="line"><span class="cl">                                        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                                            <span class="s">&#34;~/Areas/{2}/{1}/{0}.cshtml&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                                            <span class="s">&#34;~/Areas/{2}/Shared/{0}.cshtml&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                                            <span class="s">&#34;~/Areas/Shared/{0}.cshtml&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                                        <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">ViewLocationFormats</span> <span class="p">=</span> <span class="k">new</span><span class="p">[]</span>
+</span></span><span class="line"><span class="cl">                            <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                                <span class="s">&#34;~/Features/{1}/{0}.cshtml&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                                <span class="s">&#34;~/Features/Shared/{0}.cshtml&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                            <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">MasterLocationFormats</span> <span class="p">=</span> <span class="k">new</span><span class="p">[]</span>
+</span></span><span class="line"><span class="cl">                                <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                                    <span class="s">&#34;~/Features/{1}/{0}.cshtml&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                                    <span class="s">&#34;~/Features/Shared/{0}.cshtml&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                                <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">PartialViewLocationFormats</span> <span class="p">=</span> <span class="k">new</span><span class="p">[]</span>
+</span></span><span class="line"><span class="cl">                                    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                                        <span class="s">&#34;~/Features/{1}/{0}.cshtml&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                                        <span class="s">&#34;~/Features/Shared/{0}.cshtml&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                                    <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">FileExtensions</span> <span class="p">=</span> <span class="k">new</span><span class="p">[]</span>
+</span></span><span class="line"><span class="cl">                        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                            <span class="s">&#34;cshtml&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                        <span class="p">};</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>Of course, if you use this new structure, you lose some of the built-in templating- and navigation-support in Visual Studio since VS does not recognize these folders as &ldquo;Views&rdquo;-folders. Therefore, the following things no longer work:</p>
 <ul>
@@ -1083,7 +1083,7 @@ Christian Weiss</p>
 ]]></description></item><item><title>Testable and reusable cookie access with ASP.Net MVC RC</title><link>https://www.chwe.at/2009/01/testable-and-reusable-cookie-access-with-asp.net-mvc-rc/</link><pubDate>Wed, 28 Jan 2009 18:35:00 +0100</pubDate><author>Author</author><guid>https://www.chwe.at/2009/01/testable-and-reusable-cookie-access-with-asp.net-mvc-rc/</guid><description><![CDATA[<p>All good things come in threes, so I&rsquo;m writing another post about how to access cookie or sessions. I got inspired by a comment from <a href="http://www.marisic.net/" target="_blank" rel="noopener noreffer">Chris Marisic</a>, who suggested to use a more testable way for this stuff!</p>
 <p>Previous posts about this topic:</p>
 <ul>
-<li><a href="https://www.chwe.at/2009/01/don-t-use-response.cookies-string-to-check-if-a-cookie-exists/" rel="">Don&rsquo;t use Response.Cookies[string] to check if a cookie exists!</a></li>
+<li><a href="https://www.chwe.at/2009/01/don-t-use-response.cookies-string--to-check-if-a-cookie-exists/" rel="">Don&rsquo;t use Response.Cookies[string] to check if a cookie exists!</a></li>
 <li><a href="https://www.chwe.at/2009/01/use-wrappers-to-access-your-cookies-sessions/" rel="">Use wrappers to access your cookies, sessions, &hellip;</a></li>
 </ul>
 <h3 id="intro">Intro</h3>
@@ -1105,16 +1105,16 @@ Christian Weiss</p>
 </span><span class="lnt">9
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c#" data-lang="c#"><span class="k">public</span> <span class="k">interface</span> <span class="n">ICookieContainer</span>
-<span class="p">{</span>
-    <span class="kt">bool</span> <span class="n">Exists</span><span class="p">(</span><span class="kt">string</span> <span class="n">key</span><span class="p">);</span>
-        
-    <span class="kt">string</span> <span class="n">GetValue</span><span class="p">(</span><span class="kt">string</span> <span class="n">key</span><span class="p">);</span>
-    <span class="n">T</span> <span class="n">GetValue</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;(</span><span class="kt">string</span> <span class="n">key</span><span class="p">);</span>
-        
-    <span class="k">void</span> <span class="n">SetValue</span><span class="p">(</span><span class="kt">string</span> <span class="n">key</span><span class="p">,</span> <span class="kt">object</span> <span class="k">value</span><span class="p">,</span> <span class="n">DateTime</span> <span class="n">expires</span><span class="p">);</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c#" data-lang="c#"><span class="line"><span class="cl"><span class="k">public</span> <span class="k">interface</span> <span class="nc">ICookieContainer</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">bool</span> <span class="n">Exists</span><span class="p">(</span><span class="kt">string</span> <span class="n">key</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">    <span class="kt">string</span> <span class="n">GetValue</span><span class="p">(</span><span class="kt">string</span> <span class="n">key</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">T</span> <span class="n">GetValue</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;(</span><span class="kt">string</span> <span class="n">key</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">    <span class="k">void</span> <span class="n">SetValue</span><span class="p">(</span><span class="kt">string</span> <span class="n">key</span><span class="p">,</span> <span class="kt">object</span> <span class="k">value</span><span class="p">,</span> <span class="n">DateTime</span> <span class="n">expires</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>I will just show the fundamental code here. If you want to see the whole implementation, please take a look at the code sample. (see bottom)</p>
 <p>As you can see below, I&rsquo;ve used the abstracted versions of HttpRequest and HttpResponse, which you get, if you use ASP.Net MVC. That&rsquo;s just one of thousand things I love about ASP.Net MVC. These classes can be used easily in unit tests. Notice that everything can be injected here. There’s no direct access to HttpContext.Current!</p>
@@ -1157,42 +1157,42 @@ Christian Weiss</p>
 </span><span class="lnt">35
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c#" data-lang="c#"><span class="k">public</span> <span class="k">class</span> <span class="nc">CookieContainer</span> <span class="p">:</span> <span class="n">ICookieContainer</span>
-<span class="p">{</span>
-    <span class="k">private</span> <span class="k">readonly</span> <span class="n">HttpRequestBase</span> <span class="m">_</span><span class="n">request</span><span class="p">;</span>
-    <span class="k">private</span> <span class="k">readonly</span> <span class="n">HttpResponseBase</span> <span class="m">_</span><span class="n">response</span><span class="p">;</span>
-    
-    <span class="k">public</span> <span class="n">CookieContainer</span><span class="p">(</span><span class="n">HttpRequestBase</span> <span class="n">request</span><span class="p">,</span> <span class="n">HttpResponseBase</span> <span class="n">response</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="c1">// &#34;Check&#34; is a helper class, I&#39;ve got from the &#34;Kigg&#34; project
-</span><span class="c1"></span>        <span class="n">Check</span><span class="p">.</span><span class="n">IsNotNull</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">&#34;request&#34;</span><span class="p">);</span>
-        <span class="n">Check</span><span class="p">.</span><span class="n">IsNotNull</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="s">&#34;response&#34;</span><span class="p">);</span>
-        
-        <span class="m">_</span><span class="n">request</span> <span class="p">=</span> <span class="n">request</span><span class="p">;</span>
-        <span class="m">_</span><span class="n">response</span> <span class="p">=</span> <span class="n">response</span><span class="p">;</span>
-    <span class="p">}</span>
-    
-    <span class="k">public</span> <span class="kt">string</span> <span class="n">GetValue</span><span class="p">(</span><span class="kt">string</span> <span class="n">key</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="n">Check</span><span class="p">.</span><span class="n">IsNotEmpty</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s">&#34;key&#34;</span><span class="p">);</span>
-        
-        <span class="n">HttpCookie</span> <span class="n">cookie</span> <span class="p">=</span> <span class="m">_</span><span class="n">request</span><span class="p">.</span><span class="n">Cookies</span><span class="p">[</span><span class="n">key</span><span class="p">];</span>
-        <span class="k">return</span> <span class="n">cookie</span> <span class="p">!=</span> <span class="k">null</span> <span class="p">?</span> <span class="n">cookie</span><span class="p">.</span><span class="n">Value</span> <span class="p">:</span> <span class="k">null</span><span class="p">;</span>
-    <span class="p">}</span>
-    
-    <span class="k">public</span> <span class="k">void</span> <span class="n">SetValue</span><span class="p">(</span><span class="kt">string</span> <span class="n">key</span><span class="p">,</span> <span class="kt">object</span> <span class="k">value</span><span class="p">,</span> <span class="n">DateTime</span> <span class="n">expires</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="n">Check</span><span class="p">.</span><span class="n">IsNotEmpty</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s">&#34;key&#34;</span><span class="p">);</span>
-        
-        <span class="kt">string</span> <span class="n">strValue</span> <span class="p">=</span> <span class="n">CheckAndConvertValue</span><span class="p">(</span><span class="k">value</span><span class="p">);</span>
-        
-        <span class="n">HttpCookie</span> <span class="n">cookie</span> <span class="p">=</span> <span class="k">new</span> <span class="n">HttpCookie</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">strValue</span><span class="p">)</span> <span class="p">{</span><span class="n">Expires</span> <span class="p">=</span> <span class="n">expires</span><span class="p">};</span>
-        <span class="m">_</span><span class="n">response</span><span class="p">.</span><span class="n">Cookies</span><span class="p">.</span><span class="n">Set</span><span class="p">(</span><span class="n">cookie</span><span class="p">);</span>
-    <span class="p">}</span>
-    
-    <span class="c1">// ... see code sample for full implementation
-</span><span class="c1"></span><span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c#" data-lang="c#"><span class="line"><span class="cl"><span class="k">public</span> <span class="k">class</span> <span class="nc">CookieContainer</span> <span class="p">:</span> <span class="n">ICookieContainer</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">private</span> <span class="k">readonly</span> <span class="n">HttpRequestBase</span> <span class="m">_</span><span class="n">request</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">private</span> <span class="k">readonly</span> <span class="n">HttpResponseBase</span> <span class="m">_</span><span class="n">response</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">public</span> <span class="n">CookieContainer</span><span class="p">(</span><span class="n">HttpRequestBase</span> <span class="n">request</span><span class="p">,</span> <span class="n">HttpResponseBase</span> <span class="n">response</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// &#34;Check&#34; is a helper class, I&#39;ve got from the &#34;Kigg&#34; project</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Check</span><span class="p">.</span><span class="n">IsNotNull</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">&#34;request&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Check</span><span class="p">.</span><span class="n">IsNotNull</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="s">&#34;response&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="m">_</span><span class="n">request</span> <span class="p">=</span> <span class="n">request</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="m">_</span><span class="n">response</span> <span class="p">=</span> <span class="n">response</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">public</span> <span class="kt">string</span> <span class="n">GetValue</span><span class="p">(</span><span class="kt">string</span> <span class="n">key</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Check</span><span class="p">.</span><span class="n">IsNotEmpty</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s">&#34;key&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="n">HttpCookie</span> <span class="n">cookie</span> <span class="p">=</span> <span class="m">_</span><span class="n">request</span><span class="p">.</span><span class="n">Cookies</span><span class="p">[</span><span class="n">key</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">cookie</span> <span class="p">!=</span> <span class="k">null</span> <span class="p">?</span> <span class="n">cookie</span><span class="p">.</span><span class="n">Value</span> <span class="p">:</span> <span class="k">null</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">public</span> <span class="k">void</span> <span class="n">SetValue</span><span class="p">(</span><span class="kt">string</span> <span class="n">key</span><span class="p">,</span> <span class="kt">object</span> <span class="k">value</span><span class="p">,</span> <span class="n">DateTime</span> <span class="n">expires</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Check</span><span class="p">.</span><span class="n">IsNotEmpty</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s">&#34;key&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="kt">string</span> <span class="n">strValue</span> <span class="p">=</span> <span class="n">CheckAndConvertValue</span><span class="p">(</span><span class="k">value</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="n">HttpCookie</span> <span class="n">cookie</span> <span class="p">=</span> <span class="k">new</span> <span class="n">HttpCookie</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">strValue</span><span class="p">)</span> <span class="p">{</span><span class="n">Expires</span> <span class="p">=</span> <span class="n">expires</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">        <span class="m">_</span><span class="n">response</span><span class="p">.</span><span class="n">Cookies</span><span class="p">.</span><span class="n">Set</span><span class="p">(</span><span class="n">cookie</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">// ... see code sample for full implementation</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>Here’s a sample unit tests that proves the testability of this code. I use <a href="http://code.google.com/p/moq/" target="_blank" rel="noopener noreffer">Moq</a> as my mocking framework.</p>
 <div class="highlight"><div class="chroma">
@@ -1242,50 +1242,50 @@ Christian Weiss</p>
 </span><span class="lnt">43
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c#" data-lang="c#"><span class="k">public</span> <span class="k">static</span> <span class="k">class</span> <span class="nc">Mocks</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="k">static</span> <span class="n">Mock</span><span class="p">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="n">HttpRequestBase</span><span class="p">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="n">HttpRequest</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="kt">var</span> <span class="n">httpRequest</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Mock</span><span class="p">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="n">HttpRequestBase</span><span class="p">&amp;</span><span class="n">gt</span><span class="p">;();</span>
-        <span class="n">httpRequest</span><span class="p">.</span><span class="n">Setup</span><span class="p">(</span><span class="n">x</span> <span class="p">=&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="n">x</span><span class="p">.</span><span class="n">Cookies</span><span class="p">).</span><span class="n">Returns</span><span class="p">(</span><span class="k">new</span> <span class="n">HttpCookieCollection</span><span class="p">());</span>
-        <span class="k">return</span> <span class="n">httpRequest</span><span class="p">;</span>
-    <span class="p">}</span>
-    
-    <span class="k">public</span> <span class="k">static</span> <span class="n">Mock</span><span class="p">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="n">HttpResponseBase</span><span class="p">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="n">HttpResponse</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="kt">var</span> <span class="n">httpResponse</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Mock</span><span class="p">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="n">HttpResponseBase</span><span class="p">&amp;</span><span class="n">gt</span><span class="p">;();</span>
-        <span class="n">httpResponse</span><span class="p">.</span><span class="n">Setup</span><span class="p">(</span><span class="n">x</span> <span class="p">=&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="n">x</span><span class="p">.</span><span class="n">Cookies</span><span class="p">).</span><span class="n">Returns</span><span class="p">(</span><span class="k">new</span> <span class="n">HttpCookieCollection</span><span class="p">());</span>
-        <span class="k">return</span> <span class="n">httpResponse</span><span class="p">;</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="c1">// This method is from my CookieContainerTests class
-</span><span class="c1"></span><span class="na">
-</span><span class="na">[TestMethod]</span>
-<span class="k">public</span> <span class="k">void</span> <span class="n">SetValue_UpdatesExistingCookie</span><span class="p">()</span>
-<span class="p">{</span>
-    <span class="c1">// Arrange
-</span><span class="c1"></span>    <span class="k">const</span> <span class="kt">string</span> <span class="n">cookieName</span> <span class="p">=</span> <span class="s">&#34;myCookie&#34;</span><span class="p">;</span>
-    <span class="k">const</span> <span class="kt">string</span> <span class="n">cookieValue</span> <span class="p">=</span> <span class="s">&#34;myValue&#34;</span><span class="p">;</span>
-    <span class="n">DateTime</span> <span class="n">cookieExpires</span> <span class="p">=</span> <span class="k">new</span> <span class="n">DateTime</span><span class="p">(</span><span class="m">2009</span><span class="p">,</span> <span class="m">1</span><span class="p">,</span> <span class="m">1</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">);</span>
-    
-    <span class="kt">var</span> <span class="n">httpRequest</span> <span class="p">=</span> <span class="n">Mocks</span><span class="p">.</span><span class="n">HttpRequest</span><span class="p">();</span>
-    <span class="kt">var</span> <span class="n">httpResponse</span> <span class="p">=</span> <span class="n">Mocks</span><span class="p">.</span><span class="n">HttpResponse</span><span class="p">();</span>
-    <span class="kt">var</span> <span class="n">cookieContainer</span> <span class="p">=</span> <span class="k">new</span> <span class="n">CookieContainer</span><span class="p">(</span><span class="n">httpRequest</span><span class="p">.</span><span class="n">Object</span><span class="p">,</span> <span class="n">httpResponse</span><span class="p">.</span><span class="n">Object</span><span class="p">);</span>
-    
-    <span class="n">httpResponse</span><span class="p">.</span><span class="n">Object</span><span class="p">.</span><span class="n">Cookies</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="k">new</span> <span class="n">HttpCookie</span><span class="p">(</span><span class="n">cookieName</span><span class="p">,</span> <span class="s">&#34;oldValue&#34;</span><span class="p">));</span>
-    
-    <span class="c1">// Act
-</span><span class="c1"></span>    <span class="m">_</span><span class="n">cookieContainer</span><span class="p">.</span><span class="n">SetValue</span><span class="p">(</span><span class="n">cookieName</span><span class="p">,</span> <span class="n">cookieValue</span><span class="p">,</span> <span class="n">cookieExpires</span><span class="p">);</span>
-
-    <span class="c1">// Assert
-</span><span class="c1"></span>    <span class="n">HttpCookie</span> <span class="n">cookie</span> <span class="p">=</span> <span class="n">httpResponse</span><span class="p">.</span><span class="n">Object</span><span class="p">.</span><span class="n">Cookies</span><span class="p">[</span><span class="s">&#34;myCookie&#34;</span><span class="p">];</span>
-    <span class="n">Assert</span><span class="p">.</span><span class="n">IsNotNull</span><span class="p">(</span><span class="n">cookie</span><span class="p">);</span>
-    <span class="n">Assert</span><span class="p">.</span><span class="n">AreEqual</span><span class="p">(</span><span class="n">cookie</span><span class="p">.</span><span class="n">Name</span><span class="p">,</span> <span class="n">cookieName</span><span class="p">);</span>
-    <span class="n">Assert</span><span class="p">.</span><span class="n">AreEqual</span><span class="p">(</span><span class="n">cookie</span><span class="p">.</span><span class="n">Value</span><span class="p">,</span> <span class="n">cookieValue</span><span class="p">);</span>
-    <span class="n">Assert</span><span class="p">.</span><span class="n">AreEqual</span><span class="p">(</span><span class="n">cookie</span><span class="p">.</span><span class="n">Expires</span><span class="p">,</span> <span class="n">cookieExpires</span><span class="p">);</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c#" data-lang="c#"><span class="line"><span class="cl"><span class="k">public</span> <span class="k">static</span> <span class="k">class</span> <span class="nc">Mocks</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">public</span> <span class="k">static</span> <span class="n">Mock</span><span class="p">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="n">HttpRequestBase</span><span class="p">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="n">HttpRequest</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">var</span> <span class="n">httpRequest</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Mock</span><span class="p">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="n">HttpRequestBase</span><span class="p">&amp;</span><span class="n">gt</span><span class="p">;();</span>
+</span></span><span class="line"><span class="cl">        <span class="n">httpRequest</span><span class="p">.</span><span class="n">Setup</span><span class="p">(</span><span class="n">x</span> <span class="p">=&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="n">x</span><span class="p">.</span><span class="n">Cookies</span><span class="p">).</span><span class="n">Returns</span><span class="p">(</span><span class="k">new</span> <span class="n">HttpCookieCollection</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">httpRequest</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">public</span> <span class="k">static</span> <span class="n">Mock</span><span class="p">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="n">HttpResponseBase</span><span class="p">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="n">HttpResponse</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">var</span> <span class="n">httpResponse</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Mock</span><span class="p">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="n">HttpResponseBase</span><span class="p">&amp;</span><span class="n">gt</span><span class="p">;();</span>
+</span></span><span class="line"><span class="cl">        <span class="n">httpResponse</span><span class="p">.</span><span class="n">Setup</span><span class="p">(</span><span class="n">x</span> <span class="p">=&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="n">x</span><span class="p">.</span><span class="n">Cookies</span><span class="p">).</span><span class="n">Returns</span><span class="p">(</span><span class="k">new</span> <span class="n">HttpCookieCollection</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">httpResponse</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// This method is from my CookieContainerTests class</span>
+</span></span><span class="line"><span class="cl"><span class="na">
+</span></span></span><span class="line"><span class="cl"><span class="na">[TestMethod]</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span> <span class="k">void</span> <span class="n">SetValue_UpdatesExistingCookie</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// Arrange</span>
+</span></span><span class="line"><span class="cl">    <span class="k">const</span> <span class="kt">string</span> <span class="n">cookieName</span> <span class="p">=</span> <span class="s">&#34;myCookie&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">const</span> <span class="kt">string</span> <span class="n">cookieValue</span> <span class="p">=</span> <span class="s">&#34;myValue&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DateTime</span> <span class="n">cookieExpires</span> <span class="p">=</span> <span class="k">new</span> <span class="n">DateTime</span><span class="p">(</span><span class="m">2009</span><span class="p">,</span> <span class="m">1</span><span class="p">,</span> <span class="m">1</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="kt">var</span> <span class="n">httpRequest</span> <span class="p">=</span> <span class="n">Mocks</span><span class="p">.</span><span class="n">HttpRequest</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">var</span> <span class="n">httpResponse</span> <span class="p">=</span> <span class="n">Mocks</span><span class="p">.</span><span class="n">HttpResponse</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">var</span> <span class="n">cookieContainer</span> <span class="p">=</span> <span class="k">new</span> <span class="n">CookieContainer</span><span class="p">(</span><span class="n">httpRequest</span><span class="p">.</span><span class="n">Object</span><span class="p">,</span> <span class="n">httpResponse</span><span class="p">.</span><span class="n">Object</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="n">httpResponse</span><span class="p">.</span><span class="n">Object</span><span class="p">.</span><span class="n">Cookies</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="k">new</span> <span class="n">HttpCookie</span><span class="p">(</span><span class="n">cookieName</span><span class="p">,</span> <span class="s">&#34;oldValue&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">// Act</span>
+</span></span><span class="line"><span class="cl">    <span class="m">_</span><span class="n">cookieContainer</span><span class="p">.</span><span class="n">SetValue</span><span class="p">(</span><span class="n">cookieName</span><span class="p">,</span> <span class="n">cookieValue</span><span class="p">,</span> <span class="n">cookieExpires</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// Assert</span>
+</span></span><span class="line"><span class="cl">    <span class="n">HttpCookie</span> <span class="n">cookie</span> <span class="p">=</span> <span class="n">httpResponse</span><span class="p">.</span><span class="n">Object</span><span class="p">.</span><span class="n">Cookies</span><span class="p">[</span><span class="s">&#34;myCookie&#34;</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Assert</span><span class="p">.</span><span class="n">IsNotNull</span><span class="p">(</span><span class="n">cookie</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Assert</span><span class="p">.</span><span class="n">AreEqual</span><span class="p">(</span><span class="n">cookie</span><span class="p">.</span><span class="n">Name</span><span class="p">,</span> <span class="n">cookieName</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Assert</span><span class="p">.</span><span class="n">AreEqual</span><span class="p">(</span><span class="n">cookie</span><span class="p">.</span><span class="n">Value</span><span class="p">,</span> <span class="n">cookieValue</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Assert</span><span class="p">.</span><span class="n">AreEqual</span><span class="p">(</span><span class="n">cookie</span><span class="p">.</span><span class="n">Expires</span><span class="p">,</span> <span class="n">cookieExpires</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>That’s it! Now you have a testable and reusable cookie container!</p>
 <h3 id="how-to-use-it-in-your-application">How to use it in your application</h3>
@@ -1321,34 +1321,34 @@ Christian Weiss</p>
 </span><span class="lnt">27
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c#" data-lang="c#"><span class="k">public</span> <span class="k">interface</span> <span class="n">IAppCookies</span>
-<span class="p">{</span>
-    <span class="kt">string</span> <span class="n">UserEmail</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
-    <span class="n">DateTime</span><span class="p">?</span> <span class="n">LastVisit</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="k">public</span> <span class="k">class</span> <span class="nc">AppCookies</span> <span class="p">:</span> <span class="n">IAppCookies</span>
-<span class="p">{</span>
-    <span class="k">private</span> <span class="k">readonly</span> <span class="n">ICookieContainer</span> <span class="m">_</span><span class="n">cookieContainer</span><span class="p">;</span>
-    
-    <span class="k">public</span> <span class="n">AppCookies</span><span class="p">(</span><span class="n">ICookieContainer</span> <span class="n">cookieContainer</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="m">_</span><span class="n">cookieContainer</span> <span class="p">=</span> <span class="n">cookieContainer</span><span class="p">;</span>
-    <span class="p">}</span>
-    
-    <span class="k">public</span> <span class="kt">string</span> <span class="n">UserEmail</span>
-    <span class="p">{</span>
-        <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="m">_</span><span class="n">cookieContainer</span><span class="p">.</span><span class="n">GetValue</span><span class="p">(</span><span class="s">&#34;UserEmail&#34;</span><span class="p">);</span> <span class="p">}</span>
-        <span class="k">set</span> <span class="p">{</span> <span class="m">_</span><span class="n">cookieContainer</span><span class="p">.</span><span class="n">SetValue</span><span class="p">(</span><span class="s">&#34;UserEmail&#34;</span><span class="p">,</span> <span class="k">value</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">.</span><span class="n">Now</span><span class="p">.</span><span class="n">AddDays</span><span class="p">(</span><span class="m">10</span><span class="p">));</span> <span class="p">}</span>
-    <span class="p">}</span>
-    
-    <span class="k">public</span> <span class="n">DateTime</span><span class="p">?</span> <span class="n">LastVisit</span>
-    <span class="p">{</span>
-        <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="m">_</span><span class="n">cookieContainer</span><span class="p">.</span><span class="n">GetValue</span><span class="p">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="n">DateTime</span><span class="p">?&amp;</span><span class="n">gt</span><span class="p">;(</span><span class="s">&#34;LastVisit&#34;</span><span class="p">);</span> <span class="p">}</span>
-        <span class="k">set</span> <span class="p">{</span> <span class="m">_</span><span class="n">cookieContainer</span><span class="p">.</span><span class="n">SetValue</span><span class="p">(</span><span class="s">&#34;LastVisit&#34;</span><span class="p">,</span> <span class="k">value</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">.</span><span class="n">Now</span><span class="p">.</span><span class="n">AddDays</span><span class="p">(</span><span class="m">10</span><span class="p">));</span> <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c#" data-lang="c#"><span class="line"><span class="cl"><span class="k">public</span> <span class="k">interface</span> <span class="nc">IAppCookies</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">string</span> <span class="n">UserEmail</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DateTime</span><span class="p">?</span> <span class="n">LastVisit</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">public</span> <span class="k">class</span> <span class="nc">AppCookies</span> <span class="p">:</span> <span class="n">IAppCookies</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">private</span> <span class="k">readonly</span> <span class="n">ICookieContainer</span> <span class="m">_</span><span class="n">cookieContainer</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">public</span> <span class="n">AppCookies</span><span class="p">(</span><span class="n">ICookieContainer</span> <span class="n">cookieContainer</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="m">_</span><span class="n">cookieContainer</span> <span class="p">=</span> <span class="n">cookieContainer</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">public</span> <span class="kt">string</span> <span class="n">UserEmail</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="m">_</span><span class="n">cookieContainer</span><span class="p">.</span><span class="n">GetValue</span><span class="p">(</span><span class="s">&#34;UserEmail&#34;</span><span class="p">);</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="k">set</span> <span class="p">{</span> <span class="m">_</span><span class="n">cookieContainer</span><span class="p">.</span><span class="n">SetValue</span><span class="p">(</span><span class="s">&#34;UserEmail&#34;</span><span class="p">,</span> <span class="k">value</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">.</span><span class="n">Now</span><span class="p">.</span><span class="n">AddDays</span><span class="p">(</span><span class="m">10</span><span class="p">));</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">public</span> <span class="n">DateTime</span><span class="p">?</span> <span class="n">LastVisit</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="m">_</span><span class="n">cookieContainer</span><span class="p">.</span><span class="n">GetValue</span><span class="p">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="n">DateTime</span><span class="p">?&amp;</span><span class="n">gt</span><span class="p">;(</span><span class="s">&#34;LastVisit&#34;</span><span class="p">);</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="k">set</span> <span class="p">{</span> <span class="m">_</span><span class="n">cookieContainer</span><span class="p">.</span><span class="n">SetValue</span><span class="p">(</span><span class="s">&#34;LastVisit&#34;</span><span class="p">,</span> <span class="k">value</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">.</span><span class="n">Now</span><span class="p">.</span><span class="n">AddDays</span><span class="p">(</span><span class="m">10</span><span class="p">));</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>You can now inject this IAppCookies interface to your MVC Controller:</p>
 <div class="highlight"><div class="chroma">
@@ -1387,39 +1387,39 @@ Christian Weiss</p>
 </span><span class="lnt">32
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c#" data-lang="c#"><span class="k">public</span> <span class="k">class</span> <span class="nc">HomeController</span> <span class="p">:</span> <span class="n">Controller</span>
-<span class="p">{</span>
-    <span class="k">private</span> <span class="k">readonly</span> <span class="n">IAppCookies</span> <span class="m">_</span><span class="n">cookies</span><span class="p">;</span>
-
-    <span class="k">public</span> <span class="n">HomeController</span><span class="p">(</span><span class="n">IAppCookies</span> <span class="n">cookies</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="m">_</span><span class="n">cookies</span> <span class="p">=</span> <span class="n">cookies</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="n">ActionResult</span> <span class="n">Index</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="n">DateTime</span> <span class="n">currentTime</span> <span class="p">=</span> <span class="n">DateTime</span><span class="p">.</span><span class="n">Now</span><span class="p">;</span>
-
-        <span class="n">IndexViewModel</span> <span class="n">viewModel</span> <span class="p">=</span> <span class="k">new</span> <span class="n">IndexViewModel</span>
-        <span class="p">{</span>
-            <span class="n">CurrentTime</span> <span class="p">=</span> <span class="n">currentTime</span><span class="p">,</span>
-            <span class="n">LastVisit</span> <span class="p">=</span> <span class="p">(</span><span class="m">_</span><span class="n">cookies</span><span class="p">.</span><span class="n">LastVisit</span> <span class="p">??</span> <span class="n">currentTime</span><span class="p">),</span>
-            <span class="n">UserEmail</span> <span class="p">=</span> <span class="m">_</span><span class="n">cookies</span><span class="p">.</span><span class="n">UserEmail</span>
-        <span class="p">};</span>
-
-        <span class="m">_</span><span class="n">cookies</span><span class="p">.</span><span class="n">LastVisit</span> <span class="p">=</span> <span class="n">currentTime</span><span class="p">;</span>
-
-        <span class="k">return</span> <span class="n">View</span><span class="p">(</span><span class="n">viewModel</span><span class="p">);</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">class</span> <span class="nc">IndexViewModel</span>
-    <span class="p">{</span>
-        <span class="k">public</span> <span class="kt">string</span> <span class="n">UserEmail</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
-        <span class="k">public</span> <span class="n">DateTime</span> <span class="n">LastVisit</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
-        <span class="k">public</span> <span class="n">DateTime</span> <span class="n">CurrentTime</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c#" data-lang="c#"><span class="line"><span class="cl"><span class="k">public</span> <span class="k">class</span> <span class="nc">HomeController</span> <span class="p">:</span> <span class="n">Controller</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">private</span> <span class="k">readonly</span> <span class="n">IAppCookies</span> <span class="m">_</span><span class="n">cookies</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">public</span> <span class="n">HomeController</span><span class="p">(</span><span class="n">IAppCookies</span> <span class="n">cookies</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="m">_</span><span class="n">cookies</span> <span class="p">=</span> <span class="n">cookies</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">public</span> <span class="n">ActionResult</span> <span class="n">Index</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">DateTime</span> <span class="n">currentTime</span> <span class="p">=</span> <span class="n">DateTime</span><span class="p">.</span><span class="n">Now</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">IndexViewModel</span> <span class="n">viewModel</span> <span class="p">=</span> <span class="k">new</span> <span class="n">IndexViewModel</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">CurrentTime</span> <span class="p">=</span> <span class="n">currentTime</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="n">LastVisit</span> <span class="p">=</span> <span class="p">(</span><span class="m">_</span><span class="n">cookies</span><span class="p">.</span><span class="n">LastVisit</span> <span class="p">??</span> <span class="n">currentTime</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">            <span class="n">UserEmail</span> <span class="p">=</span> <span class="m">_</span><span class="n">cookies</span><span class="p">.</span><span class="n">UserEmail</span>
+</span></span><span class="line"><span class="cl">        <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="m">_</span><span class="n">cookies</span><span class="p">.</span><span class="n">LastVisit</span> <span class="p">=</span> <span class="n">currentTime</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">View</span><span class="p">(</span><span class="n">viewModel</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">public</span> <span class="k">class</span> <span class="nc">IndexViewModel</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">public</span> <span class="kt">string</span> <span class="n">UserEmail</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="k">public</span> <span class="n">DateTime</span> <span class="n">LastVisit</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="k">public</span> <span class="n">DateTime</span> <span class="n">CurrentTime</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>Wow, you’re still reading :-)</p>
 <p>That’s all I want to show here! If you want to see more about how the IOC is set up (I’m using <a href="http://structuremap.sourceforge.net/Default.htm" target="_blank" rel="noopener noreffer">StructureMap</a>) or anything else, take a look at the full code:</p>

@@ -16,53 +16,31 @@
 <meta name=application-name content="Christian Weiss">
 <meta name=apple-mobile-web-app-title content="Christian Weiss"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico>
 <link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png>
-<link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://www.chwe.at/2009/01/use-wrappers-to-access-your-cookies-sessions/><link rel=prev href=https://www.chwe.at/2009/01/don-t-use-response.cookies-string-to-check-if-a-cookie-exists/><link rel=next href=https://www.chwe.at/2009/01/testable-and-reusable-cookie-access-with-asp.net-mvc-rc/><link rel=stylesheet href=/lib/normalize/normalize.min.css><link rel=stylesheet href=/css/style.min.css><link rel=stylesheet href=/lib/fontawesome-free/all.min.css><link rel=stylesheet href=/lib/animate/animate.min.css><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"Use wrappers to access your cookies, sessions, ...","inLanguage":"en","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/www.chwe.at\/2009\/01\/use-wrappers-to-access-your-cookies-sessions\/"},"genre":"posts","wordcount":293,"url":"https:\/\/www.chwe.at\/2009\/01\/use-wrappers-to-access-your-cookies-sessions\/","datePublished":"2009-01-26T18:45:00+01:00","dateModified":"2009-01-26T18:45:00+01:00","publisher":{"@type":"Organization","name":""},"author":{"@type":"Person","name":"Christian Weiss"},"description":""}</script></head>
-<body header-desktop header-mobile><script type=text/javascript>(window.localStorage&&localStorage.getItem('theme')?localStorage.getItem('theme')==='dark':''==='auto'?window.matchMedia('(prefers-color-scheme: dark)').matches:''==='dark')&&document.body.setAttribute('theme','dark')</script>
+<link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://www.chwe.at/2009/01/use-wrappers-to-access-your-cookies-sessions/><link rel=prev href=https://www.chwe.at/2009/01/don-t-use-response.cookies-string--to-check-if-a-cookie-exists/><link rel=next href=https://www.chwe.at/2009/01/testable-and-reusable-cookie-access-with-asp.net-mvc-rc/><link rel=stylesheet href=/lib/normalize/normalize.min.css><link rel=stylesheet href=/css/style.min.css><link rel=stylesheet href=/lib/fontawesome-free/all.min.css><link rel=stylesheet href=/lib/animate/animate.min.css><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"Use wrappers to access your cookies, sessions, ...","inLanguage":"en","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/www.chwe.at\/2009\/01\/use-wrappers-to-access-your-cookies-sessions\/"},"genre":"posts","wordcount":293,"url":"https:\/\/www.chwe.at\/2009\/01\/use-wrappers-to-access-your-cookies-sessions\/","datePublished":"2009-01-26T18:45:00+01:00","dateModified":"2009-01-26T18:45:00+01:00","publisher":{"@type":"Organization","name":""},"author":{"@type":"Person","name":"Christian Weiss"},"description":""}</script></head><body header-desktop header-mobile><script type=text/javascript>(window.localStorage&&localStorage.getItem("theme")?localStorage.getItem("theme")==="dark":''==="auto"?window.matchMedia("(prefers-color-scheme: dark)").matches:''==="dark")&&document.body.setAttribute("theme","dark")</script>
 <div id=mask></div><div class=wrapper><header class=desktop id=header-desktop>
 <div class=header-wrapper>
 <div class=header-title>
 <a href=/ title="Christian Weiss">Christian Weiss</a>
-</div>
-<div class=menu>
+</div><div class=menu>
 <div class=menu-inner><a class=menu-item href=/posts/> Posts </a><a class=menu-item href=/about/> About me </a><span class="menu-item delimiter"></span><a href=javascript:void(0); class="menu-item theme-switch" title="Switch Theme">
 <i class="fas fa-adjust fa-fw"></i>
 </a>
-</div>
-</div>
-</div>
-</header><header class=mobile id=header-mobile>
+</div></div></div></header><header class=mobile id=header-mobile>
 <div class=header-container>
 <div class=header-wrapper>
 <div class=header-title>
 <a href=/ title="Christian Weiss">Christian Weiss</a>
-</div>
-<div class=menu-toggle id=menu-toggle-mobile>
+</div><div class=menu-toggle id=menu-toggle-mobile>
 <span></span><span></span><span></span>
-</div>
-</div>
-<div class=menu id=menu-mobile><a class=menu-item href=/posts/ title>Posts</a><a class=menu-item href=/about/ title>About me</a><a href=javascript:void(0); class="menu-item theme-switch" title="Switch Theme">
+</div></div><div class=menu id=menu-mobile><a class=menu-item href=/posts/ title>Posts</a><a class=menu-item href=/about/ title>About me</a><a href=javascript:void(0); class="menu-item theme-switch" title="Switch Theme">
 <i class="fas fa-adjust fa-fw"></i>
-</a></div>
-</div>
-</header>
-<div class="search-dropdown desktop">
-<div id=search-dropdown-desktop></div>
-</div>
-<div class="search-dropdown mobile">
-<div id=search-dropdown-mobile></div>
-</div>
-<main class=main>
+</a></div></div></header><div class="search-dropdown desktop">
+<div id=search-dropdown-desktop></div></div><div class="search-dropdown mobile">
+<div id=search-dropdown-mobile></div></div><main class=main>
 <div class=container><article class="page single"><h1 class="single-title animated flipInX">Use wrappers to access your cookies, sessions, ...</h1><div class=post-meta>
-<div class=post-meta-line><span class=post-author><a href=/ title=Author rel=author class=author><i class="fas fa-user-circle fa-fw"></i>Christian Weiss</a></span>&nbsp;<span class=post-category>included in <a href=/categories/.net/><i class="far fa-folder fa-fw"></i>.NET</a></span></div>
-<div class=post-meta-line><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime=2009-01-26>2009-01-26</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;293 words&nbsp;
-<i class="far fa-clock fa-fw"></i>&nbsp;2 minutes&nbsp;</div>
-</div><div class=content id=content><p>As described in my <a href=https://www.chwe.at/2009/01/don-t-use-response.cookies-string-to-check-if-a-cookie-exists/ rel>previous post</a>, I will give you some more details about how you can access your cookies in a type-safe and easy way!</p>
-<h3 id=update-read-the-follow-up-post>Update: Read the follow up post</h3>
-<ul>
-<li><a href=https://www.chwe.at/2009/01/testable-and-reusable-cookie-access-with-asp.net-mvc-rc/ rel>Testable and reusable cookie access with ASP.Net MVC RC</a></li>
-</ul>
-<p>The simplest way to do this is by using a little wrapper class like this one:</p>
-<div class=highlight><div class=chroma>
+<div class=post-meta-line><span class=post-author><a href=/ title=Author rel=author class=author><i class="fas fa-user-circle fa-fw"></i>Christian Weiss</a></span>&nbsp;<span class=post-category>included in <a href=/categories/.net/><i class="far fa-folder fa-fw"></i>.NET</a></span></div><div class=post-meta-line><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime=2009-01-26>2009-01-26</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;293 words&nbsp;
+<i class="far fa-clock fa-fw"></i>&nbsp;2 minutes&nbsp;</div></div><div class=content id=content><p>As described in my <a href=https://www.chwe.at/2009/01/don-t-use-response.cookies-string--to-check-if-a-cookie-exists/ rel>previous post</a>, I will give you some more details about how you can access your cookies in a type-safe and easy way!</p><h3 id=update-read-the-follow-up-post>Update: Read the follow up post</h3><ul>
+<li><a href=https://www.chwe.at/2009/01/testable-and-reusable-cookie-access-with-asp.net-mvc-rc/ rel>Testable and reusable cookie access with ASP.Net MVC RC</a></li></ul><p>The simplest way to do this is by using a little wrapper class like this one:</p><div class=highlight><div class=chroma>
 <table class=lntable><tr><td class=lntd>
 <pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
@@ -109,105 +87,79 @@
 </span><span class=lnt>43
 </span><span class=lnt>44
 </span><span class=lnt>45
-</span></code></pre></td>
-<td class=lntd>
-<pre tabindex=0 class=chroma><code class=language-c# data-lang=c#><span class=k>using</span> <span class=nn>System</span><span class=p>;</span>
-<span class=k>using</span> <span class=nn>System.Globalization</span><span class=p>;</span>
-<span class=k>using</span> <span class=nn>System.Web</span><span class=p>;</span>
-    
-<span class=k>namespace</span> <span class=nn>CookieWrapper.Web</span>
-<span class=p>{</span>
-    <span class=k>public</span> <span class=k>static</span> <span class=k>class</span> <span class=nc>MyCookies</span>
-    <span class=p>{</span>
-        <span class=k>public</span> <span class=k>static</span> <span class=kt>string</span> <span class=n>UserEmail</span>
-        <span class=p>{</span>
-            <span class=k>get</span> <span class=p>{</span> <span class=k>return</span> <span class=n>GetValue</span><span class=p>(</span><span class=s>&#34;UserEmail&#34;</span><span class=p>);</span> <span class=p>}</span>
-            <span class=k>set</span> <span class=p>{</span> <span class=n>SetValue</span><span class=p>(</span><span class=s>&#34;UserEmail&#34;</span><span class=p>,</span> <span class=k>value</span><span class=p>,</span> <span class=n>DateTime</span><span class=p>.</span><span class=n>Now</span><span class=p>.</span><span class=n>AddDays</span><span class=p>(</span><span class=m>10</span><span class=p>));</span> <span class=p>}</span>
-        <span class=p>}</span>
-    
-        <span class=k>public</span> <span class=k>static</span> <span class=n>DateTime</span><span class=p>?</span> <span class=n>LastVisit</span>
-        <span class=p>{</span>
-            <span class=k>get</span>
-            <span class=p>{</span>
-                <span class=kt>string</span> <span class=n>strDate</span> <span class=p>=</span> <span class=n>GetValue</span><span class=p>(</span><span class=s>&#34;LastVisit&#34;</span><span class=p>);</span>
-                <span class=k>if</span> <span class=p>(</span><span class=n>String</span><span class=p>.</span><span class=n>IsNullOrEmpty</span><span class=p>(</span><span class=n>strDate</span><span class=p>))</span>
-                    <span class=k>return</span> <span class=k>null</span><span class=p>;</span>
-                <span class=k>return</span> <span class=n>DateTime</span><span class=p>.</span><span class=n>Parse</span><span class=p>(</span><span class=n>strDate</span><span class=p>,</span> <span class=n>CultureInfo</span><span class=p>.</span><span class=n>InvariantCulture</span><span class=p>);</span>
-            <span class=p>}</span>
-            <span class=k>set</span>
-            <span class=p>{</span>
-                <span class=kt>string</span> <span class=n>strDate</span> <span class=p>=</span> <span class=k>value</span><span class=p>.</span><span class=n>HasValue</span> <span class=p>?</span> <span class=k>value</span><span class=p>.</span><span class=n>Value</span><span class=p>.</span><span class=n>ToString</span><span class=p>(</span><span class=n>CultureInfo</span><span class=p>.</span><span class=n>InvariantCulture</span><span class=p>)</span> <span class=p>:</span> <span class=k>null</span><span class=p>;</span>
-                <span class=n>SetValue</span><span class=p>(</span><span class=s>&#34;LastVisit&#34;</span><span class=p>,</span> <span class=n>strDate</span><span class=p>,</span> <span class=n>DateTime</span><span class=p>.</span><span class=n>Now</span><span class=p>.</span><span class=n>AddDays</span><span class=p>(</span><span class=m>10</span><span class=p>));</span>
-            <span class=p>}</span>
-        <span class=p>}</span>
-    
-        <span class=k>private</span> <span class=k>static</span> <span class=kt>string</span> <span class=n>GetValue</span><span class=p>(</span><span class=kt>string</span> <span class=n>key</span><span class=p>)</span>
-        <span class=p>{</span>
-            <span class=n>HttpCookie</span> <span class=n>cookie</span> <span class=p>=</span> <span class=n>HttpContext</span><span class=p>.</span><span class=n>Current</span><span class=p>.</span><span class=n>Request</span><span class=p>.</span><span class=n>Cookies</span><span class=p>[</span><span class=n>key</span><span class=p>];</span>
-            <span class=k>if</span> <span class=p>(</span><span class=n>cookie</span> <span class=p>!=</span> <span class=k>null</span><span class=p>)</span>
-                <span class=k>return</span> <span class=n>cookie</span><span class=p>.</span><span class=n>Value</span><span class=p>;</span>
-            <span class=k>return</span> <span class=k>null</span><span class=p>;</span>
-        <span class=p>}</span>
-    
-        <span class=k>private</span> <span class=k>static</span> <span class=k>void</span> <span class=n>SetValue</span><span class=p>(</span><span class=kt>string</span> <span class=n>key</span><span class=p>,</span> <span class=kt>string</span> <span class=k>value</span><span class=p>,</span> <span class=n>DateTime</span> <span class=n>expires</span><span class=p>)</span>
-        <span class=p>{</span>
-            <span class=n>HttpContext</span><span class=p>.</span><span class=n>Current</span><span class=p>.</span><span class=n>Response</span><span class=p>.</span><span class=n>Cookies</span><span class=p>[</span><span class=n>key</span><span class=p>].</span><span class=n>Value</span> <span class=p>=</span> <span class=k>value</span><span class=p>;</span>
-            <span class=n>HttpContext</span><span class=p>.</span><span class=n>Current</span><span class=p>.</span><span class=n>Response</span><span class=p>.</span><span class=n>Cookies</span><span class=p>[</span><span class=n>key</span><span class=p>].</span><span class=n>Expires</span> <span class=p>=</span> <span class=n>expires</span><span class=p>;</span>
-        <span class=p>}</span>
-    <span class=p>}</span>
-<span class=p>}</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>All you have to do is create a static property for every cookie that you would like to work with. As you can see you also have the Expires-times administrated in one single place!</p>
-<p>Now you can access the values as seen below and you don&rsquo;t have to worry about the cookie implementation-details in every place.</p>
-<div class=highlight><div class=chroma>
+</span></code></pre></td><td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-c# data-lang=c#><span class=line><span class=cl><span class=k>using</span> <span class=nn>System</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=k>using</span> <span class=nn>System.Globalization</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=k>using</span> <span class=nn>System.Web</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl><span class=k>namespace</span> <span class=nn>CookieWrapper.Web</span>
+</span></span><span class=line><span class=cl><span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>public</span> <span class=k>static</span> <span class=k>class</span> <span class=nc>MyCookies</span>
+</span></span><span class=line><span class=cl>    <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>public</span> <span class=k>static</span> <span class=kt>string</span> <span class=n>UserEmail</span>
+</span></span><span class=line><span class=cl>        <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=k>get</span> <span class=p>{</span> <span class=k>return</span> <span class=n>GetValue</span><span class=p>(</span><span class=s>&#34;UserEmail&#34;</span><span class=p>);</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>            <span class=k>set</span> <span class=p>{</span> <span class=n>SetValue</span><span class=p>(</span><span class=s>&#34;UserEmail&#34;</span><span class=p>,</span> <span class=k>value</span><span class=p>,</span> <span class=n>DateTime</span><span class=p>.</span><span class=n>Now</span><span class=p>.</span><span class=n>AddDays</span><span class=p>(</span><span class=m>10</span><span class=p>));</span> <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>        <span class=k>public</span> <span class=k>static</span> <span class=n>DateTime</span><span class=p>?</span> <span class=n>LastVisit</span>
+</span></span><span class=line><span class=cl>        <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=k>get</span>
+</span></span><span class=line><span class=cl>            <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=kt>string</span> <span class=n>strDate</span> <span class=p>=</span> <span class=n>GetValue</span><span class=p>(</span><span class=s>&#34;LastVisit&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>                <span class=k>if</span> <span class=p>(</span><span class=n>String</span><span class=p>.</span><span class=n>IsNullOrEmpty</span><span class=p>(</span><span class=n>strDate</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>                    <span class=k>return</span> <span class=k>null</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>                <span class=k>return</span> <span class=n>DateTime</span><span class=p>.</span><span class=n>Parse</span><span class=p>(</span><span class=n>strDate</span><span class=p>,</span> <span class=n>CultureInfo</span><span class=p>.</span><span class=n>InvariantCulture</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>            <span class=k>set</span>
+</span></span><span class=line><span class=cl>            <span class=p>{</span>
+</span></span><span class=line><span class=cl>                <span class=kt>string</span> <span class=n>strDate</span> <span class=p>=</span> <span class=k>value</span><span class=p>.</span><span class=n>HasValue</span> <span class=p>?</span> <span class=k>value</span><span class=p>.</span><span class=n>Value</span><span class=p>.</span><span class=n>ToString</span><span class=p>(</span><span class=n>CultureInfo</span><span class=p>.</span><span class=n>InvariantCulture</span><span class=p>)</span> <span class=p>:</span> <span class=k>null</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>                <span class=n>SetValue</span><span class=p>(</span><span class=s>&#34;LastVisit&#34;</span><span class=p>,</span> <span class=n>strDate</span><span class=p>,</span> <span class=n>DateTime</span><span class=p>.</span><span class=n>Now</span><span class=p>.</span><span class=n>AddDays</span><span class=p>(</span><span class=m>10</span><span class=p>));</span>
+</span></span><span class=line><span class=cl>            <span class=p>}</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>        <span class=k>private</span> <span class=k>static</span> <span class=kt>string</span> <span class=n>GetValue</span><span class=p>(</span><span class=kt>string</span> <span class=n>key</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=n>HttpCookie</span> <span class=n>cookie</span> <span class=p>=</span> <span class=n>HttpContext</span><span class=p>.</span><span class=n>Current</span><span class=p>.</span><span class=n>Request</span><span class=p>.</span><span class=n>Cookies</span><span class=p>[</span><span class=n>key</span><span class=p>];</span>
+</span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=p>(</span><span class=n>cookie</span> <span class=p>!=</span> <span class=k>null</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>                <span class=k>return</span> <span class=n>cookie</span><span class=p>.</span><span class=n>Value</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>            <span class=k>return</span> <span class=k>null</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>        <span class=k>private</span> <span class=k>static</span> <span class=k>void</span> <span class=n>SetValue</span><span class=p>(</span><span class=kt>string</span> <span class=n>key</span><span class=p>,</span> <span class=kt>string</span> <span class=k>value</span><span class=p>,</span> <span class=n>DateTime</span> <span class=n>expires</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>        <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=n>HttpContext</span><span class=p>.</span><span class=n>Current</span><span class=p>.</span><span class=n>Response</span><span class=p>.</span><span class=n>Cookies</span><span class=p>[</span><span class=n>key</span><span class=p>].</span><span class=n>Value</span> <span class=p>=</span> <span class=k>value</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>            <span class=n>HttpContext</span><span class=p>.</span><span class=n>Current</span><span class=p>.</span><span class=n>Response</span><span class=p>.</span><span class=n>Cookies</span><span class=p>[</span><span class=n>key</span><span class=p>].</span><span class=n>Expires</span> <span class=p>=</span> <span class=n>expires</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>All you have to do is create a static property for every cookie that you would like to work with. As you can see you also have the Expires-times administrated in one single place!</p><p>Now you can access the values as seen below and you don&rsquo;t have to worry about the cookie implementation-details in every place.</p><div class=highlight><div class=chroma>
 <table class=lntable><tr><td class=lntd>
 <pre tabindex=0 class=chroma><code><span class=lnt>1
 </span><span class=lnt>2
-</span></code></pre></td>
-<td class=lntd>
-<pre tabindex=0 class=chroma><code class=language-c# data-lang=c#><span class=n>tbLastVisit</span><span class=p>.</span><span class=n>Text</span> <span class=p>=</span> <span class=n>MyCookies</span><span class=p>.</span><span class=n>UserEmail</span><span class=p>;</span>
-<span class=n>MyCookies</span><span class=p>.</span><span class=n>LastVisit</span> <span class=p>=</span> <span class=n>DateTime</span><span class=p>.</span><span class=n>Now</span><span class=p>;</span>
-</code></pre></td></tr></table>
-</div>
-</div><p>Of course, you can also use this same approach for working with session data or any other key-based collection.</p>
-<p>Thanks for reading,<br>
+</span></code></pre></td><td class=lntd>
+<pre tabindex=0 class=chroma><code class=language-c# data-lang=c#><span class=line><span class=cl><span class=n>tbLastVisit</span><span class=p>.</span><span class=n>Text</span> <span class=p>=</span> <span class=n>MyCookies</span><span class=p>.</span><span class=n>UserEmail</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=n>MyCookies</span><span class=p>.</span><span class=n>LastVisit</span> <span class=p>=</span> <span class=n>DateTime</span><span class=p>.</span><span class=n>Now</span><span class=p>;</span>
+</span></span></code></pre></td></tr></table></div></div><p>Of course, you can also use this same approach for working with session data or any other key-based collection.</p><p>Thanks for reading,<br>
 Christian Weiss</p></div><div class=post-footer id=post-footer>
 <div class=post-info>
 <div class=post-info-line>
 <div class=post-info-mod>
 <span>Updated on 2009-01-26</span>
-</div>
-<div class=post-info-license></div>
-</div>
-<div class=post-info-line>
+</div><div class=post-info-license></div></div><div class=post-info-line>
 <div class=post-info-md><span>
 <a class=link-to-markdown href=/2009/01/use-wrappers-to-access-your-cookies-sessions/index.md target=_blank>Read Markdown</a>
-</span></div>
-<div class=post-info-share>
+</span></div><div class=post-info-share>
 <span><a href=javascript:void(0); title="Share on Twitter" data-sharer=twitter data-url=https://www.chwe.at/2009/01/use-wrappers-to-access-your-cookies-sessions/ data-title="Use wrappers to access your cookies, sessions, ..." data-via=cwe1ss><i class="fab fa-twitter fa-fw"></i></a><a href=javascript:void(0); title="Share on Hacker News" data-sharer=hackernews data-url=https://www.chwe.at/2009/01/use-wrappers-to-access-your-cookies-sessions/ data-title="Use wrappers to access your cookies, sessions, ..."><i class="fab fa-hacker-news fa-fw"></i></a><a href=javascript:void(0); title="Share on Reddit" data-sharer=reddit data-url=https://www.chwe.at/2009/01/use-wrappers-to-access-your-cookies-sessions/><i class="fab fa-reddit fa-fw"></i></a><a href=javascript:void(0); title="Share on Evernote" data-sharer=evernote data-url=https://www.chwe.at/2009/01/use-wrappers-to-access-your-cookies-sessions/ data-title="Use wrappers to access your cookies, sessions, ..."><i class="fab fa-evernote fa-fw"></i></a></span>
-</div>
-</div>
-</div>
-<div class=post-info-more>
-<section class=post-tags></section>
-<section>
+</div></div></div><div class=post-info-more>
+<section class=post-tags></section><section>
 <span><a href=javascript:void(0); onclick=window.history.back()>Back</a></span>&nbsp;|&nbsp;<span><a href=/>Home</a></span>
-</section>
-</div>
-<div class=post-nav><a href=/2009/01/don-t-use-response.cookies-string-to-check-if-a-cookie-exists/ class=prev rel=prev title="Don't use Response.Cookies[string] to check if a cookie exists!"><i class="fas fa-angle-left fa-fw"></i>Don't use Response.Cookies[string] to check if a cookie exists!</a>
-<a href=/2009/01/testable-and-reusable-cookie-access-with-asp.net-mvc-rc/ class=next rel=next title="Testable and reusable cookie access with ASP.Net MVC RC">Testable and reusable cookie access with ASP.Net MVC RC<i class="fas fa-angle-right fa-fw"></i></a></div>
-</div>
-<div id=comments></div></article></div>
-</main><footer class=footer>
-<div class=footer-container><div class=footer-line>Powered by <a href=https://gohugo.io/ target=_blank rel="noopener noreffer" title="Hugo 0.92.2">Hugo</a> | Theme - <a href=https://github.com/dillonzq/LoveIt target=_blank rel="noopener noreffer" title="LoveIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw"></i> LoveIt</a>
-</div><div class=footer-line><i class="far fa-copyright fa-fw"></i><span itemprop=copyrightYear>2022</span><span class=author itemprop=copyrightHolder>&nbsp;<a href=/ target=_blank>Christian Weiss</a></span></div>
-</div>
-</footer></div>
-<div id=fixed-buttons><a href=# id=back-to-top class=fixed-button title="Back to Top">
+</section></div><div class=post-nav><a href=/2009/01/don-t-use-response.cookies-string--to-check-if-a-cookie-exists/ class=prev rel=prev title="Don't use Response.Cookies[string] to check if a cookie exists!"><i class="fas fa-angle-left fa-fw"></i>Don't use Response.Cookies[string] to check if a cookie exists!</a>
+<a href=/2009/01/testable-and-reusable-cookie-access-with-asp.net-mvc-rc/ class=next rel=next title="Testable and reusable cookie access with ASP.Net MVC RC">Testable and reusable cookie access with ASP.Net MVC RC<i class="fas fa-angle-right fa-fw"></i></a></div></div><div id=comments></div></article></div></main><footer class=footer>
+<div class=footer-container><div class=footer-line>Powered by <a href=https://gohugo.io/ target=_blank rel="noopener noreffer" title="Hugo 0.93.3">Hugo</a> | Theme - <a href=https://github.com/dillonzq/LoveIt target=_blank rel="noopener noreffer" title="LoveIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw"></i> LoveIt</a>
+</div><div class=footer-line><i class="far fa-copyright fa-fw"></i><span itemprop=copyrightYear>2022</span><span class=author itemprop=copyrightHolder>&nbsp;<a href=/ target=_blank>Christian Weiss</a></span></div></div></footer></div><div id=fixed-buttons><a href=# id=back-to-top class=fixed-button title="Back to Top">
 <i class="fas fa-arrow-up fa-fw"></i>
 </a><a href=# id=view-comments class=fixed-button title="View Comments">
 <i class="fas fa-comment fa-fw"></i>
 </a>
-</div><link rel=stylesheet href=/lib/katex/katex.min.css><link rel=stylesheet href=/lib/katex/copy-tex.min.css><script type=text/javascript src=/lib/smooth-scroll/smooth-scroll.min.js></script><script type=text/javascript src=/lib/lazysizes/lazysizes.min.js></script><script type=text/javascript src=/lib/clipboard/clipboard.min.js></script><script type=text/javascript src=/lib/sharer/sharer.min.js></script><script type=text/javascript src=/lib/katex/katex.min.js></script><script type=text/javascript src=/lib/katex/auto-render.min.js></script><script type=text/javascript src=/lib/katex/copy-tex.min.js></script><script type=text/javascript src=/lib/katex/mhchem.min.js></script><script type=text/javascript>window.config={code:{copyTitle:"Copy to clipboard",maxShownLines:50},comment:{},math:{delimiters:[{display:!0,left:"$$",right:"$$"},{display:!0,left:"\\[",right:"\\]"},{display:!1,left:"$",right:"$"},{display:!1,left:"\\(",right:"\\)"}],strict:!1}}</script><script type=text/javascript src=/js/theme.min.js></script></body>
-</html>
+</div><link rel=stylesheet href=/lib/katex/katex.min.css><link rel=stylesheet href=/lib/katex/copy-tex.min.css><script type=text/javascript src=/lib/smooth-scroll/smooth-scroll.min.js></script><script type=text/javascript src=/lib/lazysizes/lazysizes.min.js></script><script type=text/javascript src=/lib/clipboard/clipboard.min.js></script><script type=text/javascript src=/lib/sharer/sharer.min.js></script><script type=text/javascript src=/lib/katex/katex.min.js></script><script type=text/javascript src=/lib/katex/auto-render.min.js></script><script type=text/javascript src=/lib/katex/copy-tex.min.js></script><script type=text/javascript src=/lib/katex/mhchem.min.js></script><script type=text/javascript>window.config={code:{copyTitle:"Copy to clipboard",maxShownLines:50},comment:{},math:{delimiters:[{display:!0,left:"$$",right:"$$"},{display:!0,left:"\\[",right:"\\]"},{display:!1,left:"$",right:"$"},{display:!1,left:"\\(",right:"\\)"}],strict:!1}}</script><script type=text/javascript src=/js/theme.min.js></script></body></html>

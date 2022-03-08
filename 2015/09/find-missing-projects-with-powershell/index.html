@@ -18,86 +18,50 @@ ProjectsMissingInSolution.ps1">
 <meta name=application-name content="Christian Weiss">
 <meta name=apple-mobile-web-app-title content="Christian Weiss"><link rel="shortcut icon" type=image/x-icon href=/favicon.ico>
 <link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png>
-<link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://www.chwe.at/2015/09/find-missing-projects-with-powershell/><link rel=prev href=https://www.chwe.at/2014/08/find-projects-missing-in-visual-studio-solution/><link rel=next href=https://www.chwe.at/2020/10/flutter-flavors/><link rel=stylesheet href=/lib/normalize/normalize.min.css><link rel=stylesheet href=/css/style.min.css><link rel=stylesheet href=/lib/fontawesome-free/all.min.css><link rel=stylesheet href=/lib/animate/animate.min.css><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"Find missing projects with PowerShell","inLanguage":"en","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/www.chwe.at\/2015\/09\/find-missing-projects-with-powershell\/"},"genre":"posts","wordcount":47,"url":"https:\/\/www.chwe.at\/2015\/09\/find-missing-projects-with-powershell\/","datePublished":"2015-09-30T00:00:00+01:00","dateModified":"2015-09-30T00:00:00+01:00","publisher":{"@type":"Organization","name":""},"author":{"@type":"Person","name":"Christian Weiss"},"description":""}</script></head>
-<body header-desktop header-mobile><script type=text/javascript>(window.localStorage&&localStorage.getItem('theme')?localStorage.getItem('theme')==='dark':''==='auto'?window.matchMedia('(prefers-color-scheme: dark)').matches:''==='dark')&&document.body.setAttribute('theme','dark')</script>
+<link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=manifest href=/site.webmanifest><link rel=canonical href=https://www.chwe.at/2015/09/find-missing-projects-with-powershell/><link rel=prev href=https://www.chwe.at/2014/08/find-projects-missing-in-visual-studio-solution/><link rel=next href=https://www.chwe.at/2020/10/flutter-flavors/><link rel=stylesheet href=/lib/normalize/normalize.min.css><link rel=stylesheet href=/css/style.min.css><link rel=stylesheet href=/lib/fontawesome-free/all.min.css><link rel=stylesheet href=/lib/animate/animate.min.css><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"Find missing projects with PowerShell","inLanguage":"en","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/www.chwe.at\/2015\/09\/find-missing-projects-with-powershell\/"},"genre":"posts","wordcount":47,"url":"https:\/\/www.chwe.at\/2015\/09\/find-missing-projects-with-powershell\/","datePublished":"2015-09-30T00:00:00+01:00","dateModified":"2015-09-30T00:00:00+01:00","publisher":{"@type":"Organization","name":""},"author":{"@type":"Person","name":"Christian Weiss"},"description":""}</script></head><body header-desktop header-mobile><script type=text/javascript>(window.localStorage&&localStorage.getItem("theme")?localStorage.getItem("theme")==="dark":''==="auto"?window.matchMedia("(prefers-color-scheme: dark)").matches:''==="dark")&&document.body.setAttribute("theme","dark")</script>
 <div id=mask></div><div class=wrapper><header class=desktop id=header-desktop>
 <div class=header-wrapper>
 <div class=header-title>
 <a href=/ title="Christian Weiss">Christian Weiss</a>
-</div>
-<div class=menu>
+</div><div class=menu>
 <div class=menu-inner><a class=menu-item href=/posts/> Posts </a><a class=menu-item href=/about/> About me </a><span class="menu-item delimiter"></span><a href=javascript:void(0); class="menu-item theme-switch" title="Switch Theme">
 <i class="fas fa-adjust fa-fw"></i>
 </a>
-</div>
-</div>
-</div>
-</header><header class=mobile id=header-mobile>
+</div></div></div></header><header class=mobile id=header-mobile>
 <div class=header-container>
 <div class=header-wrapper>
 <div class=header-title>
 <a href=/ title="Christian Weiss">Christian Weiss</a>
-</div>
-<div class=menu-toggle id=menu-toggle-mobile>
+</div><div class=menu-toggle id=menu-toggle-mobile>
 <span></span><span></span><span></span>
-</div>
-</div>
-<div class=menu id=menu-mobile><a class=menu-item href=/posts/ title>Posts</a><a class=menu-item href=/about/ title>About me</a><a href=javascript:void(0); class="menu-item theme-switch" title="Switch Theme">
+</div></div><div class=menu id=menu-mobile><a class=menu-item href=/posts/ title>Posts</a><a class=menu-item href=/about/ title>About me</a><a href=javascript:void(0); class="menu-item theme-switch" title="Switch Theme">
 <i class="fas fa-adjust fa-fw"></i>
-</a></div>
-</div>
-</header>
-<div class="search-dropdown desktop">
-<div id=search-dropdown-desktop></div>
-</div>
-<div class="search-dropdown mobile">
-<div id=search-dropdown-mobile></div>
-</div>
-<main class=main>
+</a></div></div></header><div class="search-dropdown desktop">
+<div id=search-dropdown-desktop></div></div><div class="search-dropdown mobile">
+<div id=search-dropdown-mobile></div></div><main class=main>
 <div class=container><article class="page single"><h1 class="single-title animated flipInX">Find missing projects with PowerShell</h1><div class=post-meta>
-<div class=post-meta-line><span class=post-author><a href=/ title=Author rel=author class=author><i class="fas fa-user-circle fa-fw"></i>Christian Weiss</a></span>&nbsp;<span class=post-category>included in <a href=/categories/.net/><i class="far fa-folder fa-fw"></i>.NET</a></span></div>
-<div class=post-meta-line><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime=2015-09-30>2015-09-30</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;47 words&nbsp;
-<i class="far fa-clock fa-fw"></i>&nbsp;One minute&nbsp;</div>
-</div><div class=content id=content><p>In my last post, I showed you a C# script for finding projects which are not part of a SLN-file.
+<div class=post-meta-line><span class=post-author><a href=/ title=Author rel=author class=author><i class="fas fa-user-circle fa-fw"></i>Christian Weiss</a></span>&nbsp;<span class=post-category>included in <a href=/categories/.net/><i class="far fa-folder fa-fw"></i>.NET</a></span></div><div class=post-meta-line><i class="far fa-calendar-alt fa-fw"></i>&nbsp;<time datetime=2015-09-30>2015-09-30</time>&nbsp;<i class="fas fa-pencil-alt fa-fw"></i>&nbsp;47 words&nbsp;
+<i class="far fa-clock fa-fw"></i>&nbsp;One minute&nbsp;</div></div><div class=content id=content><p>In my last post, I showed you a C# script for finding projects which are not part of a SLN-file.
 Since having to compile it is a bit of an overhead, I decided to migrate this code to a powershell script,
-which you can find here:</p>
-<p><a href=https://gist.github.com/cwe1ss/c1d623a24a8b7841b785 target=_blank rel="noopener noreffer">ProjectsMissingInSolution.ps1</a></p>
-</div><div class=post-footer id=post-footer>
+which you can find here:</p><p><a href=https://gist.github.com/cwe1ss/c1d623a24a8b7841b785 target=_blank rel="noopener noreffer">ProjectsMissingInSolution.ps1</a></p></div><div class=post-footer id=post-footer>
 <div class=post-info>
 <div class=post-info-line>
 <div class=post-info-mod>
 <span>Updated on 2015-09-30</span>
-</div>
-<div class=post-info-license></div>
-</div>
-<div class=post-info-line>
+</div><div class=post-info-license></div></div><div class=post-info-line>
 <div class=post-info-md><span>
 <a class=link-to-markdown href=/2015/09/find-missing-projects-with-powershell/index.md target=_blank>Read Markdown</a>
-</span></div>
-<div class=post-info-share>
+</span></div><div class=post-info-share>
 <span><a href=javascript:void(0); title="Share on Twitter" data-sharer=twitter data-url=https://www.chwe.at/2015/09/find-missing-projects-with-powershell/ data-title="Find missing projects with PowerShell" data-via=cwe1ss><i class="fab fa-twitter fa-fw"></i></a><a href=javascript:void(0); title="Share on Hacker News" data-sharer=hackernews data-url=https://www.chwe.at/2015/09/find-missing-projects-with-powershell/ data-title="Find missing projects with PowerShell"><i class="fab fa-hacker-news fa-fw"></i></a><a href=javascript:void(0); title="Share on Reddit" data-sharer=reddit data-url=https://www.chwe.at/2015/09/find-missing-projects-with-powershell/><i class="fab fa-reddit fa-fw"></i></a><a href=javascript:void(0); title="Share on Evernote" data-sharer=evernote data-url=https://www.chwe.at/2015/09/find-missing-projects-with-powershell/ data-title="Find missing projects with PowerShell"><i class="fab fa-evernote fa-fw"></i></a></span>
-</div>
-</div>
-</div>
-<div class=post-info-more>
-<section class=post-tags></section>
-<section>
+</div></div></div><div class=post-info-more>
+<section class=post-tags></section><section>
 <span><a href=javascript:void(0); onclick=window.history.back()>Back</a></span>&nbsp;|&nbsp;<span><a href=/>Home</a></span>
-</section>
-</div>
-<div class=post-nav><a href=/2014/08/find-projects-missing-in-visual-studio-solution/ class=prev rel=prev title='Find projects which are missing in your "All Projects" solution'><i class="fas fa-angle-left fa-fw"></i>Find projects which are missing in your "All Projects" solution</a>
-<a href=/2020/10/flutter-flavors/ class=next rel=next title="Using Flutter flavors to separate the DEV and LIVE environment">Using Flutter flavors to separate the DEV and LIVE environment<i class="fas fa-angle-right fa-fw"></i></a></div>
-</div>
-<div id=comments></div></article></div>
-</main><footer class=footer>
-<div class=footer-container><div class=footer-line>Powered by <a href=https://gohugo.io/ target=_blank rel="noopener noreffer" title="Hugo 0.92.2">Hugo</a> | Theme - <a href=https://github.com/dillonzq/LoveIt target=_blank rel="noopener noreffer" title="LoveIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw"></i> LoveIt</a>
-</div><div class=footer-line><i class="far fa-copyright fa-fw"></i><span itemprop=copyrightYear>2022</span><span class=author itemprop=copyrightHolder>&nbsp;<a href=/ target=_blank>Christian Weiss</a></span></div>
-</div>
-</footer></div>
-<div id=fixed-buttons><a href=# id=back-to-top class=fixed-button title="Back to Top">
+</section></div><div class=post-nav><a href=/2014/08/find-projects-missing-in-visual-studio-solution/ class=prev rel=prev title='Find projects which are missing in your "All Projects" solution'><i class="fas fa-angle-left fa-fw"></i>Find projects which are missing in your "All Projects" solution</a>
+<a href=/2020/10/flutter-flavors/ class=next rel=next title="Using Flutter flavors to separate the DEV and LIVE environment">Using Flutter flavors to separate the DEV and LIVE environment<i class="fas fa-angle-right fa-fw"></i></a></div></div><div id=comments></div></article></div></main><footer class=footer>
+<div class=footer-container><div class=footer-line>Powered by <a href=https://gohugo.io/ target=_blank rel="noopener noreffer" title="Hugo 0.93.3">Hugo</a> | Theme - <a href=https://github.com/dillonzq/LoveIt target=_blank rel="noopener noreffer" title="LoveIt 0.2.10"><i class="far fa-kiss-wink-heart fa-fw"></i> LoveIt</a>
+</div><div class=footer-line><i class="far fa-copyright fa-fw"></i><span itemprop=copyrightYear>2022</span><span class=author itemprop=copyrightHolder>&nbsp;<a href=/ target=_blank>Christian Weiss</a></span></div></div></footer></div><div id=fixed-buttons><a href=# id=back-to-top class=fixed-button title="Back to Top">
 <i class="fas fa-arrow-up fa-fw"></i>
 </a><a href=# id=view-comments class=fixed-button title="View Comments">
 <i class="fas fa-comment fa-fw"></i>
 </a>
-</div><link rel=stylesheet href=/lib/katex/katex.min.css><link rel=stylesheet href=/lib/katex/copy-tex.min.css><script type=text/javascript src=/lib/smooth-scroll/smooth-scroll.min.js></script><script type=text/javascript src=/lib/lazysizes/lazysizes.min.js></script><script type=text/javascript src=/lib/clipboard/clipboard.min.js></script><script type=text/javascript src=/lib/sharer/sharer.min.js></script><script type=text/javascript src=/lib/katex/katex.min.js></script><script type=text/javascript src=/lib/katex/auto-render.min.js></script><script type=text/javascript src=/lib/katex/copy-tex.min.js></script><script type=text/javascript src=/lib/katex/mhchem.min.js></script><script type=text/javascript>window.config={code:{copyTitle:"Copy to clipboard",maxShownLines:50},comment:{},math:{delimiters:[{display:!0,left:"$$",right:"$$"},{display:!0,left:"\\[",right:"\\]"},{display:!1,left:"$",right:"$"},{display:!1,left:"\\(",right:"\\)"}],strict:!1}}</script><script type=text/javascript src=/js/theme.min.js></script></body>
-</html>
+</div><link rel=stylesheet href=/lib/katex/katex.min.css><link rel=stylesheet href=/lib/katex/copy-tex.min.css><script type=text/javascript src=/lib/smooth-scroll/smooth-scroll.min.js></script><script type=text/javascript src=/lib/lazysizes/lazysizes.min.js></script><script type=text/javascript src=/lib/clipboard/clipboard.min.js></script><script type=text/javascript src=/lib/sharer/sharer.min.js></script><script type=text/javascript src=/lib/katex/katex.min.js></script><script type=text/javascript src=/lib/katex/auto-render.min.js></script><script type=text/javascript src=/lib/katex/copy-tex.min.js></script><script type=text/javascript src=/lib/katex/mhchem.min.js></script><script type=text/javascript>window.config={code:{copyTitle:"Copy to clipboard",maxShownLines:50},comment:{},math:{delimiters:[{display:!0,left:"$$",right:"$$"},{display:!0,left:"\\[",right:"\\]"},{display:!1,left:"$",right:"$"},{display:!1,left:"\\(",right:"\\)"}],strict:!1}}</script><script type=text/javascript src=/js/theme.min.js></script></body></html>

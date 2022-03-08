@@ -55,28 +55,28 @@
 </span><span class="lnt">21
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="k">public</span> <span class="k">class</span> <span class="nc">ShuttingDownHealthCheck</span> <span class="p">:</span> <span class="n">IHealthCheck</span>
-<span class="p">{</span>
-    <span class="k">private</span> <span class="n">HealthStatus</span> <span class="m">_</span><span class="n">status</span> <span class="p">=</span> <span class="n">HealthStatus</span><span class="p">.</span><span class="n">Healthy</span><span class="p">;</span>
-
-    <span class="k">public</span> <span class="n">ShuttingDownHealthCheck</span><span class="p">(</span><span class="n">IHostApplicationLifetime</span> <span class="n">appLifetime</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="n">appLifetime</span><span class="p">.</span><span class="n">ApplicationStopping</span><span class="p">.</span><span class="n">Register</span><span class="p">(()</span> <span class="p">=&gt;</span>
-        <span class="p">{</span>
-            <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">&#34;Shutting down&#34;</span><span class="p">);</span>
-            <span class="m">_</span><span class="n">status</span> <span class="p">=</span> <span class="n">HealthStatus</span><span class="p">.</span><span class="n">Unhealthy</span><span class="p">;</span>
-        <span class="p">});</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="n">Task</span><span class="p">&lt;</span><span class="n">HealthCheckResult</span><span class="p">&gt;</span> <span class="n">CheckHealthAsync</span><span class="p">(</span>
-        <span class="n">HealthCheckContext</span> <span class="n">context</span><span class="p">,</span>
-        <span class="n">CancellationToken</span> <span class="n">cancellationToken</span> <span class="p">=</span> <span class="k">default</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="kt">var</span> <span class="n">result</span> <span class="p">=</span> <span class="k">new</span> <span class="n">HealthCheckResult</span><span class="p">(</span><span class="m">_</span><span class="n">status</span><span class="p">);</span>
-        <span class="k">return</span> <span class="n">Task</span><span class="p">.</span><span class="n">FromResult</span><span class="p">(</span><span class="n">result</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="k">public</span> <span class="k">class</span> <span class="nc">ShuttingDownHealthCheck</span> <span class="p">:</span> <span class="n">IHealthCheck</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">private</span> <span class="n">HealthStatus</span> <span class="m">_</span><span class="n">status</span> <span class="p">=</span> <span class="n">HealthStatus</span><span class="p">.</span><span class="n">Healthy</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">public</span> <span class="n">ShuttingDownHealthCheck</span><span class="p">(</span><span class="n">IHostApplicationLifetime</span> <span class="n">appLifetime</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">appLifetime</span><span class="p">.</span><span class="n">ApplicationStopping</span><span class="p">.</span><span class="n">Register</span><span class="p">(()</span> <span class="p">=&gt;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">&#34;Shutting down&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">            <span class="m">_</span><span class="n">status</span> <span class="p">=</span> <span class="n">HealthStatus</span><span class="p">.</span><span class="n">Unhealthy</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">});</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">public</span> <span class="n">Task</span><span class="p">&lt;</span><span class="n">HealthCheckResult</span><span class="p">&gt;</span> <span class="n">CheckHealthAsync</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">        <span class="n">HealthCheckContext</span> <span class="n">context</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">CancellationToken</span> <span class="n">cancellationToken</span> <span class="p">=</span> <span class="k">default</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">var</span> <span class="n">result</span> <span class="p">=</span> <span class="k">new</span> <span class="n">HealthCheckResult</span><span class="p">(</span><span class="m">_</span><span class="n">status</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">Task</span><span class="p">.</span><span class="n">FromResult</span><span class="p">(</span><span class="n">result</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>Our class also needs to be registered with the DI container by calling <code>.AddCheck&lt;ShuttingDownHealthCheck&gt;(&quot;shutting_down&quot;)</code> on the return object of <code>services.AddHealthChecks()</code>.</p>
 <p>However, it&rsquo;s important to know that <strong>by default, ASP.NET Core initializes the class for every request</strong> to the health endpoint. This doesn&rsquo;t work for our scenario as we need the global <code>_status</code> variable and just a single <code>ApplicationStopping</code>-registration.</p>
@@ -108,11 +108,11 @@
 </span><span class="lnt">4
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="n">services</span><span class="p">.</span><span class="n">Configure</span><span class="p">&lt;</span><span class="n">HostOptions</span><span class="p">&gt;(</span><span class="n">option</span> <span class="p">=&gt;</span>
-<span class="p">{</span>
-    <span class="n">option</span><span class="p">.</span><span class="n">ShutdownTimeout</span> <span class="p">=</span> <span class="n">System</span><span class="p">.</span><span class="n">TimeSpan</span><span class="p">.</span><span class="n">FromSeconds</span><span class="p">(</span><span class="m">30</span><span class="p">);</span>
-<span class="p">});</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="n">services</span><span class="p">.</span><span class="n">Configure</span><span class="p">&lt;</span><span class="n">HostOptions</span><span class="p">&gt;(</span><span class="n">option</span> <span class="p">=&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">option</span><span class="p">.</span><span class="n">ShutdownTimeout</span> <span class="p">=</span> <span class="n">System</span><span class="p">.</span><span class="n">TimeSpan</span><span class="p">.</span><span class="n">FromSeconds</span><span class="p">(</span><span class="m">30</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">});</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>To improve our health check, we&rsquo;ll introduce <code>IHostEnvironment</code> to detect if we&rsquo;re running in <code>Production</code>-mode and an <code>ILogger</code>. Our <code>ApplicationStopping</code>-registration will now look like this:</p>
 <div class="highlight"><div class="chroma">
@@ -139,27 +139,27 @@
 </span><span class="lnt">20
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="n">appLifetime</span><span class="p">.</span><span class="n">ApplicationStopping</span><span class="p">.</span><span class="n">Register</span><span class="p">(()</span> <span class="p">=&gt;</span>
-<span class="p">{</span>
-    <span class="m">_</span><span class="n">status</span> <span class="p">=</span> <span class="n">HealthStatus</span><span class="p">.</span><span class="n">Unhealthy</span><span class="p">;</span>
-
-    <span class="kt">bool</span> <span class="n">delayShutdown</span> <span class="p">=</span> <span class="m">_</span><span class="n">hostEnvironment</span><span class="p">.</span><span class="n">IsProduction</span><span class="p">();</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">delayShutdown</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="kt">var</span> <span class="n">shutdownDelay</span> <span class="p">=</span> <span class="n">TimeSpan</span><span class="p">.</span><span class="n">FromSeconds</span><span class="p">(</span><span class="m">25</span><span class="p">);</span>
-
-        <span class="m">_l</span><span class="n">ogger</span><span class="p">.</span><span class="n">LogInformation</span><span class="p">(</span>
-            <span class="s">&#34;Delaying shutdown for {Seconds} seconds&#34;</span><span class="p">,</span>
-            <span class="n">shutdownDelay</span><span class="p">.</span><span class="n">TotalSeconds</span><span class="p">);</span>
-
-        <span class="c1">// ASP.NET Core requests are processed on separate threads,
-</span><span class="c1"></span>        <span class="c1">// so we can just put the main thread on sleep.
-</span><span class="c1"></span>        <span class="n">Thread</span><span class="p">.</span><span class="n">Sleep</span><span class="p">(</span><span class="n">shutdownDelay</span><span class="p">);</span>
-
-        <span class="m">_l</span><span class="n">ogger</span><span class="p">.</span><span class="n">LogInformation</span><span class="p">(</span><span class="s">&#34;Shutdown delay completed&#34;</span><span class="p">);</span>
-    <span class="p">}</span>
-<span class="p">});</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="n">appLifetime</span><span class="p">.</span><span class="n">ApplicationStopping</span><span class="p">.</span><span class="n">Register</span><span class="p">(()</span> <span class="p">=&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="m">_</span><span class="n">status</span> <span class="p">=</span> <span class="n">HealthStatus</span><span class="p">.</span><span class="n">Unhealthy</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kt">bool</span> <span class="n">delayShutdown</span> <span class="p">=</span> <span class="m">_</span><span class="n">hostEnvironment</span><span class="p">.</span><span class="n">IsProduction</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">delayShutdown</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">var</span> <span class="n">shutdownDelay</span> <span class="p">=</span> <span class="n">TimeSpan</span><span class="p">.</span><span class="n">FromSeconds</span><span class="p">(</span><span class="m">25</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="m">_l</span><span class="n">ogger</span><span class="p">.</span><span class="n">LogInformation</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">            <span class="s">&#34;Delaying shutdown for {Seconds} seconds&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="n">shutdownDelay</span><span class="p">.</span><span class="n">TotalSeconds</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="c1">// ASP.NET Core requests are processed on separate threads,</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// so we can just put the main thread on sleep.</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Thread</span><span class="p">.</span><span class="n">Sleep</span><span class="p">(</span><span class="n">shutdownDelay</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="m">_l</span><span class="n">ogger</span><span class="p">.</span><span class="n">LogInformation</span><span class="p">(</span><span class="s">&#34;Shutdown delay completed&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">});</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>Of course, it would also be possible to just skip the registration ouf our health check in the <code>Startup.ConfigureServices()</code>-method.</p>
 <p>The logic in our ASP.NET Core application is now finished!</p>
@@ -233,31 +233,31 @@ which you can find here:</p>
 </span><span class="lnt">24
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c#" data-lang="c#"><span class="k">class</span> <span class="nc">Program</span>
-<span class="p">{</span>
-    <span class="k">static</span> <span class="k">void</span> <span class="n">Main</span><span class="p">(</span><span class="kt">string</span><span class="p">[]</span> <span class="n">args</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="c1">// Parameters
-</span><span class="c1"></span>        <span class="kt">string</span> <span class="n">baseFolder</span> <span class="p">=</span> <span class="s">@&#34;C:\path\to\solution\&#34;</span><span class="p">;</span>
-        <span class="kt">string</span> <span class="n">slnFile</span> <span class="p">=</span> <span class="s">&#34;AllProjects.sln&#34;</span><span class="p">;</span>
-        <span class="kt">string</span> <span class="n">outputFile</span> <span class="p">=</span> <span class="s">&#34;MissingProjects.txt&#34;</span><span class="p">;</span>
-
-        <span class="kt">string</span> <span class="n">slnContent</span> <span class="p">=</span> <span class="n">File</span><span class="p">.</span><span class="n">ReadAllText</span><span class="p">(</span><span class="n">Path</span><span class="p">.</span><span class="n">Combine</span><span class="p">(</span><span class="n">baseFolder</span><span class="p">,</span> <span class="n">slnFile</span><span class="p">));</span>
-
-        <span class="kt">string</span><span class="p">[]</span> <span class="n">projectFiles</span> <span class="p">=</span> <span class="n">Directory</span><span class="p">.</span><span class="n">GetFiles</span><span class="p">(</span><span class="n">baseFolder</span><span class="p">,</span> <span class="s">&#34;*.csproj&#34;</span><span class="p">,</span> <span class="n">SearchOption</span><span class="p">.</span><span class="n">AllDirectories</span><span class="p">);</span>
-
-        <span class="n">List</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">&gt;</span> <span class="n">missingProjects</span> <span class="p">=</span> <span class="n">projectFiles</span>
-            <span class="p">.</span><span class="n">Where</span><span class="p">(</span><span class="n">fullPath</span> <span class="p">=&gt;</span> <span class="n">slnContent</span><span class="p">.</span><span class="n">IndexOf</span><span class="p">(</span><span class="n">fullPath</span><span class="p">.</span><span class="n">Replace</span><span class="p">(</span><span class="n">baseFolder</span><span class="p">,</span> <span class="s">&#34;&#34;</span><span class="p">),</span> <span class="n">StringComparison</span><span class="p">.</span><span class="n">OrdinalIgnoreCase</span><span class="p">)</span> <span class="p">&lt;</span> <span class="m">0</span><span class="p">)</span>
-            <span class="p">.</span><span class="n">ToList</span><span class="p">();</span>
-
-        <span class="n">File</span><span class="p">.</span><span class="n">WriteAllLines</span><span class="p">(</span><span class="n">outputFile</span><span class="p">,</span> <span class="n">missingProjects</span><span class="p">);</span>
-
-        <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">&#34;Projects missing in solution: &#34;</span> <span class="p">+</span> <span class="n">missingProjects</span><span class="p">.</span><span class="n">Count</span><span class="p">);</span>
-        <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">&#34;Details: &#34;</span> <span class="p">+</span> <span class="n">outputFile</span><span class="p">);</span>
-        <span class="n">Console</span><span class="p">.</span><span class="n">ReadLine</span><span class="p">();</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c#" data-lang="c#"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Program</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">static</span> <span class="k">void</span> <span class="n">Main</span><span class="p">(</span><span class="kt">string</span><span class="p">[]</span> <span class="n">args</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// Parameters</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">string</span> <span class="n">baseFolder</span> <span class="p">=</span> <span class="s">@&#34;C:\path\to\solution\&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">string</span> <span class="n">slnFile</span> <span class="p">=</span> <span class="s">&#34;AllProjects.sln&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">string</span> <span class="n">outputFile</span> <span class="p">=</span> <span class="s">&#34;MissingProjects.txt&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="kt">string</span> <span class="n">slnContent</span> <span class="p">=</span> <span class="n">File</span><span class="p">.</span><span class="n">ReadAllText</span><span class="p">(</span><span class="n">Path</span><span class="p">.</span><span class="n">Combine</span><span class="p">(</span><span class="n">baseFolder</span><span class="p">,</span> <span class="n">slnFile</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="kt">string</span><span class="p">[]</span> <span class="n">projectFiles</span> <span class="p">=</span> <span class="n">Directory</span><span class="p">.</span><span class="n">GetFiles</span><span class="p">(</span><span class="n">baseFolder</span><span class="p">,</span> <span class="s">&#34;*.csproj&#34;</span><span class="p">,</span> <span class="n">SearchOption</span><span class="p">.</span><span class="n">AllDirectories</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">List</span><span class="p">&lt;</span><span class="kt">string</span><span class="p">&gt;</span> <span class="n">missingProjects</span> <span class="p">=</span> <span class="n">projectFiles</span>
+</span></span><span class="line"><span class="cl">            <span class="p">.</span><span class="n">Where</span><span class="p">(</span><span class="n">fullPath</span> <span class="p">=&gt;</span> <span class="n">slnContent</span><span class="p">.</span><span class="n">IndexOf</span><span class="p">(</span><span class="n">fullPath</span><span class="p">.</span><span class="n">Replace</span><span class="p">(</span><span class="n">baseFolder</span><span class="p">,</span> <span class="s">&#34;&#34;</span><span class="p">),</span> <span class="n">StringComparison</span><span class="p">.</span><span class="n">OrdinalIgnoreCase</span><span class="p">)</span> <span class="p">&lt;</span> <span class="m">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="p">.</span><span class="n">ToList</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">File</span><span class="p">.</span><span class="n">WriteAllLines</span><span class="p">(</span><span class="n">outputFile</span><span class="p">,</span> <span class="n">missingProjects</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">&#34;Projects missing in solution: &#34;</span> <span class="p">+</span> <span class="n">missingProjects</span><span class="p">.</span><span class="n">Count</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">&#34;Details: &#34;</span> <span class="p">+</span> <span class="n">outputFile</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Console</span><span class="p">.</span><span class="n">ReadLine</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div>]]></description></item><item><title>Feature Folders: Controllers and Views</title><link>https://www.chwe.at/2014/07/feature-folders-controllers-and-views/</link><pubDate>Wed, 02 Jul 2014 00:00:00 +0100</pubDate><author>Author</author><guid>https://www.chwe.at/2014/07/feature-folders-controllers-and-views/</guid><description><![CDATA[<p>The first step in our process to <a href="https://www.chwe.at/2014/04/introducing-the-asp.net-mvc-feature-folders-project-structure/" rel="">a better folder structure for our MVC projects</a> is to make sure, MVC can resolve our Controllers and Views. This is our target structure:</p>
 <ul>
@@ -372,60 +372,60 @@ which you can find here:</p>
 </span><span class="lnt">53
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c#" data-lang="c#"><span class="k">public</span> <span class="k">class</span> <span class="nc">FeatureFolderViewEngine</span> <span class="p">:</span> <span class="n">RazorViewEngine</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="n">FeatureFolderViewEngine</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="c1">// {0} ActionName
-</span><span class="c1"></span>        <span class="c1">// {1} ControllerName
-</span><span class="c1"></span>        <span class="c1">// {2} AreaName
-</span><span class="c1"></span>
-        <span class="n">AreaViewLocationFormats</span> <span class="p">=</span> <span class="k">new</span><span class="p">[]</span>
-                                <span class="p">{</span>
-                                    <span class="s">&#34;~/Areas/{2}/{1}/{0}.cshtml&#34;</span><span class="p">,</span>
-                                    <span class="s">&#34;~/Areas/{2}/Shared/{0}.cshtml&#34;</span><span class="p">,</span>
-                                    <span class="s">&#34;~/Areas/Shared/{0}.cshtml&#34;</span><span class="p">,</span>
-                                <span class="p">};</span>
-
-        <span class="n">AreaMasterLocationFormats</span> <span class="p">=</span> <span class="k">new</span><span class="p">[]</span>
-                                    <span class="p">{</span>
-                                        <span class="s">&#34;~/Areas/{2}/{1}/{0}.cshtml&#34;</span><span class="p">,</span>
-                                        <span class="s">&#34;~/Areas/{2}/Shared/{0}.cshtml&#34;</span><span class="p">,</span>
-                                        <span class="s">&#34;~/Areas/Shared/{0}.cshtml&#34;</span><span class="p">,</span>
-                                    <span class="p">};</span>
-
-        <span class="n">AreaPartialViewLocationFormats</span> <span class="p">=</span> <span class="k">new</span><span class="p">[]</span>
-                                        <span class="p">{</span>
-                                            <span class="s">&#34;~/Areas/{2}/{1}/{0}.cshtml&#34;</span><span class="p">,</span>
-                                            <span class="s">&#34;~/Areas/{2}/Shared/{0}.cshtml&#34;</span><span class="p">,</span>
-                                            <span class="s">&#34;~/Areas/Shared/{0}.cshtml&#34;</span><span class="p">,</span>
-                                        <span class="p">};</span>
-
-        <span class="n">ViewLocationFormats</span> <span class="p">=</span> <span class="k">new</span><span class="p">[]</span>
-                            <span class="p">{</span>
-                                <span class="s">&#34;~/Features/{1}/{0}.cshtml&#34;</span><span class="p">,</span>
-                                <span class="s">&#34;~/Features/Shared/{0}.cshtml&#34;</span><span class="p">,</span>
-                            <span class="p">};</span>
-
-        <span class="n">MasterLocationFormats</span> <span class="p">=</span> <span class="k">new</span><span class="p">[]</span>
-                                <span class="p">{</span>
-                                    <span class="s">&#34;~/Features/{1}/{0}.cshtml&#34;</span><span class="p">,</span>
-                                    <span class="s">&#34;~/Features/Shared/{0}.cshtml&#34;</span><span class="p">,</span>
-                                <span class="p">};</span>
-
-        <span class="n">PartialViewLocationFormats</span> <span class="p">=</span> <span class="k">new</span><span class="p">[]</span>
-                                    <span class="p">{</span>
-                                        <span class="s">&#34;~/Features/{1}/{0}.cshtml&#34;</span><span class="p">,</span>
-                                        <span class="s">&#34;~/Features/Shared/{0}.cshtml&#34;</span><span class="p">,</span>
-                                    <span class="p">};</span>
-
-        <span class="n">FileExtensions</span> <span class="p">=</span> <span class="k">new</span><span class="p">[]</span>
-                        <span class="p">{</span>
-                            <span class="s">&#34;cshtml&#34;</span><span class="p">,</span>
-                        <span class="p">};</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c#" data-lang="c#"><span class="line"><span class="cl"><span class="k">public</span> <span class="k">class</span> <span class="nc">FeatureFolderViewEngine</span> <span class="p">:</span> <span class="n">RazorViewEngine</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">public</span> <span class="n">FeatureFolderViewEngine</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// {0} ActionName</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// {1} ControllerName</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// {2} AreaName</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">AreaViewLocationFormats</span> <span class="p">=</span> <span class="k">new</span><span class="p">[]</span>
+</span></span><span class="line"><span class="cl">                                <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                                    <span class="s">&#34;~/Areas/{2}/{1}/{0}.cshtml&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                                    <span class="s">&#34;~/Areas/{2}/Shared/{0}.cshtml&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                                    <span class="s">&#34;~/Areas/Shared/{0}.cshtml&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                                <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">AreaMasterLocationFormats</span> <span class="p">=</span> <span class="k">new</span><span class="p">[]</span>
+</span></span><span class="line"><span class="cl">                                    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                                        <span class="s">&#34;~/Areas/{2}/{1}/{0}.cshtml&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                                        <span class="s">&#34;~/Areas/{2}/Shared/{0}.cshtml&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                                        <span class="s">&#34;~/Areas/Shared/{0}.cshtml&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                                    <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">AreaPartialViewLocationFormats</span> <span class="p">=</span> <span class="k">new</span><span class="p">[]</span>
+</span></span><span class="line"><span class="cl">                                        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                                            <span class="s">&#34;~/Areas/{2}/{1}/{0}.cshtml&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                                            <span class="s">&#34;~/Areas/{2}/Shared/{0}.cshtml&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                                            <span class="s">&#34;~/Areas/Shared/{0}.cshtml&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                                        <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">ViewLocationFormats</span> <span class="p">=</span> <span class="k">new</span><span class="p">[]</span>
+</span></span><span class="line"><span class="cl">                            <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                                <span class="s">&#34;~/Features/{1}/{0}.cshtml&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                                <span class="s">&#34;~/Features/Shared/{0}.cshtml&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                            <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">MasterLocationFormats</span> <span class="p">=</span> <span class="k">new</span><span class="p">[]</span>
+</span></span><span class="line"><span class="cl">                                <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                                    <span class="s">&#34;~/Features/{1}/{0}.cshtml&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                                    <span class="s">&#34;~/Features/Shared/{0}.cshtml&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                                <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">PartialViewLocationFormats</span> <span class="p">=</span> <span class="k">new</span><span class="p">[]</span>
+</span></span><span class="line"><span class="cl">                                    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                                        <span class="s">&#34;~/Features/{1}/{0}.cshtml&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                                        <span class="s">&#34;~/Features/Shared/{0}.cshtml&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                                    <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">FileExtensions</span> <span class="p">=</span> <span class="k">new</span><span class="p">[]</span>
+</span></span><span class="line"><span class="cl">                        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                            <span class="s">&#34;cshtml&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                        <span class="p">};</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>Of course, if you use this new structure, you lose some of the built-in templating- and navigation-support in Visual Studio since VS does not recognize these folders as &ldquo;Views&rdquo;-folders. Therefore, the following things no longer work:</p>
 <ul>
@@ -534,7 +534,7 @@ which you can find here:</p>
 ]]></description></item><item><title>Testable and reusable cookie access with ASP.Net MVC RC</title><link>https://www.chwe.at/2009/01/testable-and-reusable-cookie-access-with-asp.net-mvc-rc/</link><pubDate>Wed, 28 Jan 2009 18:35:00 +0100</pubDate><author>Author</author><guid>https://www.chwe.at/2009/01/testable-and-reusable-cookie-access-with-asp.net-mvc-rc/</guid><description><![CDATA[<p>All good things come in threes, so I&rsquo;m writing another post about how to access cookie or sessions. I got inspired by a comment from <a href="http://www.marisic.net/" target="_blank" rel="noopener noreffer">Chris Marisic</a>, who suggested to use a more testable way for this stuff!</p>
 <p>Previous posts about this topic:</p>
 <ul>
-<li><a href="https://www.chwe.at/2009/01/don-t-use-response.cookies-string-to-check-if-a-cookie-exists/" rel="">Don&rsquo;t use Response.Cookies[string] to check if a cookie exists!</a></li>
+<li><a href="https://www.chwe.at/2009/01/don-t-use-response.cookies-string--to-check-if-a-cookie-exists/" rel="">Don&rsquo;t use Response.Cookies[string] to check if a cookie exists!</a></li>
 <li><a href="https://www.chwe.at/2009/01/use-wrappers-to-access-your-cookies-sessions/" rel="">Use wrappers to access your cookies, sessions, &hellip;</a></li>
 </ul>
 <h3 id="intro">Intro</h3>
@@ -556,16 +556,16 @@ which you can find here:</p>
 </span><span class="lnt">9
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c#" data-lang="c#"><span class="k">public</span> <span class="k">interface</span> <span class="n">ICookieContainer</span>
-<span class="p">{</span>
-    <span class="kt">bool</span> <span class="n">Exists</span><span class="p">(</span><span class="kt">string</span> <span class="n">key</span><span class="p">);</span>
-        
-    <span class="kt">string</span> <span class="n">GetValue</span><span class="p">(</span><span class="kt">string</span> <span class="n">key</span><span class="p">);</span>
-    <span class="n">T</span> <span class="n">GetValue</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;(</span><span class="kt">string</span> <span class="n">key</span><span class="p">);</span>
-        
-    <span class="k">void</span> <span class="n">SetValue</span><span class="p">(</span><span class="kt">string</span> <span class="n">key</span><span class="p">,</span> <span class="kt">object</span> <span class="k">value</span><span class="p">,</span> <span class="n">DateTime</span> <span class="n">expires</span><span class="p">);</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c#" data-lang="c#"><span class="line"><span class="cl"><span class="k">public</span> <span class="k">interface</span> <span class="nc">ICookieContainer</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">bool</span> <span class="n">Exists</span><span class="p">(</span><span class="kt">string</span> <span class="n">key</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">    <span class="kt">string</span> <span class="n">GetValue</span><span class="p">(</span><span class="kt">string</span> <span class="n">key</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">T</span> <span class="n">GetValue</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;(</span><span class="kt">string</span> <span class="n">key</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">    <span class="k">void</span> <span class="n">SetValue</span><span class="p">(</span><span class="kt">string</span> <span class="n">key</span><span class="p">,</span> <span class="kt">object</span> <span class="k">value</span><span class="p">,</span> <span class="n">DateTime</span> <span class="n">expires</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>I will just show the fundamental code here. If you want to see the whole implementation, please take a look at the code sample. (see bottom)</p>
 <p>As you can see below, I&rsquo;ve used the abstracted versions of HttpRequest and HttpResponse, which you get, if you use ASP.Net MVC. That&rsquo;s just one of thousand things I love about ASP.Net MVC. These classes can be used easily in unit tests. Notice that everything can be injected here. There’s no direct access to HttpContext.Current!</p>
@@ -608,42 +608,42 @@ which you can find here:</p>
 </span><span class="lnt">35
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c#" data-lang="c#"><span class="k">public</span> <span class="k">class</span> <span class="nc">CookieContainer</span> <span class="p">:</span> <span class="n">ICookieContainer</span>
-<span class="p">{</span>
-    <span class="k">private</span> <span class="k">readonly</span> <span class="n">HttpRequestBase</span> <span class="m">_</span><span class="n">request</span><span class="p">;</span>
-    <span class="k">private</span> <span class="k">readonly</span> <span class="n">HttpResponseBase</span> <span class="m">_</span><span class="n">response</span><span class="p">;</span>
-    
-    <span class="k">public</span> <span class="n">CookieContainer</span><span class="p">(</span><span class="n">HttpRequestBase</span> <span class="n">request</span><span class="p">,</span> <span class="n">HttpResponseBase</span> <span class="n">response</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="c1">// &#34;Check&#34; is a helper class, I&#39;ve got from the &#34;Kigg&#34; project
-</span><span class="c1"></span>        <span class="n">Check</span><span class="p">.</span><span class="n">IsNotNull</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">&#34;request&#34;</span><span class="p">);</span>
-        <span class="n">Check</span><span class="p">.</span><span class="n">IsNotNull</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="s">&#34;response&#34;</span><span class="p">);</span>
-        
-        <span class="m">_</span><span class="n">request</span> <span class="p">=</span> <span class="n">request</span><span class="p">;</span>
-        <span class="m">_</span><span class="n">response</span> <span class="p">=</span> <span class="n">response</span><span class="p">;</span>
-    <span class="p">}</span>
-    
-    <span class="k">public</span> <span class="kt">string</span> <span class="n">GetValue</span><span class="p">(</span><span class="kt">string</span> <span class="n">key</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="n">Check</span><span class="p">.</span><span class="n">IsNotEmpty</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s">&#34;key&#34;</span><span class="p">);</span>
-        
-        <span class="n">HttpCookie</span> <span class="n">cookie</span> <span class="p">=</span> <span class="m">_</span><span class="n">request</span><span class="p">.</span><span class="n">Cookies</span><span class="p">[</span><span class="n">key</span><span class="p">];</span>
-        <span class="k">return</span> <span class="n">cookie</span> <span class="p">!=</span> <span class="k">null</span> <span class="p">?</span> <span class="n">cookie</span><span class="p">.</span><span class="n">Value</span> <span class="p">:</span> <span class="k">null</span><span class="p">;</span>
-    <span class="p">}</span>
-    
-    <span class="k">public</span> <span class="k">void</span> <span class="n">SetValue</span><span class="p">(</span><span class="kt">string</span> <span class="n">key</span><span class="p">,</span> <span class="kt">object</span> <span class="k">value</span><span class="p">,</span> <span class="n">DateTime</span> <span class="n">expires</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="n">Check</span><span class="p">.</span><span class="n">IsNotEmpty</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s">&#34;key&#34;</span><span class="p">);</span>
-        
-        <span class="kt">string</span> <span class="n">strValue</span> <span class="p">=</span> <span class="n">CheckAndConvertValue</span><span class="p">(</span><span class="k">value</span><span class="p">);</span>
-        
-        <span class="n">HttpCookie</span> <span class="n">cookie</span> <span class="p">=</span> <span class="k">new</span> <span class="n">HttpCookie</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">strValue</span><span class="p">)</span> <span class="p">{</span><span class="n">Expires</span> <span class="p">=</span> <span class="n">expires</span><span class="p">};</span>
-        <span class="m">_</span><span class="n">response</span><span class="p">.</span><span class="n">Cookies</span><span class="p">.</span><span class="n">Set</span><span class="p">(</span><span class="n">cookie</span><span class="p">);</span>
-    <span class="p">}</span>
-    
-    <span class="c1">// ... see code sample for full implementation
-</span><span class="c1"></span><span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c#" data-lang="c#"><span class="line"><span class="cl"><span class="k">public</span> <span class="k">class</span> <span class="nc">CookieContainer</span> <span class="p">:</span> <span class="n">ICookieContainer</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">private</span> <span class="k">readonly</span> <span class="n">HttpRequestBase</span> <span class="m">_</span><span class="n">request</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">private</span> <span class="k">readonly</span> <span class="n">HttpResponseBase</span> <span class="m">_</span><span class="n">response</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">public</span> <span class="n">CookieContainer</span><span class="p">(</span><span class="n">HttpRequestBase</span> <span class="n">request</span><span class="p">,</span> <span class="n">HttpResponseBase</span> <span class="n">response</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// &#34;Check&#34; is a helper class, I&#39;ve got from the &#34;Kigg&#34; project</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Check</span><span class="p">.</span><span class="n">IsNotNull</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">&#34;request&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Check</span><span class="p">.</span><span class="n">IsNotNull</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="s">&#34;response&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="m">_</span><span class="n">request</span> <span class="p">=</span> <span class="n">request</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="m">_</span><span class="n">response</span> <span class="p">=</span> <span class="n">response</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">public</span> <span class="kt">string</span> <span class="n">GetValue</span><span class="p">(</span><span class="kt">string</span> <span class="n">key</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Check</span><span class="p">.</span><span class="n">IsNotEmpty</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s">&#34;key&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="n">HttpCookie</span> <span class="n">cookie</span> <span class="p">=</span> <span class="m">_</span><span class="n">request</span><span class="p">.</span><span class="n">Cookies</span><span class="p">[</span><span class="n">key</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">cookie</span> <span class="p">!=</span> <span class="k">null</span> <span class="p">?</span> <span class="n">cookie</span><span class="p">.</span><span class="n">Value</span> <span class="p">:</span> <span class="k">null</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">public</span> <span class="k">void</span> <span class="n">SetValue</span><span class="p">(</span><span class="kt">string</span> <span class="n">key</span><span class="p">,</span> <span class="kt">object</span> <span class="k">value</span><span class="p">,</span> <span class="n">DateTime</span> <span class="n">expires</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Check</span><span class="p">.</span><span class="n">IsNotEmpty</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s">&#34;key&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="kt">string</span> <span class="n">strValue</span> <span class="p">=</span> <span class="n">CheckAndConvertValue</span><span class="p">(</span><span class="k">value</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">        <span class="n">HttpCookie</span> <span class="n">cookie</span> <span class="p">=</span> <span class="k">new</span> <span class="n">HttpCookie</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">strValue</span><span class="p">)</span> <span class="p">{</span><span class="n">Expires</span> <span class="p">=</span> <span class="n">expires</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">        <span class="m">_</span><span class="n">response</span><span class="p">.</span><span class="n">Cookies</span><span class="p">.</span><span class="n">Set</span><span class="p">(</span><span class="n">cookie</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">// ... see code sample for full implementation</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>Here’s a sample unit tests that proves the testability of this code. I use <a href="http://code.google.com/p/moq/" target="_blank" rel="noopener noreffer">Moq</a> as my mocking framework.</p>
 <div class="highlight"><div class="chroma">
@@ -693,50 +693,50 @@ which you can find here:</p>
 </span><span class="lnt">43
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c#" data-lang="c#"><span class="k">public</span> <span class="k">static</span> <span class="k">class</span> <span class="nc">Mocks</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="k">static</span> <span class="n">Mock</span><span class="p">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="n">HttpRequestBase</span><span class="p">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="n">HttpRequest</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="kt">var</span> <span class="n">httpRequest</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Mock</span><span class="p">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="n">HttpRequestBase</span><span class="p">&amp;</span><span class="n">gt</span><span class="p">;();</span>
-        <span class="n">httpRequest</span><span class="p">.</span><span class="n">Setup</span><span class="p">(</span><span class="n">x</span> <span class="p">=&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="n">x</span><span class="p">.</span><span class="n">Cookies</span><span class="p">).</span><span class="n">Returns</span><span class="p">(</span><span class="k">new</span> <span class="n">HttpCookieCollection</span><span class="p">());</span>
-        <span class="k">return</span> <span class="n">httpRequest</span><span class="p">;</span>
-    <span class="p">}</span>
-    
-    <span class="k">public</span> <span class="k">static</span> <span class="n">Mock</span><span class="p">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="n">HttpResponseBase</span><span class="p">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="n">HttpResponse</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="kt">var</span> <span class="n">httpResponse</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Mock</span><span class="p">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="n">HttpResponseBase</span><span class="p">&amp;</span><span class="n">gt</span><span class="p">;();</span>
-        <span class="n">httpResponse</span><span class="p">.</span><span class="n">Setup</span><span class="p">(</span><span class="n">x</span> <span class="p">=&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="n">x</span><span class="p">.</span><span class="n">Cookies</span><span class="p">).</span><span class="n">Returns</span><span class="p">(</span><span class="k">new</span> <span class="n">HttpCookieCollection</span><span class="p">());</span>
-        <span class="k">return</span> <span class="n">httpResponse</span><span class="p">;</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="c1">// This method is from my CookieContainerTests class
-</span><span class="c1"></span><span class="na">
-</span><span class="na">[TestMethod]</span>
-<span class="k">public</span> <span class="k">void</span> <span class="n">SetValue_UpdatesExistingCookie</span><span class="p">()</span>
-<span class="p">{</span>
-    <span class="c1">// Arrange
-</span><span class="c1"></span>    <span class="k">const</span> <span class="kt">string</span> <span class="n">cookieName</span> <span class="p">=</span> <span class="s">&#34;myCookie&#34;</span><span class="p">;</span>
-    <span class="k">const</span> <span class="kt">string</span> <span class="n">cookieValue</span> <span class="p">=</span> <span class="s">&#34;myValue&#34;</span><span class="p">;</span>
-    <span class="n">DateTime</span> <span class="n">cookieExpires</span> <span class="p">=</span> <span class="k">new</span> <span class="n">DateTime</span><span class="p">(</span><span class="m">2009</span><span class="p">,</span> <span class="m">1</span><span class="p">,</span> <span class="m">1</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">);</span>
-    
-    <span class="kt">var</span> <span class="n">httpRequest</span> <span class="p">=</span> <span class="n">Mocks</span><span class="p">.</span><span class="n">HttpRequest</span><span class="p">();</span>
-    <span class="kt">var</span> <span class="n">httpResponse</span> <span class="p">=</span> <span class="n">Mocks</span><span class="p">.</span><span class="n">HttpResponse</span><span class="p">();</span>
-    <span class="kt">var</span> <span class="n">cookieContainer</span> <span class="p">=</span> <span class="k">new</span> <span class="n">CookieContainer</span><span class="p">(</span><span class="n">httpRequest</span><span class="p">.</span><span class="n">Object</span><span class="p">,</span> <span class="n">httpResponse</span><span class="p">.</span><span class="n">Object</span><span class="p">);</span>
-    
-    <span class="n">httpResponse</span><span class="p">.</span><span class="n">Object</span><span class="p">.</span><span class="n">Cookies</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="k">new</span> <span class="n">HttpCookie</span><span class="p">(</span><span class="n">cookieName</span><span class="p">,</span> <span class="s">&#34;oldValue&#34;</span><span class="p">));</span>
-    
-    <span class="c1">// Act
-</span><span class="c1"></span>    <span class="m">_</span><span class="n">cookieContainer</span><span class="p">.</span><span class="n">SetValue</span><span class="p">(</span><span class="n">cookieName</span><span class="p">,</span> <span class="n">cookieValue</span><span class="p">,</span> <span class="n">cookieExpires</span><span class="p">);</span>
-
-    <span class="c1">// Assert
-</span><span class="c1"></span>    <span class="n">HttpCookie</span> <span class="n">cookie</span> <span class="p">=</span> <span class="n">httpResponse</span><span class="p">.</span><span class="n">Object</span><span class="p">.</span><span class="n">Cookies</span><span class="p">[</span><span class="s">&#34;myCookie&#34;</span><span class="p">];</span>
-    <span class="n">Assert</span><span class="p">.</span><span class="n">IsNotNull</span><span class="p">(</span><span class="n">cookie</span><span class="p">);</span>
-    <span class="n">Assert</span><span class="p">.</span><span class="n">AreEqual</span><span class="p">(</span><span class="n">cookie</span><span class="p">.</span><span class="n">Name</span><span class="p">,</span> <span class="n">cookieName</span><span class="p">);</span>
-    <span class="n">Assert</span><span class="p">.</span><span class="n">AreEqual</span><span class="p">(</span><span class="n">cookie</span><span class="p">.</span><span class="n">Value</span><span class="p">,</span> <span class="n">cookieValue</span><span class="p">);</span>
-    <span class="n">Assert</span><span class="p">.</span><span class="n">AreEqual</span><span class="p">(</span><span class="n">cookie</span><span class="p">.</span><span class="n">Expires</span><span class="p">,</span> <span class="n">cookieExpires</span><span class="p">);</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c#" data-lang="c#"><span class="line"><span class="cl"><span class="k">public</span> <span class="k">static</span> <span class="k">class</span> <span class="nc">Mocks</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">public</span> <span class="k">static</span> <span class="n">Mock</span><span class="p">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="n">HttpRequestBase</span><span class="p">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="n">HttpRequest</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">var</span> <span class="n">httpRequest</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Mock</span><span class="p">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="n">HttpRequestBase</span><span class="p">&amp;</span><span class="n">gt</span><span class="p">;();</span>
+</span></span><span class="line"><span class="cl">        <span class="n">httpRequest</span><span class="p">.</span><span class="n">Setup</span><span class="p">(</span><span class="n">x</span> <span class="p">=&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="n">x</span><span class="p">.</span><span class="n">Cookies</span><span class="p">).</span><span class="n">Returns</span><span class="p">(</span><span class="k">new</span> <span class="n">HttpCookieCollection</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">httpRequest</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">public</span> <span class="k">static</span> <span class="n">Mock</span><span class="p">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="n">HttpResponseBase</span><span class="p">&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="n">HttpResponse</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">var</span> <span class="n">httpResponse</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Mock</span><span class="p">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="n">HttpResponseBase</span><span class="p">&amp;</span><span class="n">gt</span><span class="p">;();</span>
+</span></span><span class="line"><span class="cl">        <span class="n">httpResponse</span><span class="p">.</span><span class="n">Setup</span><span class="p">(</span><span class="n">x</span> <span class="p">=&amp;</span><span class="n">gt</span><span class="p">;</span> <span class="n">x</span><span class="p">.</span><span class="n">Cookies</span><span class="p">).</span><span class="n">Returns</span><span class="p">(</span><span class="k">new</span> <span class="n">HttpCookieCollection</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">httpResponse</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// This method is from my CookieContainerTests class</span>
+</span></span><span class="line"><span class="cl"><span class="na">
+</span></span></span><span class="line"><span class="cl"><span class="na">[TestMethod]</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span> <span class="k">void</span> <span class="n">SetValue_UpdatesExistingCookie</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// Arrange</span>
+</span></span><span class="line"><span class="cl">    <span class="k">const</span> <span class="kt">string</span> <span class="n">cookieName</span> <span class="p">=</span> <span class="s">&#34;myCookie&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">const</span> <span class="kt">string</span> <span class="n">cookieValue</span> <span class="p">=</span> <span class="s">&#34;myValue&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DateTime</span> <span class="n">cookieExpires</span> <span class="p">=</span> <span class="k">new</span> <span class="n">DateTime</span><span class="p">(</span><span class="m">2009</span><span class="p">,</span> <span class="m">1</span><span class="p">,</span> <span class="m">1</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="kt">var</span> <span class="n">httpRequest</span> <span class="p">=</span> <span class="n">Mocks</span><span class="p">.</span><span class="n">HttpRequest</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">var</span> <span class="n">httpResponse</span> <span class="p">=</span> <span class="n">Mocks</span><span class="p">.</span><span class="n">HttpResponse</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">var</span> <span class="n">cookieContainer</span> <span class="p">=</span> <span class="k">new</span> <span class="n">CookieContainer</span><span class="p">(</span><span class="n">httpRequest</span><span class="p">.</span><span class="n">Object</span><span class="p">,</span> <span class="n">httpResponse</span><span class="p">.</span><span class="n">Object</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="n">httpResponse</span><span class="p">.</span><span class="n">Object</span><span class="p">.</span><span class="n">Cookies</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="k">new</span> <span class="n">HttpCookie</span><span class="p">(</span><span class="n">cookieName</span><span class="p">,</span> <span class="s">&#34;oldValue&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">// Act</span>
+</span></span><span class="line"><span class="cl">    <span class="m">_</span><span class="n">cookieContainer</span><span class="p">.</span><span class="n">SetValue</span><span class="p">(</span><span class="n">cookieName</span><span class="p">,</span> <span class="n">cookieValue</span><span class="p">,</span> <span class="n">cookieExpires</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// Assert</span>
+</span></span><span class="line"><span class="cl">    <span class="n">HttpCookie</span> <span class="n">cookie</span> <span class="p">=</span> <span class="n">httpResponse</span><span class="p">.</span><span class="n">Object</span><span class="p">.</span><span class="n">Cookies</span><span class="p">[</span><span class="s">&#34;myCookie&#34;</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Assert</span><span class="p">.</span><span class="n">IsNotNull</span><span class="p">(</span><span class="n">cookie</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Assert</span><span class="p">.</span><span class="n">AreEqual</span><span class="p">(</span><span class="n">cookie</span><span class="p">.</span><span class="n">Name</span><span class="p">,</span> <span class="n">cookieName</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Assert</span><span class="p">.</span><span class="n">AreEqual</span><span class="p">(</span><span class="n">cookie</span><span class="p">.</span><span class="n">Value</span><span class="p">,</span> <span class="n">cookieValue</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Assert</span><span class="p">.</span><span class="n">AreEqual</span><span class="p">(</span><span class="n">cookie</span><span class="p">.</span><span class="n">Expires</span><span class="p">,</span> <span class="n">cookieExpires</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>That’s it! Now you have a testable and reusable cookie container!</p>
 <h3 id="how-to-use-it-in-your-application">How to use it in your application</h3>
@@ -772,34 +772,34 @@ which you can find here:</p>
 </span><span class="lnt">27
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c#" data-lang="c#"><span class="k">public</span> <span class="k">interface</span> <span class="n">IAppCookies</span>
-<span class="p">{</span>
-    <span class="kt">string</span> <span class="n">UserEmail</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
-    <span class="n">DateTime</span><span class="p">?</span> <span class="n">LastVisit</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="k">public</span> <span class="k">class</span> <span class="nc">AppCookies</span> <span class="p">:</span> <span class="n">IAppCookies</span>
-<span class="p">{</span>
-    <span class="k">private</span> <span class="k">readonly</span> <span class="n">ICookieContainer</span> <span class="m">_</span><span class="n">cookieContainer</span><span class="p">;</span>
-    
-    <span class="k">public</span> <span class="n">AppCookies</span><span class="p">(</span><span class="n">ICookieContainer</span> <span class="n">cookieContainer</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="m">_</span><span class="n">cookieContainer</span> <span class="p">=</span> <span class="n">cookieContainer</span><span class="p">;</span>
-    <span class="p">}</span>
-    
-    <span class="k">public</span> <span class="kt">string</span> <span class="n">UserEmail</span>
-    <span class="p">{</span>
-        <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="m">_</span><span class="n">cookieContainer</span><span class="p">.</span><span class="n">GetValue</span><span class="p">(</span><span class="s">&#34;UserEmail&#34;</span><span class="p">);</span> <span class="p">}</span>
-        <span class="k">set</span> <span class="p">{</span> <span class="m">_</span><span class="n">cookieContainer</span><span class="p">.</span><span class="n">SetValue</span><span class="p">(</span><span class="s">&#34;UserEmail&#34;</span><span class="p">,</span> <span class="k">value</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">.</span><span class="n">Now</span><span class="p">.</span><span class="n">AddDays</span><span class="p">(</span><span class="m">10</span><span class="p">));</span> <span class="p">}</span>
-    <span class="p">}</span>
-    
-    <span class="k">public</span> <span class="n">DateTime</span><span class="p">?</span> <span class="n">LastVisit</span>
-    <span class="p">{</span>
-        <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="m">_</span><span class="n">cookieContainer</span><span class="p">.</span><span class="n">GetValue</span><span class="p">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="n">DateTime</span><span class="p">?&amp;</span><span class="n">gt</span><span class="p">;(</span><span class="s">&#34;LastVisit&#34;</span><span class="p">);</span> <span class="p">}</span>
-        <span class="k">set</span> <span class="p">{</span> <span class="m">_</span><span class="n">cookieContainer</span><span class="p">.</span><span class="n">SetValue</span><span class="p">(</span><span class="s">&#34;LastVisit&#34;</span><span class="p">,</span> <span class="k">value</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">.</span><span class="n">Now</span><span class="p">.</span><span class="n">AddDays</span><span class="p">(</span><span class="m">10</span><span class="p">));</span> <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c#" data-lang="c#"><span class="line"><span class="cl"><span class="k">public</span> <span class="k">interface</span> <span class="nc">IAppCookies</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">string</span> <span class="n">UserEmail</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="n">DateTime</span><span class="p">?</span> <span class="n">LastVisit</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">public</span> <span class="k">class</span> <span class="nc">AppCookies</span> <span class="p">:</span> <span class="n">IAppCookies</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">private</span> <span class="k">readonly</span> <span class="n">ICookieContainer</span> <span class="m">_</span><span class="n">cookieContainer</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">public</span> <span class="n">AppCookies</span><span class="p">(</span><span class="n">ICookieContainer</span> <span class="n">cookieContainer</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="m">_</span><span class="n">cookieContainer</span> <span class="p">=</span> <span class="n">cookieContainer</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">public</span> <span class="kt">string</span> <span class="n">UserEmail</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="m">_</span><span class="n">cookieContainer</span><span class="p">.</span><span class="n">GetValue</span><span class="p">(</span><span class="s">&#34;UserEmail&#34;</span><span class="p">);</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="k">set</span> <span class="p">{</span> <span class="m">_</span><span class="n">cookieContainer</span><span class="p">.</span><span class="n">SetValue</span><span class="p">(</span><span class="s">&#34;UserEmail&#34;</span><span class="p">,</span> <span class="k">value</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">.</span><span class="n">Now</span><span class="p">.</span><span class="n">AddDays</span><span class="p">(</span><span class="m">10</span><span class="p">));</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">public</span> <span class="n">DateTime</span><span class="p">?</span> <span class="n">LastVisit</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="m">_</span><span class="n">cookieContainer</span><span class="p">.</span><span class="n">GetValue</span><span class="p">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="n">DateTime</span><span class="p">?&amp;</span><span class="n">gt</span><span class="p">;(</span><span class="s">&#34;LastVisit&#34;</span><span class="p">);</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="k">set</span> <span class="p">{</span> <span class="m">_</span><span class="n">cookieContainer</span><span class="p">.</span><span class="n">SetValue</span><span class="p">(</span><span class="s">&#34;LastVisit&#34;</span><span class="p">,</span> <span class="k">value</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">.</span><span class="n">Now</span><span class="p">.</span><span class="n">AddDays</span><span class="p">(</span><span class="m">10</span><span class="p">));</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>You can now inject this IAppCookies interface to your MVC Controller:</p>
 <div class="highlight"><div class="chroma">
@@ -838,39 +838,39 @@ which you can find here:</p>
 </span><span class="lnt">32
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c#" data-lang="c#"><span class="k">public</span> <span class="k">class</span> <span class="nc">HomeController</span> <span class="p">:</span> <span class="n">Controller</span>
-<span class="p">{</span>
-    <span class="k">private</span> <span class="k">readonly</span> <span class="n">IAppCookies</span> <span class="m">_</span><span class="n">cookies</span><span class="p">;</span>
-
-    <span class="k">public</span> <span class="n">HomeController</span><span class="p">(</span><span class="n">IAppCookies</span> <span class="n">cookies</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="m">_</span><span class="n">cookies</span> <span class="p">=</span> <span class="n">cookies</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="n">ActionResult</span> <span class="n">Index</span><span class="p">()</span>
-    <span class="p">{</span>
-        <span class="n">DateTime</span> <span class="n">currentTime</span> <span class="p">=</span> <span class="n">DateTime</span><span class="p">.</span><span class="n">Now</span><span class="p">;</span>
-
-        <span class="n">IndexViewModel</span> <span class="n">viewModel</span> <span class="p">=</span> <span class="k">new</span> <span class="n">IndexViewModel</span>
-        <span class="p">{</span>
-            <span class="n">CurrentTime</span> <span class="p">=</span> <span class="n">currentTime</span><span class="p">,</span>
-            <span class="n">LastVisit</span> <span class="p">=</span> <span class="p">(</span><span class="m">_</span><span class="n">cookies</span><span class="p">.</span><span class="n">LastVisit</span> <span class="p">??</span> <span class="n">currentTime</span><span class="p">),</span>
-            <span class="n">UserEmail</span> <span class="p">=</span> <span class="m">_</span><span class="n">cookies</span><span class="p">.</span><span class="n">UserEmail</span>
-        <span class="p">};</span>
-
-        <span class="m">_</span><span class="n">cookies</span><span class="p">.</span><span class="n">LastVisit</span> <span class="p">=</span> <span class="n">currentTime</span><span class="p">;</span>
-
-        <span class="k">return</span> <span class="n">View</span><span class="p">(</span><span class="n">viewModel</span><span class="p">);</span>
-    <span class="p">}</span>
-
-    <span class="k">public</span> <span class="k">class</span> <span class="nc">IndexViewModel</span>
-    <span class="p">{</span>
-        <span class="k">public</span> <span class="kt">string</span> <span class="n">UserEmail</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
-        <span class="k">public</span> <span class="n">DateTime</span> <span class="n">LastVisit</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
-        <span class="k">public</span> <span class="n">DateTime</span> <span class="n">CurrentTime</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c#" data-lang="c#"><span class="line"><span class="cl"><span class="k">public</span> <span class="k">class</span> <span class="nc">HomeController</span> <span class="p">:</span> <span class="n">Controller</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">private</span> <span class="k">readonly</span> <span class="n">IAppCookies</span> <span class="m">_</span><span class="n">cookies</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">public</span> <span class="n">HomeController</span><span class="p">(</span><span class="n">IAppCookies</span> <span class="n">cookies</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="m">_</span><span class="n">cookies</span> <span class="p">=</span> <span class="n">cookies</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">public</span> <span class="n">ActionResult</span> <span class="n">Index</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">DateTime</span> <span class="n">currentTime</span> <span class="p">=</span> <span class="n">DateTime</span><span class="p">.</span><span class="n">Now</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">IndexViewModel</span> <span class="n">viewModel</span> <span class="p">=</span> <span class="k">new</span> <span class="n">IndexViewModel</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">CurrentTime</span> <span class="p">=</span> <span class="n">currentTime</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">            <span class="n">LastVisit</span> <span class="p">=</span> <span class="p">(</span><span class="m">_</span><span class="n">cookies</span><span class="p">.</span><span class="n">LastVisit</span> <span class="p">??</span> <span class="n">currentTime</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">            <span class="n">UserEmail</span> <span class="p">=</span> <span class="m">_</span><span class="n">cookies</span><span class="p">.</span><span class="n">UserEmail</span>
+</span></span><span class="line"><span class="cl">        <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="m">_</span><span class="n">cookies</span><span class="p">.</span><span class="n">LastVisit</span> <span class="p">=</span> <span class="n">currentTime</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">View</span><span class="p">(</span><span class="n">viewModel</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">public</span> <span class="k">class</span> <span class="nc">IndexViewModel</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">public</span> <span class="kt">string</span> <span class="n">UserEmail</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="k">public</span> <span class="n">DateTime</span> <span class="n">LastVisit</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="k">public</span> <span class="n">DateTime</span> <span class="n">CurrentTime</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>Wow, you’re still reading :-)</p>
 <p>That’s all I want to show here! If you want to see more about how the IOC is set up (I’m using <a href="http://structuremap.sourceforge.net/Default.htm" target="_blank" rel="noopener noreffer">StructureMap</a>) or anything else, take a look at the full code:</p>
@@ -879,7 +879,7 @@ which you can find here:</p>
 </ul>
 <p>I look forward to hearing your feedback on this!</p>
 <p>Thanks for reading,<br>
-Christian Weiss</p>]]></description></item><item><title>Use wrappers to access your cookies, sessions, ...</title><link>https://www.chwe.at/2009/01/use-wrappers-to-access-your-cookies-sessions/</link><pubDate>Mon, 26 Jan 2009 18:45:00 +0100</pubDate><author>Author</author><guid>https://www.chwe.at/2009/01/use-wrappers-to-access-your-cookies-sessions/</guid><description><![CDATA[<p>As described in my <a href="https://www.chwe.at/2009/01/don-t-use-response.cookies-string-to-check-if-a-cookie-exists/" rel="">previous post</a>, I will give you some more details about how you can access your cookies in a type-safe and easy way!</p>
+Christian Weiss</p>]]></description></item><item><title>Use wrappers to access your cookies, sessions, ...</title><link>https://www.chwe.at/2009/01/use-wrappers-to-access-your-cookies-sessions/</link><pubDate>Mon, 26 Jan 2009 18:45:00 +0100</pubDate><author>Author</author><guid>https://www.chwe.at/2009/01/use-wrappers-to-access-your-cookies-sessions/</guid><description><![CDATA[<p>As described in my <a href="https://www.chwe.at/2009/01/don-t-use-response.cookies-string--to-check-if-a-cookie-exists/" rel="">previous post</a>, I will give you some more details about how you can access your cookies in a type-safe and easy way!</p>
 <h3 id="update-read-the-follow-up-post">Update: Read the follow up post</h3>
 <ul>
 <li><a href="https://www.chwe.at/2009/01/testable-and-reusable-cookie-access-with-asp.net-mvc-rc/" rel="">Testable and reusable cookie access with ASP.Net MVC RC</a></li>
@@ -934,52 +934,52 @@ Christian Weiss</p>]]></description></item><item><title>Use wrappers to access y
 </span><span class="lnt">45
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c#" data-lang="c#"><span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
-<span class="k">using</span> <span class="nn">System.Globalization</span><span class="p">;</span>
-<span class="k">using</span> <span class="nn">System.Web</span><span class="p">;</span>
-    
-<span class="k">namespace</span> <span class="nn">CookieWrapper.Web</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="k">static</span> <span class="k">class</span> <span class="nc">MyCookies</span>
-    <span class="p">{</span>
-        <span class="k">public</span> <span class="k">static</span> <span class="kt">string</span> <span class="n">UserEmail</span>
-        <span class="p">{</span>
-            <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="n">GetValue</span><span class="p">(</span><span class="s">&#34;UserEmail&#34;</span><span class="p">);</span> <span class="p">}</span>
-            <span class="k">set</span> <span class="p">{</span> <span class="n">SetValue</span><span class="p">(</span><span class="s">&#34;UserEmail&#34;</span><span class="p">,</span> <span class="k">value</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">.</span><span class="n">Now</span><span class="p">.</span><span class="n">AddDays</span><span class="p">(</span><span class="m">10</span><span class="p">));</span> <span class="p">}</span>
-        <span class="p">}</span>
-    
-        <span class="k">public</span> <span class="k">static</span> <span class="n">DateTime</span><span class="p">?</span> <span class="n">LastVisit</span>
-        <span class="p">{</span>
-            <span class="k">get</span>
-            <span class="p">{</span>
-                <span class="kt">string</span> <span class="n">strDate</span> <span class="p">=</span> <span class="n">GetValue</span><span class="p">(</span><span class="s">&#34;LastVisit&#34;</span><span class="p">);</span>
-                <span class="k">if</span> <span class="p">(</span><span class="n">String</span><span class="p">.</span><span class="n">IsNullOrEmpty</span><span class="p">(</span><span class="n">strDate</span><span class="p">))</span>
-                    <span class="k">return</span> <span class="k">null</span><span class="p">;</span>
-                <span class="k">return</span> <span class="n">DateTime</span><span class="p">.</span><span class="n">Parse</span><span class="p">(</span><span class="n">strDate</span><span class="p">,</span> <span class="n">CultureInfo</span><span class="p">.</span><span class="n">InvariantCulture</span><span class="p">);</span>
-            <span class="p">}</span>
-            <span class="k">set</span>
-            <span class="p">{</span>
-                <span class="kt">string</span> <span class="n">strDate</span> <span class="p">=</span> <span class="k">value</span><span class="p">.</span><span class="n">HasValue</span> <span class="p">?</span> <span class="k">value</span><span class="p">.</span><span class="n">Value</span><span class="p">.</span><span class="n">ToString</span><span class="p">(</span><span class="n">CultureInfo</span><span class="p">.</span><span class="n">InvariantCulture</span><span class="p">)</span> <span class="p">:</span> <span class="k">null</span><span class="p">;</span>
-                <span class="n">SetValue</span><span class="p">(</span><span class="s">&#34;LastVisit&#34;</span><span class="p">,</span> <span class="n">strDate</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">.</span><span class="n">Now</span><span class="p">.</span><span class="n">AddDays</span><span class="p">(</span><span class="m">10</span><span class="p">));</span>
-            <span class="p">}</span>
-        <span class="p">}</span>
-    
-        <span class="k">private</span> <span class="k">static</span> <span class="kt">string</span> <span class="n">GetValue</span><span class="p">(</span><span class="kt">string</span> <span class="n">key</span><span class="p">)</span>
-        <span class="p">{</span>
-            <span class="n">HttpCookie</span> <span class="n">cookie</span> <span class="p">=</span> <span class="n">HttpContext</span><span class="p">.</span><span class="n">Current</span><span class="p">.</span><span class="n">Request</span><span class="p">.</span><span class="n">Cookies</span><span class="p">[</span><span class="n">key</span><span class="p">];</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">cookie</span> <span class="p">!=</span> <span class="k">null</span><span class="p">)</span>
-                <span class="k">return</span> <span class="n">cookie</span><span class="p">.</span><span class="n">Value</span><span class="p">;</span>
-            <span class="k">return</span> <span class="k">null</span><span class="p">;</span>
-        <span class="p">}</span>
-    
-        <span class="k">private</span> <span class="k">static</span> <span class="k">void</span> <span class="n">SetValue</span><span class="p">(</span><span class="kt">string</span> <span class="n">key</span><span class="p">,</span> <span class="kt">string</span> <span class="k">value</span><span class="p">,</span> <span class="n">DateTime</span> <span class="n">expires</span><span class="p">)</span>
-        <span class="p">{</span>
-            <span class="n">HttpContext</span><span class="p">.</span><span class="n">Current</span><span class="p">.</span><span class="n">Response</span><span class="p">.</span><span class="n">Cookies</span><span class="p">[</span><span class="n">key</span><span class="p">].</span><span class="n">Value</span> <span class="p">=</span> <span class="k">value</span><span class="p">;</span>
-            <span class="n">HttpContext</span><span class="p">.</span><span class="n">Current</span><span class="p">.</span><span class="n">Response</span><span class="p">.</span><span class="n">Cookies</span><span class="p">[</span><span class="n">key</span><span class="p">].</span><span class="n">Expires</span> <span class="p">=</span> <span class="n">expires</span><span class="p">;</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c#" data-lang="c#"><span class="line"><span class="cl"><span class="k">using</span> <span class="nn">System</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">using</span> <span class="nn">System.Globalization</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">using</span> <span class="nn">System.Web</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl"><span class="k">namespace</span> <span class="nn">CookieWrapper.Web</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">public</span> <span class="k">static</span> <span class="k">class</span> <span class="nc">MyCookies</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">public</span> <span class="k">static</span> <span class="kt">string</span> <span class="n">UserEmail</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="n">GetValue</span><span class="p">(</span><span class="s">&#34;UserEmail&#34;</span><span class="p">);</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">            <span class="k">set</span> <span class="p">{</span> <span class="n">SetValue</span><span class="p">(</span><span class="s">&#34;UserEmail&#34;</span><span class="p">,</span> <span class="k">value</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">.</span><span class="n">Now</span><span class="p">.</span><span class="n">AddDays</span><span class="p">(</span><span class="m">10</span><span class="p">));</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">        <span class="k">public</span> <span class="k">static</span> <span class="n">DateTime</span><span class="p">?</span> <span class="n">LastVisit</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="k">get</span>
+</span></span><span class="line"><span class="cl">            <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="kt">string</span> <span class="n">strDate</span> <span class="p">=</span> <span class="n">GetValue</span><span class="p">(</span><span class="s">&#34;LastVisit&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">                <span class="k">if</span> <span class="p">(</span><span class="n">String</span><span class="p">.</span><span class="n">IsNullOrEmpty</span><span class="p">(</span><span class="n">strDate</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">                    <span class="k">return</span> <span class="k">null</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                <span class="k">return</span> <span class="n">DateTime</span><span class="p">.</span><span class="n">Parse</span><span class="p">(</span><span class="n">strDate</span><span class="p">,</span> <span class="n">CultureInfo</span><span class="p">.</span><span class="n">InvariantCulture</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">            <span class="p">}</span>
+</span></span><span class="line"><span class="cl">            <span class="k">set</span>
+</span></span><span class="line"><span class="cl">            <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="kt">string</span> <span class="n">strDate</span> <span class="p">=</span> <span class="k">value</span><span class="p">.</span><span class="n">HasValue</span> <span class="p">?</span> <span class="k">value</span><span class="p">.</span><span class="n">Value</span><span class="p">.</span><span class="n">ToString</span><span class="p">(</span><span class="n">CultureInfo</span><span class="p">.</span><span class="n">InvariantCulture</span><span class="p">)</span> <span class="p">:</span> <span class="k">null</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                <span class="n">SetValue</span><span class="p">(</span><span class="s">&#34;LastVisit&#34;</span><span class="p">,</span> <span class="n">strDate</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">.</span><span class="n">Now</span><span class="p">.</span><span class="n">AddDays</span><span class="p">(</span><span class="m">10</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">            <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">        <span class="k">private</span> <span class="k">static</span> <span class="kt">string</span> <span class="n">GetValue</span><span class="p">(</span><span class="kt">string</span> <span class="n">key</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">HttpCookie</span> <span class="n">cookie</span> <span class="p">=</span> <span class="n">HttpContext</span><span class="p">.</span><span class="n">Current</span><span class="p">.</span><span class="n">Request</span><span class="p">.</span><span class="n">Cookies</span><span class="p">[</span><span class="n">key</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="p">(</span><span class="n">cookie</span> <span class="p">!=</span> <span class="k">null</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                <span class="k">return</span> <span class="n">cookie</span><span class="p">.</span><span class="n">Value</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="k">null</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">        <span class="k">private</span> <span class="k">static</span> <span class="k">void</span> <span class="n">SetValue</span><span class="p">(</span><span class="kt">string</span> <span class="n">key</span><span class="p">,</span> <span class="kt">string</span> <span class="k">value</span><span class="p">,</span> <span class="n">DateTime</span> <span class="n">expires</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">HttpContext</span><span class="p">.</span><span class="n">Current</span><span class="p">.</span><span class="n">Response</span><span class="p">.</span><span class="n">Cookies</span><span class="p">[</span><span class="n">key</span><span class="p">].</span><span class="n">Value</span> <span class="p">=</span> <span class="k">value</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="n">HttpContext</span><span class="p">.</span><span class="n">Current</span><span class="p">.</span><span class="n">Response</span><span class="p">.</span><span class="n">Cookies</span><span class="p">[</span><span class="n">key</span><span class="p">].</span><span class="n">Expires</span> <span class="p">=</span> <span class="n">expires</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>All you have to do is create a static property for every cookie that you would like to work with. As you can see you also have the Expires-times administrated in one single place!</p>
 <p>Now you can access the values as seen below and you don&rsquo;t have to worry about the cookie implementation-details in every place.</p>
@@ -989,13 +989,13 @@ Christian Weiss</p>]]></description></item><item><title>Use wrappers to access y
 </span><span class="lnt">2
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c#" data-lang="c#"><span class="n">tbLastVisit</span><span class="p">.</span><span class="n">Text</span> <span class="p">=</span> <span class="n">MyCookies</span><span class="p">.</span><span class="n">UserEmail</span><span class="p">;</span>
-<span class="n">MyCookies</span><span class="p">.</span><span class="n">LastVisit</span> <span class="p">=</span> <span class="n">DateTime</span><span class="p">.</span><span class="n">Now</span><span class="p">;</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-c#" data-lang="c#"><span class="line"><span class="cl"><span class="n">tbLastVisit</span><span class="p">.</span><span class="n">Text</span> <span class="p">=</span> <span class="n">MyCookies</span><span class="p">.</span><span class="n">UserEmail</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">MyCookies</span><span class="p">.</span><span class="n">LastVisit</span> <span class="p">=</span> <span class="n">DateTime</span><span class="p">.</span><span class="n">Now</span><span class="p">;</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>Of course, you can also use this same approach for working with session data or any other key-based collection.</p>
 <p>Thanks for reading,<br>
-Christian Weiss</p>]]></description></item><item><title>Don't use Response.Cookies[string] to check if a cookie exists!</title><link>https://www.chwe.at/2009/01/don-t-use-response.cookies-string-to-check-if-a-cookie-exists/</link><pubDate>Mon, 26 Jan 2009 15:57:00 +0100</pubDate><author>Author</author><guid>https://www.chwe.at/2009/01/don-t-use-response.cookies-string-to-check-if-a-cookie-exists/</guid><description><![CDATA[<h3 id="update-follow-up-posts">Update: Follow Up Posts</h3>
+Christian Weiss</p>]]></description></item><item><title>Don't use Response.Cookies[string] to check if a cookie exists!</title><link>https://www.chwe.at/2009/01/don-t-use-response.cookies-string--to-check-if-a-cookie-exists/</link><pubDate>Mon, 26 Jan 2009 15:57:00 +0100</pubDate><author>Author</author><guid>https://www.chwe.at/2009/01/don-t-use-response.cookies-string--to-check-if-a-cookie-exists/</guid><description><![CDATA[<h3 id="update-follow-up-posts">Update: Follow Up Posts</h3>
 <ul>
 <li><a href="https://www.chwe.at/2009/01/use-wrappers-to-access-your-cookies-sessions/" rel="">Use wrappers to access your cookies, sessions, &hellip;</a></li>
 <li><a href="https://www.chwe.at/2009/01/testable-and-reusable-cookie-access-with-asp.net-mvc-rc/" rel="">Testable and reusable cookie access with ASP.Net MVC RC</a></li>
@@ -1016,9 +1016,9 @@ Christian Weiss</p>]]></description></item><item><title>Don't use Response.Cooki
 </span><span class="lnt">2
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="n">Response</span><span class="p">.</span><span class="n">Cookies</span><span class="p">[</span><span class="s">&#34;mycookie&#34;</span><span class="p">].</span><span class="n">Value</span> <span class="p">=</span> <span class="s">&#34;some value&#34;</span><span class="p">;</span>
-<span class="n">Response</span><span class="p">.</span><span class="n">Cookies</span><span class="p">[</span><span class="s">&#34;mycookie&#34;</span><span class="p">].</span><span class="n">Expires</span> <span class="p">=</span> <span class="n">DateTime</span><span class="p">.</span><span class="n">Now</span><span class="p">.</span><span class="n">AddDays</span><span class="p">(</span><span class="m">10</span><span class="p">);</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="n">Response</span><span class="p">.</span><span class="n">Cookies</span><span class="p">[</span><span class="s">&#34;mycookie&#34;</span><span class="p">].</span><span class="n">Value</span> <span class="p">=</span> <span class="s">&#34;some value&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">Response</span><span class="p">.</span><span class="n">Cookies</span><span class="p">[</span><span class="s">&#34;mycookie&#34;</span><span class="p">].</span><span class="n">Expires</span> <span class="p">=</span> <span class="n">DateTime</span><span class="p">.</span><span class="n">Now</span><span class="p">.</span><span class="n">AddDays</span><span class="p">(</span><span class="m">10</span><span class="p">);</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>As you can see here, the .NET framework automatically generates the HttpCookie instance with the name &ldquo;mycookie&rdquo; in the background and adds it to the collection.</p>
 <p></p>
@@ -1034,11 +1034,11 @@ Christian Weiss</p>]]></description></item><item><title>Don't use Response.Cooki
 </span><span class="lnt">4
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="k">if</span> <span class="p">(</span><span class="n">Response</span><span class="p">.</span><span class="n">Cookies</span><span class="p">[</span><span class="s">&#34;mycookie&#34;</span><span class="p">]</span> <span class="p">!=</span> <span class="k">null</span><span class="p">)</span>
-<span class="p">{</span>
-  <span class="c1">// This automatically overwrites the existing cookie with an empty value!!!
-</span><span class="c1"></span><span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="n">Response</span><span class="p">.</span><span class="n">Cookies</span><span class="p">[</span><span class="s">&#34;mycookie&#34;</span><span class="p">]</span> <span class="p">!=</span> <span class="k">null</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// This automatically overwrites the existing cookie with an empty value!!!</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>The correct way to access cookies is by using the Request.Cookies-Collection:</p>
 <div class="highlight"><div class="chroma">
@@ -1049,11 +1049,11 @@ Christian Weiss</p>]]></description></item><item><title>Don't use Response.Cooki
 </span><span class="lnt">4
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="k">if</span> <span class="p">(</span><span class="n">Request</span><span class="p">.</span><span class="n">Cookies</span><span class="p">[</span><span class="s">&#34;mycookie&#34;</span><span class="p">]</span> <span class="p">!=</span> <span class="k">null</span><span class="p">)</span>
-<span class="p">{</span>
-  <span class="c1">// This is fine
-</span><span class="c1"></span><span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="n">Request</span><span class="p">.</span><span class="n">Cookies</span><span class="p">[</span><span class="s">&#34;mycookie&#34;</span><span class="p">]</span> <span class="p">!=</span> <span class="k">null</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// This is fine</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h3 id="so-remember-the-following-rules">So remember the following rules</h3>
 <ul>

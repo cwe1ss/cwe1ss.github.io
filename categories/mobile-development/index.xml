@@ -18,9 +18,9 @@
 </span><span class="lnt">2
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-cmd" data-lang="cmd">git clone https://github.com/cwe1ss/flutter-flavors-ci-cd.git
-<span class="k">cd</span> flutter-flavors-ci-cd/
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-cmd" data-lang="cmd"><span class="line"><span class="cl">git clone https://github.com/cwe1ss/flutter-flavors-ci-cd.git
+</span></span><span class="line"><span class="cl"><span class="k">cd</span> flutter-flavors-ci-cd/
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h2 id="create-the-flutter-app">Create the Flutter app</h2>
 <p>Let&rsquo;s get started by creating the Flutter app, named <code>flutter_flavors</code> via the Flutter CLI directly in the root folder of our repository:</p>
@@ -29,8 +29,8 @@
 <pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-cmd" data-lang="cmd">flutter create --project-name flutter_flavors .
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-cmd" data-lang="cmd"><span class="line"><span class="cl">flutter create --project-name flutter_flavors .
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>Run the app on an Android device/emulator to ensure it works.</p>
 <p><a href="https://github.com/cwe1ss/flutter-flavors-ci-cd/commit/0819ce8b51ddc39d8b7aebf71aea4f2da36a187c" target="_blank" rel="noopener noreffer">See all changes from this step in the Git commit.</a></p>
@@ -58,10 +58,10 @@
 </span><span class="lnt">3
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-cmd" data-lang="cmd">git add .idea/runConfigurations/dev.xml -f
-git add .idea/runConfigurations/live.xml -f
-git commit -m &#39;Persist flutter build configurations&#39;
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-cmd" data-lang="cmd"><span class="line"><span class="cl">git add .idea/runConfigurations/dev.xml -f
+</span></span><span class="line"><span class="cl">git add .idea/runConfigurations/live.xml -f
+</span></span><span class="line"><span class="cl">git commit -m &#39;Persist flutter build configurations&#39;
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><a href="https://github.com/cwe1ss/flutter-flavors-ci-cd/commit/36e4eacccf68eb131cd1aa6ab1ac025df56aeb05" target="_blank" rel="noopener noreffer">See all changes from this step in the Git commit.</a></p>
 <h2 id="set-up-flavors-for-android">Set up flavors for Android</h2>
@@ -89,22 +89,22 @@ git commit -m &#39;Persist flutter build configurations&#39;
 </span><span class="lnt">15
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-kotlin" data-lang="kotlin"><span class="k">import</span> <span class="nn">androidx.annotation.NonNull;</span>
-<span class="k">import</span> <span class="nn">io.flutter.embedding.android.FlutterActivity</span>
-<span class="k">import</span> <span class="nn">io.flutter.embedding.engine.FlutterEngine</span>
-<span class="k">import</span> <span class="nn">io.flutter.plugin.common.MethodChannel</span>
-<span class="k">import</span> <span class="nn">io.flutter.plugins.GeneratedPluginRegistrant</span>
-
-<span class="k">class</span> <span class="nc">MainActivity</span><span class="p">:</span> <span class="n">FlutterActivity</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">override</span> <span class="k">fun</span> <span class="nf">configureFlutterEngine</span><span class="p">(</span><span class="nd">@NonNull</span> <span class="n">flutterEngine</span><span class="p">:</span> <span class="n">FlutterEngine</span><span class="p">)</span> <span class="p">{</span>
-        <span class="n">GeneratedPluginRegistrant</span><span class="p">.</span><span class="n">registerWith</span><span class="p">(</span><span class="n">flutterEngine</span><span class="p">);</span>
-
-        <span class="n">MethodChannel</span><span class="p">(</span><span class="n">flutterEngine</span><span class="p">.</span><span class="n">dartExecutor</span><span class="p">.</span><span class="n">binaryMessenger</span><span class="p">,</span> <span class="s2">&#34;flavor&#34;</span><span class="p">).</span><span class="n">setMethodCallHandler</span> <span class="p">{</span>
-            <span class="n">call</span><span class="p">,</span> <span class="n">result</span> <span class="o">-&gt;</span> <span class="n">result</span><span class="p">.</span><span class="n">success</span><span class="p">(</span><span class="n">BuildConfig</span><span class="p">.</span><span class="n">FLAVOR</span><span class="p">)</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-kotlin" data-lang="kotlin"><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">androidx.annotation.NonNull;</span>
+</span></span><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">io.flutter.embedding.android.FlutterActivity</span>
+</span></span><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">io.flutter.embedding.engine.FlutterEngine</span>
+</span></span><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">io.flutter.plugin.common.MethodChannel</span>
+</span></span><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">io.flutter.plugins.GeneratedPluginRegistrant</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">MainActivity</span><span class="p">:</span> <span class="n">FlutterActivity</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">override</span> <span class="k">fun</span> <span class="nf">configureFlutterEngine</span><span class="p">(</span><span class="nd">@NonNull</span> <span class="n">flutterEngine</span><span class="p">:</span> <span class="n">FlutterEngine</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">GeneratedPluginRegistrant</span><span class="p">.</span><span class="n">registerWith</span><span class="p">(</span><span class="n">flutterEngine</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">MethodChannel</span><span class="p">(</span><span class="n">flutterEngine</span><span class="p">.</span><span class="n">dartExecutor</span><span class="p">.</span><span class="n">binaryMessenger</span><span class="p">,</span> <span class="s2">&#34;flavor&#34;</span><span class="p">).</span><span class="n">setMethodCallHandler</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">call</span><span class="p">,</span> <span class="n">result</span> <span class="o">-&gt;</span> <span class="n">result</span><span class="p">.</span><span class="n">success</span><span class="p">(</span><span class="n">BuildConfig</span><span class="p">.</span><span class="n">FLAVOR</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h3 id="add-the-flavor-settings-to-the-android-build-config">Add the flavor-settings to the Android build config</h3>
 <p>In Android, the native flavor-specific values are stored in <code>android/app/src/build.gradle</code> via the <code>android.flavorDimensions</code> and <code>android.productFlavors</code> keys.</p>
@@ -133,25 +133,25 @@ git commit -m &#39;Persist flutter build configurations&#39;
 </span><span class="lnt">18
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-gradle" data-lang="gradle"><span class="n">android</span> <span class="o">{</span>
-    <span class="c1">// ... all existing things like `sourceSets`, ...
-</span><span class="c1"></span>
-    <span class="n">flavorDimensions</span> <span class="s2">&#34;app&#34;</span>
-
-    <span class="n">productFlavors</span> <span class="o">{</span>
-        <span class="n">dev</span> <span class="o">{</span>
-            <span class="n">dimension</span> <span class="s2">&#34;app&#34;</span>
-            <span class="n">applicationId</span> <span class="s2">&#34;at.chwe.flutterflavors.dev&#34;</span>
-            <span class="n">resValue</span> <span class="s2">&#34;string&#34;</span><span class="o">,</span> <span class="s2">&#34;app_name&#34;</span><span class="o">,</span> <span class="s2">&#34;DEV Flutter Flavors&#34;</span>
-        <span class="o">}</span>
-        <span class="n">live</span> <span class="o">{</span>
-            <span class="n">dimension</span> <span class="s2">&#34;app&#34;</span>
-            <span class="n">applicationId</span> <span class="s2">&#34;at.chwe.flutterflavors&#34;</span>
-            <span class="n">resValue</span> <span class="s2">&#34;string&#34;</span><span class="o">,</span> <span class="s2">&#34;app_name&#34;</span><span class="o">,</span> <span class="s2">&#34;Flutter Flavors&#34;</span>
-        <span class="o">}</span>
-    <span class="o">}</span>
-<span class="o">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-gradle" data-lang="gradle"><span class="line"><span class="cl"><span class="n">android</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// ... all existing things like `sourceSets`, ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">    <span class="n">flavorDimensions</span> <span class="s2">&#34;app&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">productFlavors</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">dev</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">dimension</span> <span class="s2">&#34;app&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="n">applicationId</span> <span class="s2">&#34;at.chwe.flutterflavors.dev&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="n">resValue</span> <span class="s2">&#34;string&#34;</span><span class="o">,</span> <span class="s2">&#34;app_name&#34;</span><span class="o">,</span> <span class="s2">&#34;DEV Flutter Flavors&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="o">}</span>
+</span></span><span class="line"><span class="cl">        <span class="n">live</span> <span class="o">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">dimension</span> <span class="s2">&#34;app&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="n">applicationId</span> <span class="s2">&#34;at.chwe.flutterflavors&#34;</span>
+</span></span><span class="line"><span class="cl">            <span class="n">resValue</span> <span class="s2">&#34;string&#34;</span><span class="o">,</span> <span class="s2">&#34;app_name&#34;</span><span class="o">,</span> <span class="s2">&#34;Flutter Flavors&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="o">}</span>
+</span></span><span class="line"><span class="cl">    <span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="o">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><h3 id="use-the-app_name-in-the-androidmanifestxml">Use the app_name in the AndroidManifest.xml</h3>
 <p>The <code>applicationId</code> is a well-known key that will already be used when the app is launched with a given flavor.</p>
@@ -183,18 +183,18 @@ git commit -m &#39;Persist flutter build configurations&#39;
 </span><span class="lnt">11
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-dart" data-lang="dart"><span class="c1">/// Contains the hard-coded settings per flavor.
-</span><span class="c1"></span><span class="kd">class</span> <span class="nc">FlavorSettings</span> <span class="p">{</span>
-  <span class="kd">final</span> <span class="kt">String</span> <span class="n">apiBaseUrl</span><span class="p">;</span>
-  <span class="c1">// TODO Add any additional flavor-specific settings here.
-</span><span class="c1"></span>
-  <span class="n">FlavorSettings</span><span class="p">.</span><span class="n">dev</span><span class="p">()</span>
-    <span class="o">:</span> <span class="n">apiBaseUrl</span> <span class="o">=</span> <span class="s1">&#39;https://dev.flutter-flavors.chwe.at&#39;</span><span class="p">;</span>
-
-  <span class="n">FlavorSettings</span><span class="p">.</span><span class="n">live</span><span class="p">()</span>
-    <span class="o">:</span> <span class="n">apiBaseUrl</span> <span class="o">=</span> <span class="s1">&#39;https://flutter-flavors.chwe.at&#39;</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-dart" data-lang="dart"><span class="line"><span class="cl"><span class="c1">/// Contains the hard-coded settings per flavor.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">class</span> <span class="nc">FlavorSettings</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kd">final</span> <span class="kt">String</span> <span class="n">apiBaseUrl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// TODO Add any additional flavor-specific settings here.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">  <span class="n">FlavorSettings</span><span class="p">.</span><span class="n">dev</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="o">:</span> <span class="n">apiBaseUrl</span> <span class="o">=</span> <span class="s1">&#39;https://dev.flutter-flavors.chwe.at&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">FlavorSettings</span><span class="p">.</span><span class="n">live</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="o">:</span> <span class="n">apiBaseUrl</span> <span class="o">=</span> <span class="s1">&#39;https://flutter-flavors.chwe.at&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>Next, we&rsquo;ll use this in <code>main.dart</code>, where we&rsquo;ll read the flavor via our method channel from the native platform and we&rsquo;ll create the corresponding <code>FlavorSettings</code>-object. We&rsquo;ll also have to make our <code>main</code>-method async for that.</p>
 <p>When done, your <code>main.dart</code> should contain the following code before the <code>class MyApp extends StatelessWidget {</code> line:</p>
@@ -233,38 +233,38 @@ git commit -m &#39;Persist flutter build configurations&#39;
 </span><span class="lnt">31
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-dart" data-lang="dart"><span class="k">import</span> <span class="s1">&#39;package:flutter/material.dart&#39;</span><span class="p">;</span>
-<span class="k">import</span> <span class="s1">&#39;package:flutter/services.dart&#39;</span><span class="p">;</span>
-
-<span class="k">import</span> <span class="s1">&#39;flavor_settings.dart&#39;</span><span class="p">;</span>
-
-<span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span> <span class="n">main</span><span class="p">()</span> <span class="kd">async</span> <span class="p">{</span>
-  <span class="c1">// NOTE: This is required for accessing the method channel before runApp().
-</span><span class="c1"></span>  <span class="n">WidgetsFlutterBinding</span><span class="p">.</span><span class="n">ensureInitialized</span><span class="p">();</span>
-
-  <span class="kd">final</span> <span class="n">settings</span> <span class="o">=</span> <span class="kd">await</span> <span class="n">_getFlavorSettings</span><span class="p">();</span>
-  <span class="n">print</span><span class="p">(</span><span class="s1">&#39;API URL </span><span class="si">${</span><span class="n">settings</span><span class="p">.</span><span class="n">apiBaseUrl</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">);</span>
-
-  <span class="n">runApp</span><span class="p">(</span><span class="n">MyApp</span><span class="p">());</span>
-<span class="p">}</span>
-
-<span class="n">Future</span><span class="o">&lt;</span><span class="n">FlavorSettings</span><span class="o">&gt;</span> <span class="n">_getFlavorSettings</span><span class="p">()</span> <span class="kd">async</span> <span class="p">{</span>
-  <span class="kt">String</span> <span class="n">flavor</span> <span class="o">=</span> <span class="kd">await</span> <span class="kd">const</span> <span class="n">MethodChannel</span><span class="p">(</span><span class="s1">&#39;flavor&#39;</span><span class="p">)</span>
-        <span class="p">.</span><span class="n">invokeMethod</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">(</span><span class="s1">&#39;getFlavor&#39;</span><span class="p">);</span>
-
-  <span class="n">print</span><span class="p">(</span><span class="s1">&#39;STARTED WITH FLAVOR </span><span class="si">$</span><span class="n">flavor</span><span class="s1">&#39;</span><span class="p">);</span>
-
-  <span class="k">if</span> <span class="p">(</span><span class="n">flavor</span> <span class="o">==</span> <span class="s1">&#39;dev&#39;</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="n">FlavorSettings</span><span class="p">.</span><span class="n">dev</span><span class="p">();</span>
-  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">flavor</span> <span class="o">==</span> <span class="s1">&#39;live&#39;</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="n">FlavorSettings</span><span class="p">.</span><span class="n">live</span><span class="p">();</span>
-  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-    <span class="k">throw</span> <span class="n">Exception</span><span class="p">(</span><span class="s2">&#34;Unknown flavor: </span><span class="si">$</span><span class="n">flavor</span><span class="s2">&#34;</span><span class="p">);</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="c1">// ... class MyApp extends StatelessWidget {
-</span></code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-dart" data-lang="dart"><span class="line"><span class="cl"><span class="k">import</span> <span class="s1">&#39;package:flutter/material.dart&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">import</span> <span class="s1">&#39;package:flutter/services.dart&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">import</span> <span class="s1">&#39;flavor_settings.dart&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span> <span class="n">main</span><span class="p">()</span> <span class="kd">async</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// NOTE: This is required for accessing the method channel before runApp().
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">WidgetsFlutterBinding</span><span class="p">.</span><span class="n">ensureInitialized</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="kd">final</span> <span class="n">settings</span> <span class="o">=</span> <span class="kd">await</span> <span class="n">_getFlavorSettings</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="n">print</span><span class="p">(</span><span class="s1">&#39;API URL </span><span class="si">${</span><span class="n">settings</span><span class="p">.</span><span class="n">apiBaseUrl</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">runApp</span><span class="p">(</span><span class="n">MyApp</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">Future</span><span class="o">&lt;</span><span class="n">FlavorSettings</span><span class="o">&gt;</span> <span class="n">_getFlavorSettings</span><span class="p">()</span> <span class="kd">async</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">String</span> <span class="n">flavor</span> <span class="o">=</span> <span class="kd">await</span> <span class="kd">const</span> <span class="n">MethodChannel</span><span class="p">(</span><span class="s1">&#39;flavor&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="p">.</span><span class="n">invokeMethod</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">(</span><span class="s1">&#39;getFlavor&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">print</span><span class="p">(</span><span class="s1">&#39;STARTED WITH FLAVOR </span><span class="si">$</span><span class="n">flavor</span><span class="s1">&#39;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">if</span> <span class="p">(</span><span class="n">flavor</span> <span class="o">==</span> <span class="s1">&#39;dev&#39;</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">FlavorSettings</span><span class="p">.</span><span class="n">dev</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">flavor</span> <span class="o">==</span> <span class="s1">&#39;live&#39;</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">FlavorSettings</span><span class="p">.</span><span class="n">live</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">throw</span> <span class="n">Exception</span><span class="p">(</span><span class="s2">&#34;Unknown flavor: </span><span class="si">$</span><span class="n">flavor</span><span class="s2">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// ... class MyApp extends StatelessWidget {
+</span></span></span></code></pre></td></tr></table>
 </div>
 </div><p>Run the app with <code>dev</code> build configuration and look at the console output. It will display the following statements:</p>
 <div class="highlight"><div class="chroma">
@@ -273,9 +273,9 @@ git commit -m &#39;Persist flutter build configurations&#39;
 </span><span class="lnt">2
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">I/flutter ( 4458): STARTED WITH FLAVOR dev
-I/flutter ( 4458): API URL https://dev.flutter-flavors.chwe.at
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">I/flutter ( 4458): STARTED WITH FLAVOR dev
+</span></span><span class="line"><span class="cl">I/flutter ( 4458): API URL https://dev.flutter-flavors.chwe.at
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>Switch to the <code>live</code> build configuration and run your app again. This time, the console will display the following statements:</p>
 <div class="highlight"><div class="chroma">
@@ -284,9 +284,9 @@ I/flutter ( 4458): API URL https://dev.flutter-flavors.chwe.at
 </span><span class="lnt">2
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">I/flutter ( 4615): STARTED WITH FLAVOR live
-I/flutter ( 4615): API URL https://flutter-flavors.chwe.at
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">I/flutter ( 4615): STARTED WITH FLAVOR live
+</span></span><span class="line"><span class="cl">I/flutter ( 4615): API URL https://flutter-flavors.chwe.at
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>That&rsquo;s it! We can now access the current flavor from within Flutter and we can have flavor-specific settings.</p>
 <p>You can pass the <code>FlavorSettings</code>-instance down to your widgets manually, or you can use e.g. the <code>provider</code>-package to access it via dependency injection in your widgets.</p>
@@ -301,10 +301,10 @@ I/flutter ( 4615): API URL https://flutter-flavors.chwe.at
 </span><span class="lnt">3
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">flutter build ios --flavor dev
-
-The Xcode project does not define custom schemes. You cannot use the --flavor option.
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">flutter build ios --flavor dev
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">The Xcode project does not define custom schemes. You cannot use the --flavor option.
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>This means, that on iOS we have to rely on a feature called &ldquo;custom schemes&rdquo; to represent our flutter flavors. Setting them up requires multiple steps.</p>
 <h3 id="create-custom-build-configurations-for-the-flavors">Create custom build configurations for the flavors</h3>
@@ -359,8 +359,8 @@ The Xcode project does not define custom schemes. You cannot use the --flavor op
 <pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">[VERBOSE-2:ui_dart_state.cc(177)] Unhandled Exception: MissingPluginException(No implementation found for method getFlavor on channel flavor)
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">[VERBOSE-2:ui_dart_state.cc(177)] Unhandled Exception: MissingPluginException(No implementation found for method getFlavor on channel flavor)
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>That&rsquo;s because we haven&rsquo;t yet implemented the method channel that Flutter uses to get the current flavor from the native platform.</p>
 <p>To add this, we need to add some code to the <code>application()</code>-function of the <code>Runner/AppDelegate.swift</code>-file in XCode. The finished file should look like this:</p>
@@ -394,33 +394,33 @@ The Xcode project does not define custom schemes. You cannot use the --flavor op
 </span><span class="lnt">26
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-swift" data-lang="swift"><span class="kd">import</span> <span class="nc">UIKit</span>
-<span class="kd">import</span> <span class="nc">Flutter</span>
-
-<span class="kr">@UIApplicationMain</span>
-<span class="kr">@objc</span> <span class="kd">class</span> <span class="nc">AppDelegate</span><span class="p">:</span> <span class="n">FlutterAppDelegate</span> <span class="p">{</span>
-  <span class="kr">override</span> <span class="kd">func</span> <span class="nf">application</span><span class="p">(</span>
-    <span class="kc">_</span> <span class="n">application</span><span class="p">:</span> <span class="n">UIApplication</span><span class="p">,</span>
-    <span class="n">didFinishLaunchingWithOptions</span> <span class="n">launchOptions</span><span class="p">:</span> <span class="p">[</span><span class="n">UIApplication</span><span class="p">.</span><span class="n">LaunchOptionsKey</span><span class="p">:</span> <span class="nb">Any</span><span class="p">]?</span>
-  <span class="p">)</span> <span class="p">-&gt;</span> <span class="nb">Bool</span> <span class="p">{</span>
-    <span class="n">GeneratedPluginRegistrant</span><span class="p">.</span><span class="n">register</span><span class="p">(</span><span class="n">with</span><span class="p">:</span> <span class="kc">self</span><span class="p">)</span>
-
-    <span class="kd">let</span> <span class="nv">controller</span> <span class="p">=</span> <span class="n">window</span><span class="p">.</span><span class="n">rootViewController</span> <span class="k">as</span><span class="p">!</span> <span class="n">FlutterViewController</span>
-
-    <span class="kd">let</span> <span class="nv">flavorChannel</span> <span class="p">=</span> <span class="n">FlutterMethodChannel</span><span class="p">(</span>
-        <span class="n">name</span><span class="p">:</span> <span class="s">&#34;flavor&#34;</span><span class="p">,</span>
-        <span class="n">binaryMessenger</span><span class="p">:</span> <span class="n">controller</span><span class="p">.</span><span class="n">binaryMessenger</span><span class="p">)</span>
-
-    <span class="n">flavorChannel</span><span class="p">.</span><span class="n">setMethodCallHandler</span><span class="p">({(</span><span class="n">call</span><span class="p">:</span> <span class="n">FlutterMethodCall</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="p">@</span><span class="n">escaping</span> <span class="n">FlutterResult</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="nb">Void</span> <span class="k">in</span>
-        <span class="c1">// Note: this method is invoked on the UI thread</span>
-        <span class="kd">let</span> <span class="nv">flavor</span> <span class="p">=</span> <span class="n">Bundle</span><span class="p">.</span><span class="n">main</span><span class="p">.</span><span class="n">infoDictionary</span><span class="p">?[</span><span class="s">&#34;App - Flavor&#34;</span><span class="p">]</span>
-        <span class="n">result</span><span class="p">(</span><span class="n">flavor</span><span class="p">)</span>
-    <span class="p">})</span>
-
-    <span class="k">return</span> <span class="kc">super</span><span class="p">.</span><span class="n">application</span><span class="p">(</span><span class="n">application</span><span class="p">,</span> <span class="n">didFinishLaunchingWithOptions</span><span class="p">:</span> <span class="n">launchOptions</span><span class="p">)</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-swift" data-lang="swift"><span class="line"><span class="cl"><span class="kd">import</span> <span class="nc">UIKit</span>
+</span></span><span class="line"><span class="cl"><span class="kd">import</span> <span class="nc">Flutter</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kr">@UIApplicationMain</span>
+</span></span><span class="line"><span class="cl"><span class="kr">@objc</span> <span class="kd">class</span> <span class="nc">AppDelegate</span><span class="p">:</span> <span class="n">FlutterAppDelegate</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kr">override</span> <span class="kd">func</span> <span class="nf">application</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="kc">_</span> <span class="n">application</span><span class="p">:</span> <span class="n">UIApplication</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">    <span class="n">didFinishLaunchingWithOptions</span> <span class="n">launchOptions</span><span class="p">:</span> <span class="p">[</span><span class="n">UIApplication</span><span class="p">.</span><span class="n">LaunchOptionsKey</span><span class="p">:</span> <span class="nb">Any</span><span class="p">]?</span>
+</span></span><span class="line"><span class="cl">  <span class="p">)</span> <span class="p">-&gt;</span> <span class="nb">Bool</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">GeneratedPluginRegistrant</span><span class="p">.</span><span class="n">register</span><span class="p">(</span><span class="n">with</span><span class="p">:</span> <span class="kc">self</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kd">let</span> <span class="nv">controller</span> <span class="p">=</span> <span class="n">window</span><span class="p">.</span><span class="n">rootViewController</span> <span class="k">as</span><span class="p">!</span> <span class="n">FlutterViewController</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="kd">let</span> <span class="nv">flavorChannel</span> <span class="p">=</span> <span class="n">FlutterMethodChannel</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">        <span class="n">name</span><span class="p">:</span> <span class="s">&#34;flavor&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">binaryMessenger</span><span class="p">:</span> <span class="n">controller</span><span class="p">.</span><span class="n">binaryMessenger</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">flavorChannel</span><span class="p">.</span><span class="n">setMethodCallHandler</span><span class="p">({(</span><span class="n">call</span><span class="p">:</span> <span class="n">FlutterMethodCall</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="p">@</span><span class="n">escaping</span> <span class="n">FlutterResult</span><span class="p">)</span> <span class="p">-&gt;</span> <span class="nb">Void</span> <span class="k">in</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// Note: this method is invoked on the UI thread</span>
+</span></span><span class="line"><span class="cl">        <span class="kd">let</span> <span class="nv">flavor</span> <span class="p">=</span> <span class="n">Bundle</span><span class="p">.</span><span class="n">main</span><span class="p">.</span><span class="n">infoDictionary</span><span class="p">?[</span><span class="s">&#34;App - Flavor&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="n">result</span><span class="p">(</span><span class="n">flavor</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">})</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="kc">super</span><span class="p">.</span><span class="n">application</span><span class="p">(</span><span class="n">application</span><span class="p">,</span> <span class="n">didFinishLaunchingWithOptions</span><span class="p">:</span> <span class="n">launchOptions</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p>This will set up a method channel handler that reads the current flavor from a <code>Bundle.main.infoDictionary</code> with a key called <code>App - Flavor</code>.</p>
 <h3 id="set-up-the-flavor-value-per-scheme">Set up the flavor value per scheme</h3>
@@ -461,9 +461,9 @@ The Xcode project does not define custom schemes. You cannot use the --flavor op
 </span><span class="lnt">2
 </span></code></pre></td>
 <td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback">2020-10-03 14:44:05.525493+0200 Runner[26055:336596] flutter: STARTED WITH FLAVOR dev
-2020-10-03 14:44:05.526672+0200 Runner[26055:336596] flutter: API URL https://dev.flutter-flavors.chwe.at
-</code></pre></td></tr></table>
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">2020-10-03 14:44:05.525493+0200 Runner[26055:336596] flutter: STARTED WITH FLAVOR dev
+</span></span><span class="line"><span class="cl">2020-10-03 14:44:05.526672+0200 Runner[26055:336596] flutter: API URL https://dev.flutter-flavors.chwe.at
+</span></span></code></pre></td></tr></table>
 </div>
 </div><p><a href="https://github.com/cwe1ss/flutter-flavors-ci-cd/commit/608246ea5f948f2a63dc1d7450a77468428a4fc4" target="_blank" rel="noopener noreffer">See all changes from this step in the Git commit.</a></p>
 <p>Great, we now have set up our flavors for iOS as well!</p>
