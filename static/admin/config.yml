@@ -1,0 +1,57 @@
+backend:
+  name: git-gateway
+
+local_backend: true
+
+media_folder: "static/uploads"
+public_folder: "/uploads"
+
+collections:
+  - label: "Pages"
+    label_singular: "Page"
+    name: "page"
+    files:
+      - label: "About"
+        name: "about"
+        file: "content/about.md"
+        fields:
+          - { label: Title, name: title, widget: string }
+          - { label: "Content", name: "body", widget: "markdown" }
+  - label: 'Posts'
+    label_singular: 'Post'
+    name: 'post'
+    folder: 'content/posts'
+    path: '{{year}}/{{slug}}'
+    media_folder: '/static/uploads/{{year}}'
+    public_folder: '/uploads/{{year}}/'
+    create: true
+    editor:
+      preview: false
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Publish Date", name: "date", widget: "datetime" }
+      - { label: "Draft", name: "draft", widget: "boolean", required: false }
+#      - { label: "Tags", name: "tags", widget: "list" }
+      - label: "Categories"
+        name: categories
+        widget: "list"
+        default: [ ".NET", "Mobile Development" ]
+      - label: "TOC"
+        name: "toc"
+        widget: "object"
+        collapsed: true
+        summary: "Enable: {{fields.enable}}"
+        fields:
+          - { label: "Show TOC", name: "enable", widget: "boolean", default: true }
+      - label: "Featured Image"
+        name: "featuredImage"
+        widget: "image"
+        required: false
+#        media_folder: "/static/uploads"
+      - { label: "Body", name: "body", widget: "markdown" }
+      - label: "Redirect URLs"
+        name: "aliases"
+        widget: "list"
+        summary: "{{fields.url}}"
+        minimize_collapsed: true
+        field: { label: "URL", name: "url", widget: "string"}
