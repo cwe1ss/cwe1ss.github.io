@@ -158,7 +158,7 @@ Stop the app in Android Studio, change the build configuration to "live" and lau
 
 You'll now have both flavors of your app installed on your Android device!
 
-![Both flavors are installed on android](/images/posts/2020/flutter_flavors_app_icons_on_android.png)
+![Both flavors are installed on android](/uploads/2020/flutter_flavors_app_icons_on_android.png)
 
 Our native Android configuration is now complete.
 
@@ -272,7 +272,7 @@ Let's open our `ios`-folder in XCode and start by creating our custom build conf
 
 This means, for every flavor, we need a separate "Debug", "Release" & "Profile" configuration.
 
-![Configurations in XCode](/images/posts/2020/flutter_flavors_ios_configurations.png)
+![Configurations in XCode](/uploads/2020/flutter_flavors_ios_configurations.png)
 
 ### Assign build configurations to custom schemes
 
@@ -292,11 +292,11 @@ Now we can set up the actual "custom schemes" by doing the following:
   * Make sure "Shared" is selected
   * Close the dialog
 
-![live scheme in XCode](/images/posts/2020/flutter_flavors_ios_live_scheme.png)
+![live scheme in XCode](/uploads/2020/flutter_flavors_ios_live_scheme.png)
 
 Back in the "schemes" list, you can now delete the existing "Runner" scheme. This should result in the list looking like this:
 
-![scheme list in XCode](/images/posts/2020/flutter_flavors_ios_schemes.png)
+![scheme list in XCode](/uploads/2020/flutter_flavors_ios_schemes.png)
 
 ### Adding the method channel for iOS
 
@@ -366,7 +366,7 @@ We now have the key but we still don't have the actual flavor-specific values pe
   * Release-live: `live`
 
 When done, it should look like this:
-![flavor setting in XCode](/images/posts/2020/flutter_flavors_ios_flavor_setting.png)
+![flavor setting in XCode](/uploads/2020/flutter_flavors_ios_flavor_setting.png)
 
 ### Run the iOS app
 
@@ -389,7 +389,7 @@ Great, we now have set up our flavors for iOS as well!
 
 You might have noticed that the app name on the iPhone still is "flutter_flavors". Also, when you run both flavors, you still only have one app on your phone:
 
-![wrong app name on iPhone](/images/posts/2020/flutter_flavors_ios_wrong_appname.png)
+![wrong app name on iPhone](/uploads/2020/flutter_flavors_ios_wrong_appname.png)
 
 Remember, that for Android we've set those values in the `build.gradle` file.
 
@@ -413,7 +413,7 @@ Instead, we just have to modify this key in the the build settings:
   * Release-dev: `at.chwe.flutterflavors.dev`
   * Release-live: `at.chwe.flutterflavors`
 
-![bundle id per ios config](/images/posts/2020/flutter_flavors_ios_bundle_id.png)
+![bundle id per ios config](/uploads/2020/flutter_flavors_ios_bundle_id.png)
 
 ### Set the app name
 
@@ -434,13 +434,13 @@ To have separate display names per flavor, do the following:
   * Release-dev: `DEV Flutter Flavors`
   * Release-live: `Flutter Flavors`
 
-![app name per ios config](/images/posts/2020/flutter_flavors_ios_app_name.png)
+![app name per ios config](/uploads/2020/flutter_flavors_ios_app_name.png)
 
 ### Run the app again with the dev and live flavors
 
 Delete the existing "flutter_flavors" app from your iPhone and run it again with each flavor. You should now have both apps with the correct name on your phone:
 
-![app icons on the iPhone](/images/posts/2020/flutter_flavors_ios_app_icons.png)
+![app icons on the iPhone](/uploads/2020/flutter_flavors_ios_app_icons.png)
 
 [See all changes from this step in the Git commit.](https://github.com/cwe1ss/flutter-flavors-ci-cd/commit/6b4ead183f8b3f9128fa2b4d24b277056b747909)
 

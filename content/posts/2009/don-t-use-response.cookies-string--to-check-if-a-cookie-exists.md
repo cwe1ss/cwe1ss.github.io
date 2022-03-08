@@ -40,7 +40,7 @@ Response.Cookies["mycookie"].Expires = DateTime.Now.AddDays(10);
 
 As you can see here, the .NET framework automatically generates the HttpCookie instance with the name "mycookie" in the background and adds it to the collection.
 
-![HttpCookie.Get](/images/posts/2009/HttpCookie-Get.png)
+![HttpCookie.Get](/uploads/2009/HttpCookie-Get.png)
 
 Sending cookies to the browser this way is perfectly fine.
 
