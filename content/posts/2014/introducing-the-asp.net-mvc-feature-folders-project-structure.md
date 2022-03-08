@@ -3,6 +3,8 @@ title: Introducing the ASP.NET MVC “Feature Folders” Project Structure
 date: 2014-04-07T00:00:00+01:00
 categories:
 - .NET
+toc:
+  enable: true
 aliases:
   - /post/2014/04/07/ASPNET-MVC-Feature-Folders-Project-Structure/
 ---

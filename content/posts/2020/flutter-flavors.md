@@ -3,6 +3,8 @@ title: Using Flutter flavors to separate the DEV and LIVE environment
 date: 2020-10-03T00:00:00+01:00
 categories:
 - Mobile Development
+toc:
+  enable: true
 ---
 
 These are the requirements for our app:

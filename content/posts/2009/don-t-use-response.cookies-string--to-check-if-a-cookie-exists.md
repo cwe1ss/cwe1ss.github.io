@@ -4,6 +4,8 @@ title: "Don't use Response.Cookies[string] to check if a cookie exists!"
 date: 2009-01-26T15:57:00+01:00
 categories:
 - .NET
+toc:
+  enable: true
 aliases:
 - /post/2009/01/26/Done28099t-use-ResponseCookiesstring-to-check-if-a-cookie-exists!/
 - /post/2009/01/26/Done28099t-use-ResponseCookiesstring-to-check-if-a-cookie-exists!.aspx/

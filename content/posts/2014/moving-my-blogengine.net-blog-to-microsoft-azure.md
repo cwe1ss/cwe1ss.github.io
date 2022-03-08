@@ -1,6 +1,8 @@
 ---
 title: Moving my BlogEngine.NET blog to Microsoft Azure
 date: 2014-03-29T00:00:00+01:00
+toc:
+  enable: true
 aliases:
   - /post/2014/03/29/Moving-my-BlogEngineNET-blog-to-Microsoft-Azure/
 ---

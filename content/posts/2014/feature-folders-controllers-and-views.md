@@ -3,6 +3,8 @@ title: 'Feature Folders: Controllers and Views'
 date: 2014-07-02T00:00:00+01:00
 categories:
 - .NET
+toc:
+  enable: true
 aliases:
 - /post/2014/07/02/Feature-Folders-Controllers-and-Views/
 ---

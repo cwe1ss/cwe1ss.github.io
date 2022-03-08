@@ -3,6 +3,8 @@ title: Testable and reusable cookie access with ASP.Net MVC RC
 date: 2009-01-28T18:35:00+01:00
 categories:
 - .NET
+toc:
+  enable: true
 aliases:
   - /post/2009/01/28/Testable-and-reusable-cookie-access-with-ASPNet-MVC-RC/
   - /post/2009/01/28/Testable-and-reusable-cookie-access-with-ASPNet-MVC-RC.aspx/

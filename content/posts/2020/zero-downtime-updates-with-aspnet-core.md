@@ -3,6 +3,8 @@ title: Simple zero-downtime updates with ASP.NET Core and health checks
 date: 2020-10-22T00:00:00+01:00
 categories:
 - .NET
+toc:
+  enable: true
 ---
 
 Do you use a load balancer that isn't tightly integrated with your orchestrator and therefore doesn't know upfront when the orchestrator has to stop an instance of your ASP.NET Core application for an upgrade / a scaling action / a restart?
