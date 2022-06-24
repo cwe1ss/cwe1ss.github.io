@@ -20,11 +20,11 @@ theme = "LoveIt"
     # title will be shown when you hover on this menu link
     title = ""
     weight = 1
-  [[menu.main]]
-    identifier = "about"
-    name = "About me"
-    url = "/about/"
-    weight = 2
+#  [[menu.main]]
+#    identifier = "about"
+#    name = "About me"
+#    url = "/about/"
+#    weight = 2
 
 [params]
   # LoveIt theme version
