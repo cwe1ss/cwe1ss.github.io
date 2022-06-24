@@ -57,14 +57,14 @@
 <td class="lntd">
 <pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="k">public</span> <span class="k">class</span> <span class="nc">ShuttingDownHealthCheck</span> <span class="p">:</span> <span class="n">IHealthCheck</span>
 </span></span><span class="line"><span class="cl"><span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="k">private</span> <span class="n">HealthStatus</span> <span class="m">_</span><span class="n">status</span> <span class="p">=</span> <span class="n">HealthStatus</span><span class="p">.</span><span class="n">Healthy</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">private</span> <span class="n">HealthStatus</span> <span class="n">_status</span> <span class="p">=</span> <span class="n">HealthStatus</span><span class="p">.</span><span class="n">Healthy</span><span class="p">;</span>
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl">    <span class="k">public</span> <span class="n">ShuttingDownHealthCheck</span><span class="p">(</span><span class="n">IHostApplicationLifetime</span> <span class="n">appLifetime</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl">    <span class="p">{</span>
 </span></span><span class="line"><span class="cl">        <span class="n">appLifetime</span><span class="p">.</span><span class="n">ApplicationStopping</span><span class="p">.</span><span class="n">Register</span><span class="p">(()</span> <span class="p">=&gt;</span>
 </span></span><span class="line"><span class="cl">        <span class="p">{</span>
 </span></span><span class="line"><span class="cl">            <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">&#34;Shutting down&#34;</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl">            <span class="m">_</span><span class="n">status</span> <span class="p">=</span> <span class="n">HealthStatus</span><span class="p">.</span><span class="n">Unhealthy</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="n">_status</span> <span class="p">=</span> <span class="n">HealthStatus</span><span class="p">.</span><span class="n">Unhealthy</span><span class="p">;</span>
 </span></span><span class="line"><span class="cl">        <span class="p">});</span>
 </span></span><span class="line"><span class="cl">    <span class="p">}</span>
 </span></span><span class="line"><span class="cl">
@@ -72,7 +72,7 @@
 </span></span><span class="line"><span class="cl">        <span class="n">HealthCheckContext</span> <span class="n">context</span><span class="p">,</span>
 </span></span><span class="line"><span class="cl">        <span class="n">CancellationToken</span> <span class="n">cancellationToken</span> <span class="p">=</span> <span class="k">default</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl">    <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="kt">var</span> <span class="n">result</span> <span class="p">=</span> <span class="k">new</span> <span class="n">HealthCheckResult</span><span class="p">(</span><span class="m">_</span><span class="n">status</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">var</span> <span class="n">result</span> <span class="p">=</span> <span class="k">new</span> <span class="n">HealthCheckResult</span><span class="p">(</span><span class="n">_status</span><span class="p">);</span>
 </span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">Task</span><span class="p">.</span><span class="n">FromResult</span><span class="p">(</span><span class="n">result</span><span class="p">);</span>
 </span></span><span class="line"><span class="cl">    <span class="p">}</span>
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
@@ -141,14 +141,14 @@
 <td class="lntd">
 <pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="n">appLifetime</span><span class="p">.</span><span class="n">ApplicationStopping</span><span class="p">.</span><span class="n">Register</span><span class="p">(()</span> <span class="p">=&gt;</span>
 </span></span><span class="line"><span class="cl"><span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="m">_</span><span class="n">status</span> <span class="p">=</span> <span class="n">HealthStatus</span><span class="p">.</span><span class="n">Unhealthy</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">_status</span> <span class="p">=</span> <span class="n">HealthStatus</span><span class="p">.</span><span class="n">Unhealthy</span><span class="p">;</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="kt">bool</span> <span class="n">delayShutdown</span> <span class="p">=</span> <span class="m">_</span><span class="n">hostEnvironment</span><span class="p">.</span><span class="n">IsProduction</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">bool</span> <span class="n">delayShutdown</span> <span class="p">=</span> <span class="n">_hostEnvironment</span><span class="p">.</span><span class="n">IsProduction</span><span class="p">();</span>
 </span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">delayShutdown</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl">    <span class="p">{</span>
 </span></span><span class="line"><span class="cl">        <span class="kt">var</span> <span class="n">shutdownDelay</span> <span class="p">=</span> <span class="n">TimeSpan</span><span class="p">.</span><span class="n">FromSeconds</span><span class="p">(</span><span class="m">25</span><span class="p">);</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">        <span class="m">_l</span><span class="n">ogger</span><span class="p">.</span><span class="n">LogInformation</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">        <span class="n">_logger</span><span class="p">.</span><span class="n">LogInformation</span><span class="p">(</span>
 </span></span><span class="line"><span class="cl">            <span class="s">&#34;Delaying shutdown for {Seconds} seconds&#34;</span><span class="p">,</span>
 </span></span><span class="line"><span class="cl">            <span class="n">shutdownDelay</span><span class="p">.</span><span class="n">TotalSeconds</span><span class="p">);</span>
 </span></span><span class="line"><span class="cl">
@@ -156,7 +156,7 @@
 </span></span><span class="line"><span class="cl">        <span class="c1">// so we can just put the main thread on sleep.</span>
 </span></span><span class="line"><span class="cl">        <span class="n">Thread</span><span class="p">.</span><span class="n">Sleep</span><span class="p">(</span><span class="n">shutdownDelay</span><span class="p">);</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">        <span class="m">_l</span><span class="n">ogger</span><span class="p">.</span><span class="n">LogInformation</span><span class="p">(</span><span class="s">&#34;Shutdown delay completed&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">_logger</span><span class="p">.</span><span class="n">LogInformation</span><span class="p">(</span><span class="s">&#34;Shutdown delay completed&#34;</span><span class="p">);</span>
 </span></span><span class="line"><span class="cl">    <span class="p">}</span>
 </span></span><span class="line"><span class="cl"><span class="p">});</span>
 </span></span></code></pre></td></tr></table>
@@ -610,8 +610,8 @@ which you can find here:</p>
 <td class="lntd">
 <pre tabindex="0" class="chroma"><code class="language-c#" data-lang="c#"><span class="line"><span class="cl"><span class="k">public</span> <span class="k">class</span> <span class="nc">CookieContainer</span> <span class="p">:</span> <span class="n">ICookieContainer</span>
 </span></span><span class="line"><span class="cl"><span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="k">private</span> <span class="k">readonly</span> <span class="n">HttpRequestBase</span> <span class="m">_</span><span class="n">request</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="k">private</span> <span class="k">readonly</span> <span class="n">HttpResponseBase</span> <span class="m">_</span><span class="n">response</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">private</span> <span class="k">readonly</span> <span class="n">HttpRequestBase</span> <span class="n">_request</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">private</span> <span class="k">readonly</span> <span class="n">HttpResponseBase</span> <span class="n">_response</span><span class="p">;</span>
 </span></span><span class="line"><span class="cl">    
 </span></span><span class="line"><span class="cl">    <span class="k">public</span> <span class="n">CookieContainer</span><span class="p">(</span><span class="n">HttpRequestBase</span> <span class="n">request</span><span class="p">,</span> <span class="n">HttpResponseBase</span> <span class="n">response</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl">    <span class="p">{</span>
@@ -619,15 +619,15 @@ which you can find here:</p>
 </span></span><span class="line"><span class="cl">        <span class="n">Check</span><span class="p">.</span><span class="n">IsNotNull</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s">&#34;request&#34;</span><span class="p">);</span>
 </span></span><span class="line"><span class="cl">        <span class="n">Check</span><span class="p">.</span><span class="n">IsNotNull</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="s">&#34;response&#34;</span><span class="p">);</span>
 </span></span><span class="line"><span class="cl">        
-</span></span><span class="line"><span class="cl">        <span class="m">_</span><span class="n">request</span> <span class="p">=</span> <span class="n">request</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">        <span class="m">_</span><span class="n">response</span> <span class="p">=</span> <span class="n">response</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">_request</span> <span class="p">=</span> <span class="n">request</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">_response</span> <span class="p">=</span> <span class="n">response</span><span class="p">;</span>
 </span></span><span class="line"><span class="cl">    <span class="p">}</span>
 </span></span><span class="line"><span class="cl">    
 </span></span><span class="line"><span class="cl">    <span class="k">public</span> <span class="kt">string</span> <span class="n">GetValue</span><span class="p">(</span><span class="kt">string</span> <span class="n">key</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl">    <span class="p">{</span>
 </span></span><span class="line"><span class="cl">        <span class="n">Check</span><span class="p">.</span><span class="n">IsNotEmpty</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s">&#34;key&#34;</span><span class="p">);</span>
 </span></span><span class="line"><span class="cl">        
-</span></span><span class="line"><span class="cl">        <span class="n">HttpCookie</span> <span class="n">cookie</span> <span class="p">=</span> <span class="m">_</span><span class="n">request</span><span class="p">.</span><span class="n">Cookies</span><span class="p">[</span><span class="n">key</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">        <span class="n">HttpCookie</span> <span class="n">cookie</span> <span class="p">=</span> <span class="n">_request</span><span class="p">.</span><span class="n">Cookies</span><span class="p">[</span><span class="n">key</span><span class="p">];</span>
 </span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">cookie</span> <span class="p">!=</span> <span class="k">null</span> <span class="p">?</span> <span class="n">cookie</span><span class="p">.</span><span class="n">Value</span> <span class="p">:</span> <span class="k">null</span><span class="p">;</span>
 </span></span><span class="line"><span class="cl">    <span class="p">}</span>
 </span></span><span class="line"><span class="cl">    
@@ -638,7 +638,7 @@ which you can find here:</p>
 </span></span><span class="line"><span class="cl">        <span class="kt">string</span> <span class="n">strValue</span> <span class="p">=</span> <span class="n">CheckAndConvertValue</span><span class="p">(</span><span class="k">value</span><span class="p">);</span>
 </span></span><span class="line"><span class="cl">        
 </span></span><span class="line"><span class="cl">        <span class="n">HttpCookie</span> <span class="n">cookie</span> <span class="p">=</span> <span class="k">new</span> <span class="n">HttpCookie</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">strValue</span><span class="p">)</span> <span class="p">{</span><span class="n">Expires</span> <span class="p">=</span> <span class="n">expires</span><span class="p">};</span>
-</span></span><span class="line"><span class="cl">        <span class="m">_</span><span class="n">response</span><span class="p">.</span><span class="n">Cookies</span><span class="p">.</span><span class="n">Set</span><span class="p">(</span><span class="n">cookie</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">_response</span><span class="p">.</span><span class="n">Cookies</span><span class="p">.</span><span class="n">Set</span><span class="p">(</span><span class="n">cookie</span><span class="p">);</span>
 </span></span><span class="line"><span class="cl">    <span class="p">}</span>
 </span></span><span class="line"><span class="cl">    
 </span></span><span class="line"><span class="cl">    <span class="c1">// ... see code sample for full implementation</span>
@@ -727,7 +727,7 @@ which you can find here:</p>
 </span></span><span class="line"><span class="cl">    <span class="n">httpResponse</span><span class="p">.</span><span class="n">Object</span><span class="p">.</span><span class="n">Cookies</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="k">new</span> <span class="n">HttpCookie</span><span class="p">(</span><span class="n">cookieName</span><span class="p">,</span> <span class="s">&#34;oldValue&#34;</span><span class="p">));</span>
 </span></span><span class="line"><span class="cl">    
 </span></span><span class="line"><span class="cl">    <span class="c1">// Act</span>
-</span></span><span class="line"><span class="cl">    <span class="m">_</span><span class="n">cookieContainer</span><span class="p">.</span><span class="n">SetValue</span><span class="p">(</span><span class="n">cookieName</span><span class="p">,</span> <span class="n">cookieValue</span><span class="p">,</span> <span class="n">cookieExpires</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">_cookieContainer</span><span class="p">.</span><span class="n">SetValue</span><span class="p">(</span><span class="n">cookieName</span><span class="p">,</span> <span class="n">cookieValue</span><span class="p">,</span> <span class="n">cookieExpires</span><span class="p">);</span>
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl">    <span class="c1">// Assert</span>
 </span></span><span class="line"><span class="cl">    <span class="n">HttpCookie</span> <span class="n">cookie</span> <span class="p">=</span> <span class="n">httpResponse</span><span class="p">.</span><span class="n">Object</span><span class="p">.</span><span class="n">Cookies</span><span class="p">[</span><span class="s">&#34;myCookie&#34;</span><span class="p">];</span>
@@ -780,23 +780,23 @@ which you can find here:</p>
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl"><span class="k">public</span> <span class="k">class</span> <span class="nc">AppCookies</span> <span class="p">:</span> <span class="n">IAppCookies</span>
 </span></span><span class="line"><span class="cl"><span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="k">private</span> <span class="k">readonly</span> <span class="n">ICookieContainer</span> <span class="m">_</span><span class="n">cookieContainer</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">private</span> <span class="k">readonly</span> <span class="n">ICookieContainer</span> <span class="n">_cookieContainer</span><span class="p">;</span>
 </span></span><span class="line"><span class="cl">    
 </span></span><span class="line"><span class="cl">    <span class="k">public</span> <span class="n">AppCookies</span><span class="p">(</span><span class="n">ICookieContainer</span> <span class="n">cookieContainer</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl">    <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="m">_</span><span class="n">cookieContainer</span> <span class="p">=</span> <span class="n">cookieContainer</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">_cookieContainer</span> <span class="p">=</span> <span class="n">cookieContainer</span><span class="p">;</span>
 </span></span><span class="line"><span class="cl">    <span class="p">}</span>
 </span></span><span class="line"><span class="cl">    
 </span></span><span class="line"><span class="cl">    <span class="k">public</span> <span class="kt">string</span> <span class="n">UserEmail</span>
 </span></span><span class="line"><span class="cl">    <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="m">_</span><span class="n">cookieContainer</span><span class="p">.</span><span class="n">GetValue</span><span class="p">(</span><span class="s">&#34;UserEmail&#34;</span><span class="p">);</span> <span class="p">}</span>
-</span></span><span class="line"><span class="cl">        <span class="k">set</span> <span class="p">{</span> <span class="m">_</span><span class="n">cookieContainer</span><span class="p">.</span><span class="n">SetValue</span><span class="p">(</span><span class="s">&#34;UserEmail&#34;</span><span class="p">,</span> <span class="k">value</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">.</span><span class="n">Now</span><span class="p">.</span><span class="n">AddDays</span><span class="p">(</span><span class="m">10</span><span class="p">));</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="n">_cookieContainer</span><span class="p">.</span><span class="n">GetValue</span><span class="p">(</span><span class="s">&#34;UserEmail&#34;</span><span class="p">);</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="k">set</span> <span class="p">{</span> <span class="n">_cookieContainer</span><span class="p">.</span><span class="n">SetValue</span><span class="p">(</span><span class="s">&#34;UserEmail&#34;</span><span class="p">,</span> <span class="k">value</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">.</span><span class="n">Now</span><span class="p">.</span><span class="n">AddDays</span><span class="p">(</span><span class="m">10</span><span class="p">));</span> <span class="p">}</span>
 </span></span><span class="line"><span class="cl">    <span class="p">}</span>
 </span></span><span class="line"><span class="cl">    
 </span></span><span class="line"><span class="cl">    <span class="k">public</span> <span class="n">DateTime</span><span class="p">?</span> <span class="n">LastVisit</span>
 </span></span><span class="line"><span class="cl">    <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="m">_</span><span class="n">cookieContainer</span><span class="p">.</span><span class="n">GetValue</span><span class="p">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="n">DateTime</span><span class="p">?&amp;</span><span class="n">gt</span><span class="p">;(</span><span class="s">&#34;LastVisit&#34;</span><span class="p">);</span> <span class="p">}</span>
-</span></span><span class="line"><span class="cl">        <span class="k">set</span> <span class="p">{</span> <span class="m">_</span><span class="n">cookieContainer</span><span class="p">.</span><span class="n">SetValue</span><span class="p">(</span><span class="s">&#34;LastVisit&#34;</span><span class="p">,</span> <span class="k">value</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">.</span><span class="n">Now</span><span class="p">.</span><span class="n">AddDays</span><span class="p">(</span><span class="m">10</span><span class="p">));</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="k">get</span> <span class="p">{</span> <span class="k">return</span> <span class="n">_cookieContainer</span><span class="p">.</span><span class="n">GetValue</span><span class="p">&amp;</span><span class="n">lt</span><span class="p">;</span><span class="n">DateTime</span><span class="p">?&amp;</span><span class="n">gt</span><span class="p">;(</span><span class="s">&#34;LastVisit&#34;</span><span class="p">);</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="k">set</span> <span class="p">{</span> <span class="n">_cookieContainer</span><span class="p">.</span><span class="n">SetValue</span><span class="p">(</span><span class="s">&#34;LastVisit&#34;</span><span class="p">,</span> <span class="k">value</span><span class="p">,</span> <span class="n">DateTime</span><span class="p">.</span><span class="n">Now</span><span class="p">.</span><span class="n">AddDays</span><span class="p">(</span><span class="m">10</span><span class="p">));</span> <span class="p">}</span>
 </span></span><span class="line"><span class="cl">    <span class="p">}</span>
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></code></pre></td></tr></table>
@@ -840,11 +840,11 @@ which you can find here:</p>
 <td class="lntd">
 <pre tabindex="0" class="chroma"><code class="language-c#" data-lang="c#"><span class="line"><span class="cl"><span class="k">public</span> <span class="k">class</span> <span class="nc">HomeController</span> <span class="p">:</span> <span class="n">Controller</span>
 </span></span><span class="line"><span class="cl"><span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="k">private</span> <span class="k">readonly</span> <span class="n">IAppCookies</span> <span class="m">_</span><span class="n">cookies</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">private</span> <span class="k">readonly</span> <span class="n">IAppCookies</span> <span class="n">_cookies</span><span class="p">;</span>
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl">    <span class="k">public</span> <span class="n">HomeController</span><span class="p">(</span><span class="n">IAppCookies</span> <span class="n">cookies</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl">    <span class="p">{</span>
-</span></span><span class="line"><span class="cl">        <span class="m">_</span><span class="n">cookies</span> <span class="p">=</span> <span class="n">cookies</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">_cookies</span> <span class="p">=</span> <span class="n">cookies</span><span class="p">;</span>
 </span></span><span class="line"><span class="cl">    <span class="p">}</span>
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl">    <span class="k">public</span> <span class="n">ActionResult</span> <span class="n">Index</span><span class="p">()</span>
@@ -854,11 +854,11 @@ which you can find here:</p>
 </span></span><span class="line"><span class="cl">        <span class="n">IndexViewModel</span> <span class="n">viewModel</span> <span class="p">=</span> <span class="k">new</span> <span class="n">IndexViewModel</span>
 </span></span><span class="line"><span class="cl">        <span class="p">{</span>
 </span></span><span class="line"><span class="cl">            <span class="n">CurrentTime</span> <span class="p">=</span> <span class="n">currentTime</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">            <span class="n">LastVisit</span> <span class="p">=</span> <span class="p">(</span><span class="m">_</span><span class="n">cookies</span><span class="p">.</span><span class="n">LastVisit</span> <span class="p">??</span> <span class="n">currentTime</span><span class="p">),</span>
-</span></span><span class="line"><span class="cl">            <span class="n">UserEmail</span> <span class="p">=</span> <span class="m">_</span><span class="n">cookies</span><span class="p">.</span><span class="n">UserEmail</span>
+</span></span><span class="line"><span class="cl">            <span class="n">LastVisit</span> <span class="p">=</span> <span class="p">(</span><span class="n">_cookies</span><span class="p">.</span><span class="n">LastVisit</span> <span class="p">??</span> <span class="n">currentTime</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">            <span class="n">UserEmail</span> <span class="p">=</span> <span class="n">_cookies</span><span class="p">.</span><span class="n">UserEmail</span>
 </span></span><span class="line"><span class="cl">        <span class="p">};</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">        <span class="m">_</span><span class="n">cookies</span><span class="p">.</span><span class="n">LastVisit</span> <span class="p">=</span> <span class="n">currentTime</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">_cookies</span><span class="p">.</span><span class="n">LastVisit</span> <span class="p">=</span> <span class="n">currentTime</span><span class="p">;</span>
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">View</span><span class="p">(</span><span class="n">viewModel</span><span class="p">);</span>
 </span></span><span class="line"><span class="cl">    <span class="p">}</span>
