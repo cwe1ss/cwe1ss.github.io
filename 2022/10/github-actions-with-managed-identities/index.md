@@ -1,7 +1,7 @@
 # Deploy from GitHub to Azure without any secrets using managed identities
 
 
-I've been building [a microservices template](https://github.com/cwe1ss/msa-template) as part of my master's thesis. It's using GitHub for code hosting and Microsoft Azure for hosting the resources. One key requirement of my template is to use [Managed identities for Azure](https://learn.microsoft.com/en-us/azure/active-directory/managed-identities-azure-resources/) everywhere and not use any secrets when connection to dependent resources.
+I've been building [a microservices template](https://github.com/cwe1ss/msa-template) as part of my master's thesis. It's using GitHub for code hosting and Microsoft Azure for hosting the resources. One key requirement of my template is to use [Managed identities for Azure](https://learn.microsoft.com/en-us/azure/active-directory/managed-identities-azure-resources/) everywhere and not use any secrets when connecting to dependent resources.
 
 Managed identities are a great feature and very easy to use for built-in workloads like VMs, Azure Container Apps, App Services. However, until recently, managed identities could not be used for non-native workloads like GitHub Actions. We had to use an Azure AD app registration instead and store its credentials (including a `CLIENT_SECRET`) as GitHub secrets. With the introduction of [workload identity federation](https://learn.microsoft.com/en-us/azure/active-directory/develop/workload-identity-federation) for app registrations, it was then possible to [configure a trust relationship between GitHub and Azure](https://learn.microsoft.com/en-us/azure/active-directory/develop/workload-identity-federation-create-trust?pivots=identity-wif-apps-methods-azp#configure-a-federated-identity-credential-on-an-app) that allows the GitHub Actions to authenticate to Azure without the need for providing a `CLIENT_SECRET`. This would have already solved my requirement for not needing any secrets, but the problem is, that creating an Azure AD app registration requires elevated permissions and therefore often can't easily be done by regular developers. 
 
@@ -245,3 +245,4 @@ New-AzSubscriptionDeployment `
 *([Original source](https://github.com/cwe1ss/msa-template/blob/650565fb5be038ae737676ac3f87291763b082bd/infrastructure/deploy-platform.ps1#L16-L23))*
 
 Feel free to start a discussion or create an issue in [cwe1ss/msa-template](https://github.com/cwe1ss/msa-template) if you have any feedback.
+
