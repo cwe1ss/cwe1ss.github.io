@@ -25,8 +25,8 @@ The script will execute the following steps (among other things that are out of 
 * A GitHub environment called `platform`  will be created via the GitHub CLI. 
   * This will be used to protect further deployments with required reviewers or other protection rules.
 * Federated credentials will be added to the managed identity for the `main`-branch and for the `platform`-environment.
-  * There *must* be a federated credential for each branch and environment that we want to deploy from.
-* The necessary resource IDs (tenant id, subscription id, managed identity client id) will be created as GitHub secrets
+  * There *must* be a federated credential for each branch and GitHub environment that we want to deploy from.
+* The necessary resource IDs (tenant id, subscription id, client id of our managed identity) will be created as GitHub secrets
 
 ## Deploying the managed identity and its federated credentials to Azure
 
@@ -41,9 +41,9 @@ resource githubIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-0
   tags: tags
 }
 ```
-*([Original source](https://github.com/cwe1ss/msa-template/blob/650565fb5be038ae737676ac3f87291763b082bd/infrastructure/platform/github-identity-resources.bicep#L37))*
+*([Original source](https://github.com/cwe1ss/msa-template/blob/650565fb5be038ae737676ac3f87291763b082bd/infrastructure/platform/github-identity-resources.bicep#L37-L41))*
 
-Creating the federated credentials via Bicep is more complex. Since I need federated credentials for the `main`-branch, the shared `platform`-environment and each actual application environment (`development`, `production`), I'm creating a list variable that holds the `name` and `subject` for each credential based on my global config-file:
+Creating the federated credentials via Bicep is more complex. Since I need federated credentials for the `main`-branch, the shared `platform`-environment, and each actual application environment (`development`, `production`), I'm creating a list variable that holds the `name` and `subject` for each credential based on my global config-file:
 
 ```bicep
 var config = loadJsonContent('./../config.json')
@@ -87,7 +87,7 @@ The fields `audiences`, `issuer` and `subject` are set according to [the require
 
 ## Assigning RBAC-roles to the managed identity
 
-In order for my GitHub-worflows to be able to deploy resources to Azure, the managed identity must have the appropriate RBAC permissions. For my template, I'm assigning the `Contributor`-role and `UserAccessAdministrator`-role to the identity. The `UserAccessAdministrator`-role is necessary to allow my GitHub workflows to create other managed identities and to assign RBAC-roles to them.
+In order for my GitHub-worflows to be able to deploy resources to Azure, the managed identity must have the appropriate RBAC permissions. For my template, I'm assigning the `Contributor`-role and `UserAccessAdministrator`-role at the subscription-scope to the identity. The `UserAccessAdministrator`-role is necessary to allow my GitHub workflows to create other managed identities and to assign RBAC-roles to them.
 
 To assign a RBAC-role, we must know its internal ID. For built-in roles, this ID can be found here: https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles
 
@@ -165,13 +165,17 @@ foreach ($permissionName in $githubIdentityMsGraphPermissions) {
 ````
 *([Original source](https://github.com/cwe1ss/msa-template/blob/main/infrastructure/init-platform.ps1#L204-L229))*
 
+**NOTE:** To execute this step, you must have elevated permissions in Azure AD.
+
 ## Creating a GitHub environment for the `platform`
 
 My template uses [GitHub environments](https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment) to protect deployments to Azure.
 
-As all previous steps, this could be done manually via the UI, but I prefer to have automation and therefore create the environment via the script.
+As with all previous steps, this could be done manually via the UI, but I prefer automation and therefore create the environment via the script by using the [GitHub CLI](https://github.com/cli/cli).
 
-The GitHub CLI does not yet have support for environments, so we need to use `gh api` to call the GitHub REST API. The script also uses a custom [Exec](https://github.com/cwe1ss/msa-template/blob/650565fb5be038ae737676ac3f87291763b082bd/infrastructure/_includes/helpers.ps1#L12)-function (copied from [psake](https://github.com/psake/psake/blob/master/src/public/Exec.ps1)) to fail the PowerShell script if the CLI-invocation fails.
+The GitHub CLI does not yet have support for environments, so we need to use `gh api` to call the GitHub REST API. 
+
+The script also uses a custom [Exec](https://github.com/cwe1ss/msa-template/blob/650565fb5be038ae737676ac3f87291763b082bd/infrastructure/_includes/helpers.ps1#L12)-function (copied from [psake](https://github.com/psake/psake/blob/master/src/public/Exec.ps1)) to fail the PowerShell script if the invocation of the native EXE fails (you'd have to always check `$LastExitCode` otherwise).
 
 To create a GitHub environment, I'm using the following code:
 
@@ -214,7 +218,7 @@ permissions:
 ```
 *([Original source](https://github.com/cwe1ss/msa-template/blob/650565fb5be038ae737676ac3f87291763b082bd/.github/workflows/platform.yml#L6-L8))*
 
-We can then use `azure/login` to authenticate with Azure:
+We can then use `azure/login` to authenticate with Azure (using the previously created GitHub secrets):
 ```yml
     - uses: azure/login@v1
       with:
