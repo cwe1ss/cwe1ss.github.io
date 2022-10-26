@@ -171,6 +171,8 @@ foreach ($permissionName in $githubIdentityMsGraphPermissions) {
 ````
 *([Original source](https://github.com/cwe1ss/msa-template/blob/main/infrastructure/init-platform.ps1#L204-L229))*
 
+**NOTE:** To execute this step, you must have elevated permissions in Azure AD.
+
 ## Creating a GitHub environment for the `platform`
 
 My template uses [GitHub environments](https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment) to protect deployments to Azure.
