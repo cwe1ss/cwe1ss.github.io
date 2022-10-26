@@ -2,7 +2,7 @@
 title: Deploy from GitHub to Azure without any secrets using managed identities
 date: 2022-10-26T20:00:00+02:00
 categories:
-- .NET
+- Azure
 toc:
   enable: true
 ---
