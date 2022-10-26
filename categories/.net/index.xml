@@ -1,4 +1,365 @@
-<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title>.NET - Category - Christian Weiss</title><link>https://www.chwe.at/categories/.net/</link><description>.NET - Category - Christian Weiss</description><generator>Hugo -- gohugo.io</generator><language>en</language><managingEditor>christian@chwe.at (Christian Weiss)</managingEditor><webMaster>christian@chwe.at (Christian Weiss)</webMaster><lastBuildDate>Thu, 22 Oct 2020 00:00:00 +0100</lastBuildDate><atom:link href="https://www.chwe.at/categories/.net/" rel="self" type="application/rss+xml"/><item><title>Simple zero-downtime updates with ASP.NET Core and health checks</title><link>https://www.chwe.at/2020/10/zero-downtime-updates-with-aspnet-core/</link><pubDate>Thu, 22 Oct 2020 00:00:00 +0100</pubDate><author>Author</author><guid>https://www.chwe.at/2020/10/zero-downtime-updates-with-aspnet-core/</guid><description><![CDATA[<p>Do you use a load balancer that isn&rsquo;t tightly integrated with your orchestrator and therefore doesn&rsquo;t know upfront when the orchestrator has to stop an instance of your ASP.NET Core application for an upgrade / a scaling action / a restart?</p>
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title>.NET - Category - Christian Weiss</title><link>https://www.chwe.at/categories/.net/</link><description>.NET - Category - Christian Weiss</description><generator>Hugo -- gohugo.io</generator><language>en</language><managingEditor>christian@chwe.at (Christian Weiss)</managingEditor><webMaster>christian@chwe.at (Christian Weiss)</webMaster><lastBuildDate>Wed, 26 Oct 2022 20:00:00 +0200</lastBuildDate><atom:link href="https://www.chwe.at/categories/.net/" rel="self" type="application/rss+xml"/><item><title>Deploy from GitHub to Azure without any secrets using managed identities</title><link>https://www.chwe.at/2022/10/github-actions-with-managed-identities/</link><pubDate>Wed, 26 Oct 2022 20:00:00 +0200</pubDate><author>Author</author><guid>https://www.chwe.at/2022/10/github-actions-with-managed-identities/</guid><description><![CDATA[<p>I&rsquo;ve been building <a href="https://github.com/cwe1ss/msa-template" target="_blank" rel="noopener noreffer">a microservices template</a> as part of my master&rsquo;s thesis. It&rsquo;s using GitHub for code hosting and Microsoft Azure for hosting the resources. One key requirement of my template is to use <a href="https://learn.microsoft.com/en-us/azure/active-directory/managed-identities-azure-resources/" target="_blank" rel="noopener noreffer">Managed identities for Azure</a> everywhere and not use any secrets when connection to dependent resources.</p>
+<p>Managed identities are a great feature and very easy to use for built-in workloads like VMs, Azure Container Apps, App Services. However, until recently, managed identities could not be used for non-native workloads like GitHub Actions. We had to use an Azure AD app registration instead and store its credentials (including a <code>CLIENT_SECRET</code>) as GitHub secrets. With the introduction of <a href="https://learn.microsoft.com/en-us/azure/active-directory/develop/workload-identity-federation" target="_blank" rel="noopener noreffer">workload identity federation</a> for app registrations, it was then possible to <a href="https://learn.microsoft.com/en-us/azure/active-directory/develop/workload-identity-federation-create-trust?pivots=identity-wif-apps-methods-azp#configure-a-federated-identity-credential-on-an-app" target="_blank" rel="noopener noreffer">configure a trust relationship between GitHub and Azure</a> that allows the GitHub Actions to authenticate to Azure without the need for providing a <code>CLIENT_SECRET</code>. This would have already solved my requirement for not needing any secrets, but the problem is, that creating an Azure AD app registration requires elevated permissions and therefore often can&rsquo;t easily be done by regular developers.</p>
+<p>The good news is that <strong>Microsoft now also supports federated credentials for user-assigned managed identities</strong>! Managed identities only require regular Azure RBAC rights and can be created via Bicep templates and are therefore much easier to integrate into Infrastructure as Code-processes and CI/CD systems.</p>
+<p><a href="https://github.com/udayxhegde" target="_blank" rel="noopener noreffer">Uday Hegde</a> has written a good blog post explaining federated credentials for managed identities: <a href="https://blog.identitydigest.com/azuread-federate-mi/" target="_blank" rel="noopener noreffer">https://blog.identitydigest.com/azuread-federate-mi/</a></p>
+<p>The remainder of this blog post will focus on how federated credentials for managed identities are used in my microservices template. Have a look at the project&rsquo;s <a href="https://github.com/cwe1ss/msa-template/blob/main/README.md" target="_blank" rel="noopener noreffer">README.md</a> for more details.</p>
+<h2 id="overview">Overview</h2>
+<p>For my microservices template, the entire process for creating the Azure resources and connecting GitHub with Azure is automated via the <a href="https://github.com/cwe1ss/msa-template/blob/main/infrastructure/init-platform.ps1" target="_blank" rel="noopener noreffer">init-platform.ps1</a> script. The script must be executed <em>manually</em> once, since there&rsquo;s the &ldquo;chicken and egg&rdquo;-problem of already needing the managed identity to deploy Azure resources via a GitHub workflow.</p>
+<p>The script will execute the following steps (among other things that are out of scope for this post):</p>
+<ul>
+<li>It will create a resource group in Azure that will host the managed identity.</li>
+<li>It will create a user-assigned managed identity in this resource group.</li>
+<li>The managed identity will be given <code>Contributor</code> &amp; <code>UserAccessAdministrator</code> rights on the Azure subscription.
+<ul>
+<li>(So that the GitHub workflows of my services can create Azure resources and assign rights to newly created managed identities)</li>
+</ul>
+</li>
+<li>The managed identity will be given additional AAD permissions.
+<ul>
+<li>(My GitHub workflows need to be able to query AAD groups)</li>
+</ul>
+</li>
+<li>A GitHub environment called <code>platform</code>  will be created via the GitHub CLI.
+<ul>
+<li>This will be used to protect further deployments with required reviewers or other protection rules.</li>
+</ul>
+</li>
+<li>Federated credentials will be added to the managed identity for the <code>main</code>-branch and for the <code>platform</code>-environment.
+<ul>
+<li>There <em>must</em> be a federated credential for each branch and environment that we want to deploy from.</li>
+</ul>
+</li>
+<li>The necessary resource IDs (tenant id, subscription id, managed identity client id) will be created as GitHub secrets</li>
+</ul>
+<h2 id="deploying-the-managed-identity-and-its-federated-credentials-to-azure">Deploying the managed identity and its federated credentials to Azure</h2>
+<p>The template creates all Azure resources via <a href="https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/overview?tabs=bicep" target="_blank" rel="noopener noreffer">Bicep</a>-templates stored in the <a href="https://github.com/cwe1ss/msa-template/tree/main/infrastructure" target="_blank" rel="noopener noreffer">infrastructure</a> directory. The managed identity for GitHub is part of the <a href="https://github.com/cwe1ss/msa-template/tree/main/infrastructure/platform" target="_blank" rel="noopener noreffer">platform-resources</a> that are shared by all environments of my microservice template (e.g., development, production).</p>
+<p>To create the managed identity for GitHub, the following Bicep-template is used:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bicep" data-lang="bicep"><span class="line"><span class="cl"><span class="kd">resource</span><span class="w"> </span>githubIdentity<span class="w"> </span><span class="s">&#39;Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview&#39;</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="py">name</span><span class="p">:</span><span class="w"> </span>githubIdentityName<span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="py">location</span><span class="p">:</span><span class="w"> </span>location<span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="py">tags</span><span class="p">:</span><span class="w"> </span>tags<span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><em>(<a href="https://github.com/cwe1ss/msa-template/blob/650565fb5be038ae737676ac3f87291763b082bd/infrastructure/platform/github-identity-resources.bicep#L37" target="_blank" rel="noopener noreffer">Original source</a>)</em></p>
+<p>Creating the federated credentials via Bicep is more complex. Since I need federated credentials for the <code>main</code>-branch, the shared <code>platform</code>-environment and each actual application environment (<code>development</code>, <code>production</code>), I&rsquo;m creating a list variable that holds the <code>name</code> and <code>subject</code> for each credential based on my global config-file:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bicep" data-lang="bicep"><span class="line"><span class="cl"><span class="kd">var</span><span class="w"> </span>config<span class="w"> </span><span class="p">=</span><span class="w"> </span>loadJsonContent<span class="p">(</span><span class="s">&#39;./../config.json&#39;</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">// All credentials must be in one list as concurrent writes to /federatedIdentityCredentials are not allowed.</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">var</span><span class="w"> </span>ghBranchCredentials<span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="py">name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;github-branch-${githubDefaultBranchName}&#39;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="py">subject</span><span class="p">:</span><span class="w"> </span><span class="py">&#39;repo</span><span class="p">:</span><span class="err">$</span><span class="p">{</span>githubRepoNameWithOwner<span class="p">}:</span><span class="py">ref</span><span class="p">:</span>refs<span class="o">/</span>heads<span class="o">/</span><span class="err">$</span><span class="p">{</span>githubDefaultBranchName<span class="p">}</span><span class="err">&#39;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}]</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">var</span><span class="w"> </span>ghPlatformCredentials<span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="py">name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;github-env-platform&#39;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="py">subject</span><span class="p">:</span><span class="w"> </span><span class="py">&#39;repo</span><span class="p">:</span><span class="err">$</span><span class="p">{</span>githubRepoNameWithOwner<span class="p">}:</span><span class="py">environment</span><span class="p">:</span>platform<span class="err">&#39;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}]</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">var</span><span class="w"> </span>ghEnvironmentCredentials<span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="k">for</span><span class="w"> </span>item<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nf">items</span><span class="p">(</span>config<span class="p">.</span>environments<span class="p">):</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="py">name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;github-env-${item.key}&#39;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="py">subject</span><span class="p">:</span><span class="w"> </span><span class="py">&#39;repo</span><span class="p">:</span><span class="err">$</span><span class="p">{</span>githubRepoNameWithOwner<span class="p">}:</span><span class="py">environment</span><span class="p">:</span><span class="err">$</span><span class="p">{</span>item<span class="p">.</span>key<span class="p">}</span><span class="err">&#39;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}]</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">var</span><span class="w"> </span>githubCredentials<span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nf">concat</span><span class="p">(</span>ghBranchCredentials<span class="err">,</span><span class="w"> </span>ghPlatformCredentials<span class="err">,</span><span class="w"> </span>ghEnvironmentCredentials<span class="p">)</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><em>(<a href="https://github.com/cwe1ss/msa-template/blob/650565fb5be038ae737676ac3f87291763b082bd/infrastructure/platform/github-identity-resources.bicep#L16-L31" target="_blank" rel="noopener noreffer">Original source</a>)</em></p>
+<p>The credential resources are then created via a Bicep-loop. It&rsquo;s important that <code>batchSize(1)</code> is used because concurrent writes are not supported and will result in a deployment error.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bicep" data-lang="bicep"><span class="line"><span class="cl"><span class="p">@</span><span class="nd">batchSize</span><span class="p">(</span>1<span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">resource</span><span class="w"> </span>federatedCredentials<span class="w"> </span><span class="s">&#39;Microsoft.ManagedIdentity/userAssignedIdentities/federatedIdentityCredentials@2022-01-31-preview&#39;</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="k">for</span><span class="w"> </span>item<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="py">githubCredentials</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="py">name</span><span class="p">:</span><span class="w"> </span>item<span class="p">.</span>name<span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="py">parent</span><span class="p">:</span><span class="w"> </span>githubIdentity<span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="py">properties</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="py">audiences</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="py">&#39;api</span><span class="p">:</span><span class="c1">//AzureADTokenExchange&#39;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">]</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="py">issuer</span><span class="p">:</span><span class="w"> </span><span class="py">&#39;https</span><span class="p">:</span><span class="c1">//token.actions.githubusercontent.com&#39;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="py">subject</span><span class="p">:</span><span class="w"> </span>item<span class="p">.</span>subject<span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}]</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><em>(<a href="https://github.com/cwe1ss/msa-template/blob/650565fb5be038ae737676ac3f87291763b082bd/infrastructure/platform/github-identity-resources.bicep#L43-L58" target="_blank" rel="noopener noreffer">Original source</a>)</em></p>
+<p>The fields <code>audiences</code>, <code>issuer</code> and <code>subject</code> are set according to <a href="https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-azure" target="_blank" rel="noopener noreffer">the requirements by GitHub</a>.</p>
+<h2 id="assigning-rbac-roles-to-the-managed-identity">Assigning RBAC-roles to the managed identity</h2>
+<p>In order for my GitHub-worflows to be able to deploy resources to Azure, the managed identity must have the appropriate RBAC permissions. For my template, I&rsquo;m assigning the <code>Contributor</code>-role and <code>UserAccessAdministrator</code>-role to the identity. The <code>UserAccessAdministrator</code>-role is necessary to allow my GitHub workflows to create other managed identities and to assign RBAC-roles to them.</p>
+<p>To assign a RBAC-role, we must know its internal ID. For built-in roles, this ID can be found here: <a href="https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles" target="_blank" rel="noopener noreffer">https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles</a></p>
+<p>Here&rsquo;s the code to reference the <code>Contributor</code>-role:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bicep" data-lang="bicep"><span class="line"><span class="cl"><span class="kd">resource</span><span class="w"> </span>contributorRoleDefinition<span class="w"> </span><span class="s">&#39;Microsoft.Authorization/roleDefinitions@2022-04-01&#39;</span><span class="w"> </span>existing<span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="py">scope</span><span class="p">:</span><span class="w"> </span><span class="nf">subscription</span><span class="p">()</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="py">name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;b24988ac-6180-42a0-ab88-20f7382dd24c&#39;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><em>(<a href="https://github.com/cwe1ss/msa-template/blob/650565fb5be038ae737676ac3f87291763b082bd/infrastructure/platform/github-identity.bicep#L16-L20" target="_blank" rel="noopener noreffer">Original source</a>)</em></p>
+<p>With the reference to the role definition, we can now create the actual role assignment for the managed identity:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bicep" data-lang="bicep"><span class="line"><span class="cl"><span class="kd">resource</span><span class="w"> </span>githubIdentityContributor<span class="w"> </span><span class="s">&#39;Microsoft.Authorization/roleAssignments@2020-04-01-preview&#39;</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="py">name</span><span class="p">:</span><span class="w"> </span><span class="nf">guid</span><span class="p">(</span><span class="nf">subscription</span><span class="p">().</span>id<span class="err">,</span><span class="w"> </span><span class="si">&#39;github&#39;</span><span class="err">,</span><span class="w"> </span><span class="si">&#39;Contributor&#39;</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="py">properties</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="py">roleDefinitionId</span><span class="p">:</span><span class="w"> </span>contributorRoleDefinition<span class="p">.</span>id<span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="py">principalId</span><span class="p">:</span><span class="w"> </span>githubIdentity<span class="p">.</span>outputs<span class="p">.</span>githubIdentityPrincipalId<span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="py">principalType</span><span class="p">:</span><span class="w"> </span><span class="si">&#39;ServicePrincipal&#39;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><em>(<a href="https://github.com/cwe1ss/msa-template/blob/650565fb5be038ae737676ac3f87291763b082bd/infrastructure/platform/github-identity.bicep#L52-L59" target="_blank" rel="noopener noreffer">Original source</a>)</em></p>
+<p><strong>NOTE:</strong> Azure does not automatically delete RBAC-role assignments when the managed identity is deleted. You must <em>manually</em> delete them or future re-deployments will fail with a conflict.</p>
+<h2 id="assigning-aad-permissions-to-the-managed-identity">Assigning AAD permissions to the managed identity</h2>
+<p>Some of my GitHub workflows need to be able to query the Azure AD graph for details about an Azure AD group and to do so, the managed identity must have the proper AAD permissions.</p>
+<p>Unfortunately, AAD resources and permissions can NOT be created via Bicep templates, so we need to either use the <a href="https://learn.microsoft.com/en-us/powershell/module/azuread" target="_blank" rel="noopener noreffer">AzureAD</a>-module (which is planned for deprecation), its successor-module <a href="https://learn.microsoft.com/en-us/powershell/microsoftgraph/overview" target="_blank" rel="noopener noreffer">Microsoft.Graph</a>, or use the Graph REST API.</p>
+<p>Since I&rsquo;m already using the <a href="https://learn.microsoft.com/en-us/powershell/azure/install-az-ps" target="_blank" rel="noopener noreffer">Az</a>-module to deploy my Bicep-templates, I didn&rsquo;t want to use another module and potentially deal with separate sign-in methods and tokens, so I decided to just call the Graph API directly:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ps" data-lang="ps"><span class="line"><span class="cl"><span class="nf">#</span> <span class="nf">A</span> <span class="nf">list</span> <span class="nf">of</span> <span class="nf">all</span> <span class="nf">AAD</span> <span class="nf">permissions</span> <span class="nf">that</span> <span class="nf">should</span> <span class="nf">be</span> <span class="nf">granted</span> <span class="nf">for</span> <span class="nf">the</span> <span class="nf">managed</span> <span class="nf">identity</span>
+</span></span><span class="line"><span class="cl"><span class="nf">#</span> <span class="nf">https:</span><span class="err">/</span><span class="nv">/learn.microsoft.com/en-us/graph/permissions-reference</span>
+</span></span><span class="line"><span class="cl"><span class="nf">$githubIdentityMsGraphPermissions</span> <span class="nf">=</span> <span class="nf">@</span><span class="s">(
+</span></span></span><span class="line"><span class="cl"><span class="s">    &#34;Group.Read.All&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nf">#</span> <span class="nf">This</span> <span class="nf">is</span> <span class="nf">a</span> <span class="nf">well-known</span> <span class="nf">ID</span> <span class="nf">for</span> <span class="nf">the</span> <span class="nf">MS</span> <span class="nf">Graph</span> <span class="nf">service</span> <span class="nf">principal</span>
+</span></span><span class="line"><span class="cl"><span class="nf">$msGraphSp</span> <span class="nf">=</span> <span class="nf">Get-AzAdServicePrincipal</span> <span class="nf">-ApplicationId</span> <span class="nf">&#34;00000003-0000-0000-c000-000000000000&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nf">#</span> <span class="nf">We&#39;re</span> <span class="nf">using</span> <span class="nf">the</span> <span class="nf">Az-module</span> <span class="nf">to</span> <span class="nf">aquire</span> <span class="nf">an</span> <span class="nf">access</span> <span class="nf">token</span> <span class="nf">for</span> <span class="nf">the</span> <span class="nf">Graph</span> <span class="nf">API</span>
+</span></span><span class="line"><span class="cl"><span class="nf">$graphAccessToken</span> <span class="nf">=</span> <span class="nf">Get-AzAccessToken</span> <span class="nf">-ResourceUrl</span> <span class="nf">&#34;https:</span><span class="err">/</span><span class="nv">/graph.microsoft.com/&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nf">#</span> <span class="nf">https:</span><span class="err">/</span><span class="nv">/learn.microsoft.com/en-us/graph/api/resources/approleassignment</span>
+</span></span><span class="line"><span class="cl"><span class="nf">$apiUrl</span> <span class="nf">=</span> <span class="nf">&#34;https:</span><span class="err">/</span><span class="nv">/graph.microsoft.com/v1.0/servicePrincipals/$</span><span class="s">($githubIdentity.Id)</span><span class="nv">/appRoleAssignments&#34;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nf">#</span> <span class="nf">We&#39;re</span> <span class="nf">only</span> <span class="nf">creating</span> <span class="nf">assignments</span> <span class="nf">that</span> <span class="nf">don&#39;t</span> <span class="nf">yet</span> <span class="nf">exist</span>
+</span></span><span class="line"><span class="cl"><span class="nf">$existingAssignments</span> <span class="nf">=</span> <span class="nf">Invoke-RestMethod</span> <span class="nf">-Uri</span> <span class="nf">$apiUrl</span> <span class="nf">-Method</span> <span class="nf">Get</span> <span class="nf">-Headers</span> <span class="nf">@</span><span class="p">{</span> <span class="nf">Authorization</span> <span class="nf">=</span> <span class="nf">&#34;Bearer</span> <span class="nf">$</span><span class="s">($graphAccessToken.Token)</span><span class="nf">&#34;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nf">foreach</span> <span class="s">($permissionName in $githubIdentityMsGraphPermissions)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">#$permissionName</span> <span class="nf">=</span> <span class="nf">&#34;Group.Read.All&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">$appRoleId</span> <span class="nf">=</span> <span class="s">($msGraphSp.AppRole | Where-Object { $_.Value -eq $permissionName } | Select-Object)</span><span class="nf">.Id</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="nf">$exists</span> <span class="nf">=</span> <span class="nf">$existingAssignments.value</span> <span class="nf">|</span> <span class="nf">Where-Object</span> <span class="p">{</span> <span class="nf">$_.appRoleId</span> <span class="nf">-eq</span> <span class="nf">$appRoleId</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">if</span> <span class="s">($exists)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">Write-Success</span> <span class="nf">&#34;Permission</span> <span class="nf">&#39;$permissionName&#39;</span> <span class="nf">already</span> <span class="nf">exists&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span> <span class="nf">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">$body</span> <span class="nf">=</span> <span class="nf">@</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="nf">appRoleId</span> <span class="nf">=</span> <span class="nf">$appRoleId</span>
+</span></span><span class="line"><span class="cl">            <span class="nf">resourceId</span> <span class="nf">=</span> <span class="nf">$msGraphSp.Id</span>
+</span></span><span class="line"><span class="cl">            <span class="nf">principalId</span> <span class="nf">=</span> <span class="nf">$githubIdentity.Id</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">Invoke-RestMethod</span> <span class="nf">-Uri</span> <span class="nf">$apiUrl</span> <span class="nf">-Method</span> <span class="nf">Post</span> <span class="nf">-ContentType</span> <span class="nf">&#34;application</span><span class="nv">/json&#34;</span> <span class="nf">`</span>
+</span></span><span class="line"><span class="cl">            <span class="nf">-Headers</span> <span class="nf">@</span><span class="p">{</span> <span class="nf">Authorization</span> <span class="nf">=</span> <span class="nf">&#34;Bearer</span> <span class="nf">$</span><span class="s">($graphAccessToken.Token)</span><span class="nf">&#34;</span> <span class="p">}</span> <span class="nf">`</span>
+</span></span><span class="line"><span class="cl">            <span class="nf">-Body</span> <span class="nf">$</span><span class="s">($body | convertto-json)</span> <span class="nf">|</span> <span class="nf">Out-Null</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="nf">Write-Success</span> <span class="nf">&#34;Permission</span> <span class="nf">&#39;$permissionName&#39;</span> <span class="nf">created&#34;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><em>(<a href="https://github.com/cwe1ss/msa-template/blob/main/infrastructure/init-platform.ps1#L204-L229" target="_blank" rel="noopener noreffer">Original source</a>)</em></p>
+<h2 id="creating-a-github-environment-for-the-platform">Creating a GitHub environment for the <code>platform</code></h2>
+<p>My template uses <a href="https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment" target="_blank" rel="noopener noreffer">GitHub environments</a> to protect deployments to Azure.</p>
+<p>As all previous steps, this could be done manually via the UI, but I prefer to have automation and therefore create the environment via the script.</p>
+<p>The GitHub CLI does not yet have support for environments, so we need to use <code>gh api</code> to call the GitHub REST API. The script also uses a custom <a href="https://github.com/cwe1ss/msa-template/blob/650565fb5be038ae737676ac3f87291763b082bd/infrastructure/_includes/helpers.ps1#L12" target="_blank" rel="noopener noreffer">Exec</a>-function (copied from <a href="https://github.com/psake/psake/blob/master/src/public/Exec.ps1" target="_blank" rel="noopener noreffer">psake</a>) to fail the PowerShell script if the CLI-invocation fails.</p>
+<p>To create a GitHub environment, I&rsquo;m using the following code:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ps" data-lang="ps"><span class="line"><span class="cl"><span class="nf">$body</span> <span class="nf">=</span> <span class="nf">@</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">reviewers</span> <span class="nf">=</span> <span class="nf">@</span><span class="s">(
+</span></span></span><span class="line"><span class="cl"><span class="s">    @{ type = &#34;User&#34;; id = $ghUser.id }
+</span></span></span><span class="line"><span class="cl"><span class="s">  )</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span> <span class="nf">|</span> <span class="nf">ConvertTo-Json</span> <span class="nf">-Compress</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nf">$ghEnv</span> <span class="nf">=</span> <span class="nf">Exec</span> <span class="p">{</span> <span class="nf">$body</span> <span class="nf">|</span> <span class="nf">gh</span> <span class="nf">api</span> <span class="nf">&#34;</span><span class="nv">/repos/$</span><span class="s">($ghRepo.nameWithOwner)</span><span class="nv">/environments/$environment&#34;</span> <span class="nf">-X</span> <span class="nf">PUT</span> <span class="nf">-H</span> <span class="nf">&#34;Accept:</span> <span class="nf">application</span><span class="nv">/vnd.github+json&#34;</span> <span class="nf">--input</span> <span class="nf">-</span> <span class="p">}</span> <span class="nf">|</span> <span class="nf">ConvertFrom-Json</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><em>(<a href="https://github.com/cwe1ss/msa-template/blob/650565fb5be038ae737676ac3f87291763b082bd/infrastructure/init-platform.ps1#L354-L360" target="_blank" rel="noopener noreffer">Original source</a>)</em></p>
+<h2 id="creating-the-resource-ids-as-secrets-in-github">Creating the resource IDs as secrets in GitHub</h2>
+<p>While there are no passwords to authenticate GitHub with Azure, we still need to tell GitHub about the managed identity and its target tenant &amp; subscription. We therefore need to store some IDs as GitHub secrets. These IDs will then be used by the GitHub workflows when running deployments to Azure.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ps" data-lang="ps"><span class="line"><span class="cl"><span class="nf">Exec</span> <span class="p">{</span> <span class="nf">gh</span> <span class="nf">secret</span> <span class="nf">set</span> <span class="nf">&#34;AZURE_CLIENT_ID&#34;</span> <span class="nf">-b</span> <span class="nf">$githubIdentity.AppId</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="nf">Exec</span> <span class="p">{</span> <span class="nf">gh</span> <span class="nf">secret</span> <span class="nf">set</span> <span class="nf">&#34;AZURE_SUBSCRIPTION_ID&#34;</span> <span class="nf">-b</span> <span class="nf">$</span><span class="s">((Get-AzContext).Subscription.Id)</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="nf">Exec</span> <span class="p">{</span> <span class="nf">gh</span> <span class="nf">secret</span> <span class="nf">set</span> <span class="nf">&#34;AZURE_TENANT_ID&#34;</span> <span class="nf">-b</span> <span class="nf">$</span><span class="s">((Get-AzContext).Subscription.TenantId)</span> <span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><em>(<a href="https://github.com/cwe1ss/msa-template/blob/650565fb5be038ae737676ac3f87291763b082bd/infrastructure/init-platform.ps1#L372-L374" target="_blank" rel="noopener noreffer">Original source</a>)</em></p>
+<h2 id="using-the-managed-identity-in-a-github-workflow">Using the managed identity in a GitHub workflow</h2>
+<p>With the preceding steps, the managed identity has been created, federated credentials have been assigned and GitHub has references to the required IDs as GitHub secrets. We&rsquo;re therefore finally ready to do any further deployments via GitHub workflows.</p>
+<p>My microservice template includes <a href="https://github.com/cwe1ss/msa-template/tree/main/.github/workflows" target="_blank" rel="noopener noreffer">multiple GitHub workflows</a>. There&rsquo;s a workflow for each service, for shared environment resources, and for the shared platform resources.</p>
+<p>We&rsquo;ll look at the <a href="https://github.com/cwe1ss/msa-template/blob/main/.github/workflows/platform.yml" target="_blank" rel="noopener noreffer">platform.yml</a> workflow as an example for the following steps.</p>
+<p>In order for GitHub-workflows to work with federated credentials, we <a href="https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-azure#updating-your-github-actions-workflow" target="_blank" rel="noopener noreffer">must add permissions for the token</a>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yml" data-lang="yml"><span class="line"><span class="cl"><span class="nt">permissions</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">id-token</span><span class="p">:</span><span class="w"> </span><span class="l">write</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">contents</span><span class="p">:</span><span class="w"> </span><span class="l">read</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><em>(<a href="https://github.com/cwe1ss/msa-template/blob/650565fb5be038ae737676ac3f87291763b082bd/.github/workflows/platform.yml#L6-L8" target="_blank" rel="noopener noreffer">Original source</a>)</em></p>
+<p>We can then use <code>azure/login</code> to authenticate with Azure:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yml" data-lang="yml"><span class="line"><span class="cl"><span class="w">    </span>- <span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l">azure/login@v1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">with</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">client-id</span><span class="p">:</span><span class="w"> </span><span class="l">${{ secrets.AZURE_CLIENT_ID }}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">tenant-id</span><span class="p">:</span><span class="w"> </span><span class="l">${{ secrets.AZURE_TENANT_ID }}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">subscription-id</span><span class="p">:</span><span class="w"> </span><span class="l">${{ secrets.AZURE_SUBSCRIPTION_ID }}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="c"># This allows us to use Azure PowerShell in addition to Azure CLI</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">enable-AzPSSession</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><em>(<a href="https://github.com/cwe1ss/msa-template/blob/650565fb5be038ae737676ac3f87291763b082bd/.github/workflows/platform.yml#L20-L25" target="_blank" rel="noopener noreffer">Original source</a>)</em></p>
+<p>That&rsquo;s it. Further calls via the <code>Az</code>-module should then be able to run successfully:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-ps" data-lang="ps"><span class="line"><span class="cl"><span class="nf">New-AzSubscriptionDeployment</span> <span class="nf">`</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">-Location</span> <span class="nf">$config.location</span> <span class="nf">`</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">-Name</span> <span class="s">(&#34;platform-&#34; + (Get-Date).ToString(&#34;yyyyMMddHHmmss&#34;))</span> <span class="nf">`</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">-TemplateFile</span> <span class="nf">.\platform\main.bicep</span> <span class="nf">`</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">-TemplateParameterObject</span> <span class="nf">@</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">deployGitHubIdentity</span> <span class="nf">=</span> <span class="nf">$false</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span> <span class="nf">`</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">-Verbose</span> <span class="nf">|</span> <span class="nf">Out-Null</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><em>(<a href="https://github.com/cwe1ss/msa-template/blob/650565fb5be038ae737676ac3f87291763b082bd/infrastructure/deploy-platform.ps1#L16-L23" target="_blank" rel="noopener noreffer">Original source</a>)</em></p>
+<p>Feel free to start a discussion or create an issue in <a href="https://github.com/cwe1ss/msa-template" target="_blank" rel="noopener noreffer">cwe1ss/msa-template</a> if you have any feedback.</p>
+]]></description></item><item><title>Simple zero-downtime updates with ASP.NET Core and health checks</title><link>https://www.chwe.at/2020/10/zero-downtime-updates-with-aspnet-core/</link><pubDate>Thu, 22 Oct 2020 00:00:00 +0100</pubDate><author>Author</author><guid>https://www.chwe.at/2020/10/zero-downtime-updates-with-aspnet-core/</guid><description><![CDATA[<p>Do you use a load balancer that isn&rsquo;t tightly integrated with your orchestrator and therefore doesn&rsquo;t know upfront when the orchestrator has to stop an instance of your ASP.NET Core application for an upgrade / a scaling action / a restart?</p>
 <p>Does this result in a few failing requests until the load balancer has finally figured out that the instance is gone?</p>
 <p>If so, this blog post might be for you!</p>
 <h2 id="problem-details">Problem details</h2>
