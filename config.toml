@@ -252,7 +252,7 @@ theme = "LoveIt"
 
   # LoveIt NEW | 0.2.0 Analytics config
   [params.analytics]
-    enable = false
+    enable = true
     # Google Analytics
     [params.analytics.google]
       id = ""
@@ -260,7 +260,7 @@ theme = "LoveIt"
       anonymizeIP = true
     # Fathom Analytics
     [params.analytics.fathom]
-      id = ""
+      id = "KUYCRMLC"
       # server url for your tracker if you're self hosting
       server = ""
 
