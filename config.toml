@@ -262,7 +262,7 @@ theme = "LoveIt"
     [params.analytics.fathom]
       id = "KUYCRMLC"
       # server url for your tracker if you're self hosting
-      server = "ideal-novel.chwe.at"
+      server = ""
 
   # LoveIt NEW | 0.2.7 Cookie consent config
   [params.cookieconsent]
