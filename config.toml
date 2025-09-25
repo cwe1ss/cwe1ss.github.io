@@ -61,7 +61,7 @@ theme = "LoveIt"
   [params.social]
     GitHub = "cwe1ss"
     Linkedin = "cwe1ss"
-    Twitter = "cwe1ss"
+    Twitter = ""
     Email = "christian@chwe.at"
     RSS = true # LoveIt NEW | 0.2.0
 
