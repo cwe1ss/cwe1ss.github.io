@@ -1,39 +1,34 @@
-<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title>Mobile Development - Category - Christian Weiss</title><link>https://www.chwe.at/categories/mobile-development/</link><description>Mobile Development - Category - Christian Weiss</description><generator>Hugo -- gohugo.io</generator><language>en</language><managingEditor>christian@chwe.at (Christian Weiss)</managingEditor><webMaster>christian@chwe.at (Christian Weiss)</webMaster><lastBuildDate>Sat, 03 Oct 2020 00:00:00 +0100</lastBuildDate><atom:link href="https://www.chwe.at/categories/mobile-development/" rel="self" type="application/rss+xml"/><item><title>Using Flutter flavors to separate the DEV and LIVE environment</title><link>https://www.chwe.at/2020/10/flutter-flavors/</link><pubDate>Sat, 03 Oct 2020 00:00:00 +0100</pubDate><author>Author</author><guid>https://www.chwe.at/2020/10/flutter-flavors/</guid><description><![CDATA[<p>These are the requirements for our app:</p>
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title>Mobile Development - Category - Christian Weiss</title><link>https://www.chwe.at/categories/mobile-development/</link><description>Mobile Development - Category - Christian Weiss</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Sat, 03 Oct 2020 00:00:00 +0100</lastBuildDate><atom:link href="https://www.chwe.at/categories/mobile-development/" rel="self" type="application/rss+xml"/><item><title>Using Flutter flavors to separate the DEV and LIVE environment</title><link>https://www.chwe.at/2020/10/flutter-flavors/</link><pubDate>Sat, 03 Oct 2020 00:00:00 +0100</pubDate><author>xxxx</author><guid>https://www.chwe.at/2020/10/flutter-flavors/</guid><description><![CDATA[<p>These are the requirements for our app:</p>
 <ul>
 <li>Our Flutter app should target iOS and Android.</li>
 <li>We want a DEV version and a LIVE version of our app, each targeting a different API URL.</li>
 <li>Developers should never have to manually change any code to switch between the environments.</li>
 <li>We want to be able to have the DEV app and the LIVE app installed on the same device at the same time.</li>
 </ul>
-<p>The best way to solve these requirements in Flutter is to use <strong>flavors</strong>. There are also some other tutorials for this linked on the official <a href="https://flutter.dev/docs/deployment/flavors" target="_blank" rel="noopener noreffer">Flutter docs</a> which might be helpful.</p>
-<p>The <a href="https://github.com/cwe1ss/flutter-flavors-ci-cd" target="_blank" rel="noopener noreffer">code for this guide</a> is stored on GitHub and changes for each section are separate commits that are linked in the section below.</p>
+<p>The best way to solve these requirements in Flutter is to use <strong>flavors</strong>. There are also some other tutorials for this linked on the official <a href="https://flutter.dev/docs/deployment/flavors" target="_blank" rel="noopener noreffer ">Flutter docs</a> which might be helpful.</p>
+<p>The <a href="https://github.com/cwe1ss/flutter-flavors-ci-cd" target="_blank" rel="noopener noreffer ">code for this guide</a> is stored on GitHub and changes for each section are separate commits that are linked in the section below.</p>
 <p>As we need to change settings in XCode, we need a Mac with Android Studio and XCode for this tutorial.</p>
-<p>You also need to have Flutter installed already. Follow the <a href="https://flutter.dev/docs/get-started/install" target="_blank" rel="noopener noreffer">Getting started-docs</a> if you still need to install it.</p>
+<p>You also need to have Flutter installed already. Follow the <a href="https://flutter.dev/docs/get-started/install" target="_blank" rel="noopener noreffer ">Getting started-docs</a> if you still need to install it.</p>
 <p>I&rsquo;m using <code>Flutter v1.22.0</code> for this tutorial.</p>
 <h2 id="create-the-git-repository-and-clone-it-locally">Create the Git repository and clone it locally</h2>
-<p>Create a new Git repository. Mine is: <a href="https://github.com/cwe1ss/flutter-flavors-ci-cd" target="_blank" rel="noopener noreffer">https://github.com/cwe1ss/flutter-flavors-ci-cd</a></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-cmd" data-lang="cmd"><span class="line"><span class="cl">git clone https://github.com/cwe1ss/flutter-flavors-ci-cd.git
-</span></span><span class="line"><span class="cl"><span class="k">cd</span> flutter-flavors-ci-cd/
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h2 id="create-the-flutter-app">Create the Flutter app</h2>
+<p>Create a new Git repository. Mine is: <a href="https://github.com/cwe1ss/flutter-flavors-ci-cd" target="_blank" rel="noopener noreffer ">https://github.com/cwe1ss/flutter-flavors-ci-cd</a></p>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-cmd">
+        <span class="code-title"><i class="arrow fas fa-angle-right fa-fw" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h fa-fw" aria-hidden="true"></i></span>
+        <span class="copy" title="Copy to clipboard"><i class="far fa-copy fa-fw" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cmd" data-lang="cmd"><span class="line"><span class="cl">git clone https://github.com/cwe1ss/flutter-flavors-ci-cd.git
+</span></span><span class="line"><span class="cl"><span class="k">cd</span> flutter-flavors-ci-cd/</span></span></code></pre></div></div>
+<h2 id="create-the-flutter-app">Create the Flutter app</h2>
 <p>Let&rsquo;s get started by creating the Flutter app, named <code>flutter_flavors</code> via the Flutter CLI directly in the root folder of our repository:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-cmd" data-lang="cmd"><span class="line"><span class="cl">flutter create --project-name flutter_flavors .
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>Run the app on an Android device/emulator to ensure it works.</p>
-<p><a href="https://github.com/cwe1ss/flutter-flavors-ci-cd/commit/0819ce8b51ddc39d8b7aebf71aea4f2da36a187c" target="_blank" rel="noopener noreffer">See all changes from this step in the Git commit.</a></p>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-cmd">
+        <span class="code-title"><i class="arrow fas fa-angle-right fa-fw" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h fa-fw" aria-hidden="true"></i></span>
+        <span class="copy" title="Copy to clipboard"><i class="far fa-copy fa-fw" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cmd" data-lang="cmd"><span class="line"><span class="cl">flutter create --project-name flutter_flavors .</span></span></code></pre></div></div>
+<p>Run the app on an Android device/emulator to ensure it works.</p>
+<p><a href="https://github.com/cwe1ss/flutter-flavors-ci-cd/commit/0819ce8b51ddc39d8b7aebf71aea4f2da36a187c" target="_blank" rel="noopener noreffer ">See all changes from this step in the Git commit.</a></p>
 <h2 id="add-a-flutter-build-configuration-for-each-flavor-in-android-studio">Add a Flutter build configuration for each flavor in Android Studio</h2>
 <p>We want to have two flavors called <code>dev</code> and <code>live</code>.</p>
 <p>If you want to launch a flutter app with a flavor, you have to use the <code>--flavor NAME</code> parameter in the <em>Flutter CLI</em>. To automatically start the app with a flavor in <em>Android Studio</em> we need to change the build configurations:</p>
@@ -51,45 +46,27 @@
 <h3 id="add-the-build-configurations-to-git">Add the build configurations to Git</h3>
 <p>When you select &ldquo;Share through VCS&rdquo;, Android studio will create files in the <code>.idea/runConfigurations</code> folder, however they&rsquo;ll be ignored by the existing .gitignore file.</p>
 <p>We&rsquo;ll therefore add these files manually to Git, so that other users in the team can use it as well:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-cmd" data-lang="cmd"><span class="line"><span class="cl">git add .idea/runConfigurations/dev.xml -f
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-cmd">
+        <span class="code-title"><i class="arrow fas fa-angle-right fa-fw" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h fa-fw" aria-hidden="true"></i></span>
+        <span class="copy" title="Copy to clipboard"><i class="far fa-copy fa-fw" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cmd" data-lang="cmd"><span class="line"><span class="cl">git add .idea/runConfigurations/dev.xml -f
 </span></span><span class="line"><span class="cl">git add .idea/runConfigurations/live.xml -f
-</span></span><span class="line"><span class="cl">git commit -m &#39;Persist flutter build configurations&#39;
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p><a href="https://github.com/cwe1ss/flutter-flavors-ci-cd/commit/36e4eacccf68eb131cd1aa6ab1ac025df56aeb05" target="_blank" rel="noopener noreffer">See all changes from this step in the Git commit.</a></p>
+</span></span><span class="line"><span class="cl">git commit -m &#39;Persist flutter build configurations&#39;</span></span></code></pre></div></div>
+<p><a href="https://github.com/cwe1ss/flutter-flavors-ci-cd/commit/36e4eacccf68eb131cd1aa6ab1ac025df56aeb05" target="_blank" rel="noopener noreffer ">See all changes from this step in the Git commit.</a></p>
 <h2 id="set-up-flavors-for-android">Set up flavors for Android</h2>
 <p>In order to actually use different flavors, we need to set them up in the <code>lib</code>-folder and in each platform (<code>android</code>, <code>ios</code>).</p>
 <p>We&rsquo;ll start with the <code>android</code> part.</p>
 <h3 id="add-the-method-channel-in-android-code">Add the method channel in Android code</h3>
 <p>When the app starts, Flutter needs a way to ask the native platform which flavor it has been started with. To communicate with native code, Flutter uses <code>method channels</code>.</p>
 <p>Go to <code>android/app/src/main/kotlin/com.example.flutter_flavors</code> and replace everything except the first line (the package import) with the following code. This will set up the method channel that returns the <code>BuildConfig.FLAVOR</code> value, which is a built-in value of Android.</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-kotlin" data-lang="kotlin"><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">androidx.annotation.NonNull;</span>
+<div class="code-block code-line-numbers" style="counter-reset: code-block 0">
+    <div class="code-header language-kotlin">
+        <span class="code-title"><i class="arrow fas fa-angle-right fa-fw" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h fa-fw" aria-hidden="true"></i></span>
+        <span class="copy" title="Copy to clipboard"><i class="far fa-copy fa-fw" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-kotlin" data-lang="kotlin"><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">androidx.annotation.NonNull;</span>
 </span></span><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">io.flutter.embedding.android.FlutterActivity</span>
 </span></span><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">io.flutter.embedding.engine.FlutterEngine</span>
 </span></span><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">io.flutter.plugin.common.MethodChannel</span>
@@ -103,37 +80,18 @@
 </span></span><span class="line"><span class="cl">            <span class="n">call</span><span class="p">,</span> <span class="n">result</span> <span class="o">-&gt;</span> <span class="n">result</span><span class="p">.</span><span class="n">success</span><span class="p">(</span><span class="nc">BuildConfig</span><span class="p">.</span><span class="n">FLAVOR</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl">        <span class="p">}</span>
 </span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h3 id="add-the-flavor-settings-to-the-android-build-config">Add the flavor-settings to the Android build config</h3>
+</span></span><span class="line"><span class="cl"><span class="p">}</span></span></span></code></pre></div></div>
+<h3 id="add-the-flavor-settings-to-the-android-build-config">Add the flavor-settings to the Android build config</h3>
 <p>In Android, the native flavor-specific values are stored in <code>android/app/src/build.gradle</code> via the <code>android.flavorDimensions</code> and <code>android.productFlavors</code> keys.</p>
 <p>We&rsquo;ll use these keys to set up the flavor-specific <code>applicationId</code> and the flavor-specific display name for the app. This is important because we want to be able to have both flavors of the app installed at the same time.</p>
 <p>The <code>applicationId</code> is the unique app id for each flavor in the Google Play store. Once deployed to Google Play, this can not be changed anymore!</p>
 <p>Therefore, add the following two things within the <code>android { ... }</code> section:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-gradle" data-lang="gradle"><span class="line"><span class="cl"><span class="n">android</span> <span class="o">{</span>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-gradle">
+        <span class="code-title"><i class="arrow fas fa-angle-right fa-fw" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h fa-fw" aria-hidden="true"></i></span>
+        <span class="copy" title="Copy to clipboard"><i class="far fa-copy fa-fw" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-gradle" data-lang="gradle"><span class="line"><span class="cl"><span class="n">android</span> <span class="o">{</span>
 </span></span><span class="line"><span class="cl">    <span class="c1">// ... all existing things like `sourceSets`, ...
 </span></span></span><span class="line"><span class="cl"><span class="c1"></span>
 </span></span><span class="line"><span class="cl">    <span class="n">flavorDimensions</span> <span class="s2">&#34;app&#34;</span>
@@ -150,10 +108,8 @@
 </span></span><span class="line"><span class="cl">            <span class="n">resValue</span> <span class="s2">&#34;string&#34;</span><span class="o">,</span> <span class="s2">&#34;app_name&#34;</span><span class="o">,</span> <span class="s2">&#34;Flutter Flavors&#34;</span>
 </span></span><span class="line"><span class="cl">        <span class="o">}</span>
 </span></span><span class="line"><span class="cl">    <span class="o">}</span>
-</span></span><span class="line"><span class="cl"><span class="o">}</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h3 id="use-the-app_name-in-the-androidmanifestxml">Use the app_name in the AndroidManifest.xml</h3>
+</span></span><span class="line"><span class="cl"><span class="o">}</span></span></span></code></pre></div></div>
+<h3 id="use-the-app_name-in-the-androidmanifestxml">Use the app_name in the AndroidManifest.xml</h3>
 <p>The <code>applicationId</code> is a well-known key that will already be used when the app is launched with a given flavor.</p>
 <p>However, we&rsquo;ll need to do some more work to get the app_name working: Open <code>android/app/src/main/AndroidManifest.xml</code> and replace the <code>&lt;application android:label=&quot;flutter_flavors&quot; /&gt;</code> key with <code>&lt;application android:label=&quot;@string/app_name&quot; /&gt;</code>.</p>
 <h3 id="run-the-app-again-on-android">Run the app again on Android</h3>
@@ -164,26 +120,16 @@
 <p>You&rsquo;ll now have both flavors of your app installed on your Android device!</p>
 <p></p>
 <p>Our native Android configuration is now complete.</p>
-<p><a href="https://github.com/cwe1ss/flutter-flavors-ci-cd/commit/099284216215e0a8578518399117d8e28db31b75" target="_blank" rel="noopener noreffer">See all changes from this step in the Git commit.</a></p>
+<p><a href="https://github.com/cwe1ss/flutter-flavors-ci-cd/commit/099284216215e0a8578518399117d8e28db31b75" target="_blank" rel="noopener noreffer ">See all changes from this step in the Git commit.</a></p>
 <h2 id="get-the-flavor-in-our-flutter-code">Get the flavor in our Flutter code</h2>
 <p>As described in our requirements, we want to target different API endpoints per flavor so we need a way to get the current flavor in our Flutter code.</p>
 <p>We&rsquo;ll first add a class called <code>FlavorSettings</code> in a new file called <code>lib/flavor_settings.dart</code> that will hold all of our flavor-specific settings that we only need in our Flutter code:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-dart" data-lang="dart"><span class="line"><span class="cl"><span class="c1">/// Contains the hard-coded settings per flavor.
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-dart">
+        <span class="code-title"><i class="arrow fas fa-angle-right fa-fw" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h fa-fw" aria-hidden="true"></i></span>
+        <span class="copy" title="Copy to clipboard"><i class="far fa-copy fa-fw" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dart" data-lang="dart"><span class="line"><span class="cl"><span class="c1">/// Contains the hard-coded settings per flavor.
 </span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">class</span> <span class="nc">FlavorSettings</span> <span class="p">{</span>
 </span></span><span class="line"><span class="cl">  <span class="kd">final</span> <span class="kt">String</span> <span class="n">apiBaseUrl</span><span class="p">;</span>
 </span></span><span class="line"><span class="cl">  <span class="c1">// TODO Add any additional flavor-specific settings here.
@@ -193,47 +139,15 @@
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl">  <span class="n">FlavorSettings</span><span class="p">.</span><span class="n">live</span><span class="p">()</span>
 </span></span><span class="line"><span class="cl">    <span class="o">:</span> <span class="n">apiBaseUrl</span> <span class="o">=</span> <span class="s1">&#39;https://flutter-flavors.chwe.at&#39;</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>Next, we&rsquo;ll use this in <code>main.dart</code>, where we&rsquo;ll read the flavor via our method channel from the native platform and we&rsquo;ll create the corresponding <code>FlavorSettings</code>-object. We&rsquo;ll also have to make our <code>main</code>-method async for that.</p>
+</span></span><span class="line"><span class="cl"><span class="p">}</span></span></span></code></pre></div></div>
+<p>Next, we&rsquo;ll use this in <code>main.dart</code>, where we&rsquo;ll read the flavor via our method channel from the native platform and we&rsquo;ll create the corresponding <code>FlavorSettings</code>-object. We&rsquo;ll also have to make our <code>main</code>-method async for that.</p>
 <p>When done, your <code>main.dart</code> should contain the following code before the <code>class MyApp extends StatelessWidget {</code> line:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span><span class="lnt">27
-</span><span class="lnt">28
-</span><span class="lnt">29
-</span><span class="lnt">30
-</span><span class="lnt">31
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-dart" data-lang="dart"><span class="line"><span class="cl"><span class="k">import</span> <span class="s1">&#39;package:flutter/material.dart&#39;</span><span class="p">;</span>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-dart">
+        <span class="code-title"><i class="arrow fas fa-angle-right fa-fw" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h fa-fw" aria-hidden="true"></i></span>
+        <span class="copy" title="Copy to clipboard"><i class="far fa-copy fa-fw" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dart" data-lang="dart"><span class="line"><span class="cl"><span class="k">import</span> <span class="s1">&#39;package:flutter/material.dart&#39;</span><span class="p">;</span>
 </span></span><span class="line"><span class="cl"><span class="k">import</span> <span class="s1">&#39;package:flutter/services.dart&#39;</span><span class="p">;</span>
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl"><span class="k">import</span> <span class="s1">&#39;flavor_settings.dart&#39;</span><span class="p">;</span>
@@ -263,50 +177,38 @@
 </span></span><span class="line"><span class="cl">  <span class="p">}</span>
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1">// ... class MyApp extends StatelessWidget {
-</span></span></span></code></pre></td></tr></table>
-</div>
-</div><p>Run the app with <code>dev</code> build configuration and look at the console output. It will display the following statements:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">I/flutter ( 4458): STARTED WITH FLAVOR dev
-</span></span><span class="line"><span class="cl">I/flutter ( 4458): API URL https://dev.flutter-flavors.chwe.at
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>Switch to the <code>live</code> build configuration and run your app again. This time, the console will display the following statements:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">I/flutter ( 4615): STARTED WITH FLAVOR live
-</span></span><span class="line"><span class="cl">I/flutter ( 4615): API URL https://flutter-flavors.chwe.at
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>That&rsquo;s it! We can now access the current flavor from within Flutter and we can have flavor-specific settings.</p>
+</span></span><span class="line"><span class="cl"><span class="o">//</span> <span class="p">...</span> <span class="kd">class</span> <span class="nc">MyApp</span> <span class="kd">extends</span> <span class="n">StatelessWidget</span> <span class="p">{</span></span></span></code></pre></div></div>
+<p>Run the app with <code>dev</code> build configuration and look at the console output. It will display the following statements:</p>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-">
+        <span class="code-title"><i class="arrow fas fa-angle-right fa-fw" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h fa-fw" aria-hidden="true"></i></span>
+        <span class="copy" title="Copy to clipboard"><i class="far fa-copy fa-fw" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">I/flutter ( 4458): STARTED WITH FLAVOR dev
+</span></span><span class="line"><span class="cl">I/flutter ( 4458): API URL https://dev.flutter-flavors.chwe.at</span></span></code></pre></div></div>
+<p>Switch to the <code>live</code> build configuration and run your app again. This time, the console will display the following statements:</p>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-">
+        <span class="code-title"><i class="arrow fas fa-angle-right fa-fw" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h fa-fw" aria-hidden="true"></i></span>
+        <span class="copy" title="Copy to clipboard"><i class="far fa-copy fa-fw" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">I/flutter ( 4615): STARTED WITH FLAVOR live
+</span></span><span class="line"><span class="cl">I/flutter ( 4615): API URL https://flutter-flavors.chwe.at</span></span></code></pre></div></div>
+<p>That&rsquo;s it! We can now access the current flavor from within Flutter and we can have flavor-specific settings.</p>
 <p>You can pass the <code>FlavorSettings</code>-instance down to your widgets manually, or you can use e.g. the <code>provider</code>-package to access it via dependency injection in your widgets.</p>
-<p><a href="https://github.com/cwe1ss/flutter-flavors-ci-cd/commit/64ee8642551702dd4d36f15c5f788befe8c6bc9a" target="_blank" rel="noopener noreffer">See all changes from this step in the Git commit.</a></p>
+<p><a href="https://github.com/cwe1ss/flutter-flavors-ci-cd/commit/64ee8642551702dd4d36f15c5f788befe8c6bc9a" target="_blank" rel="noopener noreffer ">See all changes from this step in the Git commit.</a></p>
 <h2 id="set-up-flavors-for-ios">Set up flavors for iOS</h2>
 <p>Unfortunately, setting up flavors in iOS is more complex and we&rsquo;ll have to use XCode and its UI for most of the steps.</p>
 <p>Let&rsquo;s try building our app with a flavor for iOS now to see, what kind of error we get:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">flutter build ios --flavor dev
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-">
+        <span class="code-title"><i class="arrow fas fa-angle-right fa-fw" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h fa-fw" aria-hidden="true"></i></span>
+        <span class="copy" title="Copy to clipboard"><i class="far fa-copy fa-fw" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">flutter build ios --flavor dev
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">The Xcode project does not define custom schemes. You cannot use the --flavor option.
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>This means, that on iOS we have to rely on a feature called &ldquo;custom schemes&rdquo; to represent our flutter flavors. Setting them up requires multiple steps.</p>
+</span></span><span class="line"><span class="cl">The Xcode project does not define custom schemes. You cannot use the --flavor option.</span></span></code></pre></div></div>
+<p>This means, that on iOS we have to rely on a feature called &ldquo;custom schemes&rdquo; to represent our flutter flavors. Setting them up requires multiple steps.</p>
 <h3 id="create-custom-build-configurations-for-the-flavors">Create custom build configurations for the flavors</h3>
 <p>Let&rsquo;s open our <code>ios</code>-folder in XCode and start by creating our custom build configurations:</p>
 <ul>
@@ -354,47 +256,20 @@
 <p></p>
 <h3 id="adding-the-method-channel-for-ios">Adding the method channel for iOS</h3>
 <p>Building the app now shoud succeed, however when you try to run it, it will fail with the following error:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">[VERBOSE-2:ui_dart_state.cc(177)] Unhandled Exception: MissingPluginException(No implementation found for method getFlavor on channel flavor)
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>That&rsquo;s because we haven&rsquo;t yet implemented the method channel that Flutter uses to get the current flavor from the native platform.</p>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-">
+        <span class="code-title"><i class="arrow fas fa-angle-right fa-fw" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h fa-fw" aria-hidden="true"></i></span>
+        <span class="copy" title="Copy to clipboard"><i class="far fa-copy fa-fw" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">[VERBOSE-2:ui_dart_state.cc(177)] Unhandled Exception: MissingPluginException(No implementation found for method getFlavor on channel flavor)</span></span></code></pre></div></div>
+<p>That&rsquo;s because we haven&rsquo;t yet implemented the method channel that Flutter uses to get the current flavor from the native platform.</p>
 <p>To add this, we need to add some code to the <code>application()</code>-function of the <code>Runner/AppDelegate.swift</code>-file in XCode. The finished file should look like this:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-swift" data-lang="swift"><span class="line"><span class="cl"><span class="kd">import</span> <span class="nc">UIKit</span>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-swift">
+        <span class="code-title"><i class="arrow fas fa-angle-right fa-fw" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h fa-fw" aria-hidden="true"></i></span>
+        <span class="copy" title="Copy to clipboard"><i class="far fa-copy fa-fw" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-swift" data-lang="swift"><span class="line"><span class="cl"><span class="kd">import</span> <span class="nc">UIKit</span>
 </span></span><span class="line"><span class="cl"><span class="kd">import</span> <span class="nc">Flutter</span>
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl"><span class="kr">@UIApplicationMain</span>
@@ -419,10 +294,8 @@
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="kc">super</span><span class="p">.</span><span class="n">application</span><span class="p">(</span><span class="n">application</span><span class="p">,</span> <span class="n">didFinishLaunchingWithOptions</span><span class="p">:</span> <span class="n">launchOptions</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl">  <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>This will set up a method channel handler that reads the current flavor from a <code>Bundle.main.infoDictionary</code> with a key called <code>App - Flavor</code>.</p>
+</span></span><span class="line"><span class="cl"><span class="p">}</span></span></span></code></pre></div></div>
+<p>This will set up a method channel handler that reads the current flavor from a <code>Bundle.main.infoDictionary</code> with a key called <code>App - Flavor</code>.</p>
 <h3 id="set-up-the-flavor-value-per-scheme">Set up the flavor value per scheme</h3>
 <p>The <code>Bundle.main.infoDictionary</code> from before refers to the <code>Runner/Info.plist</code> file and <code>App - Flavor</code> is a custom key that we have to add there manually next.</p>
 <p>So open the <code>Runner/Info.plist</code> file in XCode and and add a new row with the following settings:</p>
@@ -455,17 +328,14 @@
 <p>We should now be able to select the &ldquo;dev&rdquo;-scheme in the top navigation bar of XCode and run the app.</p>
 <p><em>NOTE: If you get weird build errors from XCode, try switching between the dev/live schemes or try restarting XCode or running the iOS app from Android Studio.</em></p>
 <p>You should now see similar console output like for the Android app:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">2020-10-03 14:44:05.525493+0200 Runner[26055:336596] flutter: STARTED WITH FLAVOR dev
-</span></span><span class="line"><span class="cl">2020-10-03 14:44:05.526672+0200 Runner[26055:336596] flutter: API URL https://dev.flutter-flavors.chwe.at
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p><a href="https://github.com/cwe1ss/flutter-flavors-ci-cd/commit/608246ea5f948f2a63dc1d7450a77468428a4fc4" target="_blank" rel="noopener noreffer">See all changes from this step in the Git commit.</a></p>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-">
+        <span class="code-title"><i class="arrow fas fa-angle-right fa-fw" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h fa-fw" aria-hidden="true"></i></span>
+        <span class="copy" title="Copy to clipboard"><i class="far fa-copy fa-fw" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">2020-10-03 14:44:05.525493+0200 Runner[26055:336596] flutter: STARTED WITH FLAVOR dev
+</span></span><span class="line"><span class="cl">2020-10-03 14:44:05.526672+0200 Runner[26055:336596] flutter: API URL https://dev.flutter-flavors.chwe.at</span></span></code></pre></div></div>
+<p><a href="https://github.com/cwe1ss/flutter-flavors-ci-cd/commit/608246ea5f948f2a63dc1d7450a77468428a4fc4" target="_blank" rel="noopener noreffer ">See all changes from this step in the Git commit.</a></p>
 <p>Great, we now have set up our flavors for iOS as well!</p>
 <h2 id="set-the-bundle-id-and-app-name-per-flavor-for-ios">Set the bundle id and app name per flavor for iOS</h2>
 <p>You might have noticed that the app name on the iPhone still is &ldquo;flutter_flavors&rdquo;. Also, when you run both flavors, you still only have one app on your phone:</p>
@@ -519,7 +389,7 @@
 <h3 id="run-the-app-again-with-the-dev-and-live-flavors">Run the app again with the dev and live flavors</h3>
 <p>Delete the existing &ldquo;flutter_flavors&rdquo; app from your iPhone and run it again with each flavor. You should now have both apps with the correct name on your phone:</p>
 <p></p>
-<p><a href="https://github.com/cwe1ss/flutter-flavors-ci-cd/commit/6b4ead183f8b3f9128fa2b4d24b277056b747909" target="_blank" rel="noopener noreffer">See all changes from this step in the Git commit.</a></p>
+<p><a href="https://github.com/cwe1ss/flutter-flavors-ci-cd/commit/6b4ead183f8b3f9128fa2b4d24b277056b747909" target="_blank" rel="noopener noreffer ">See all changes from this step in the Git commit.</a></p>
 <h2 id="add-your-own-flavor-specific-settings">Add your own flavor-specific settings</h2>
 <p>If you need another flavor-specific setting, you have to know if it is a platform-specific setting, that needs to be integrated directly into the <code>android</code> and <code>ios</code> folders or if it is a setting that is only required in your Flutter code.</p>
 <p>For platform-specific settings, the above guides for setting the app name and bundle id should help.</p>

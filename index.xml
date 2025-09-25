@@ -1,10 +1,10 @@
-<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title>Christian Weiss</title><link>https://www.chwe.at/</link><description>Christian Weiss</description><generator>Hugo -- gohugo.io</generator><language>en</language><managingEditor>christian@chwe.at (Christian Weiss)</managingEditor><webMaster>christian@chwe.at (Christian Weiss)</webMaster><lastBuildDate>Wed, 26 Oct 2022 20:00:00 +0200</lastBuildDate><atom:link href="https://www.chwe.at/index.xml" rel="self" type="application/rss+xml"/><item><title>Deploy from GitHub to Azure without any secrets using managed identities</title><link>https://www.chwe.at/2022/10/github-actions-with-managed-identities/</link><pubDate>Wed, 26 Oct 2022 20:00:00 +0200</pubDate><author>Author</author><guid>https://www.chwe.at/2022/10/github-actions-with-managed-identities/</guid><description><![CDATA[<p>I&rsquo;ve been building <a href="https://github.com/cwe1ss/msa-template" target="_blank" rel="noopener noreffer">a microservices template</a> as part of my master&rsquo;s thesis. It&rsquo;s using GitHub for code hosting and Microsoft Azure for hosting the resources. One key requirement of my template is to use <a href="https://learn.microsoft.com/en-us/azure/active-directory/managed-identities-azure-resources/" target="_blank" rel="noopener noreffer">Managed identities for Azure</a> everywhere and not use any secrets when connecting to dependent resources.</p>
-<p>Managed identities are a great feature and very easy to use for built-in workloads like VMs, Azure Container Apps, App Services. However, until recently, managed identities could not be used for non-native workloads like GitHub Actions. We had to use an Azure AD app registration instead and store its credentials (including a <code>CLIENT_SECRET</code>) as GitHub secrets. With the introduction of <a href="https://learn.microsoft.com/en-us/azure/active-directory/develop/workload-identity-federation" target="_blank" rel="noopener noreffer">workload identity federation</a> for app registrations, it was then possible to <a href="https://learn.microsoft.com/en-us/azure/active-directory/develop/workload-identity-federation-create-trust?pivots=identity-wif-apps-methods-azp#configure-a-federated-identity-credential-on-an-app" target="_blank" rel="noopener noreffer">configure a trust relationship between GitHub and Azure</a> that allows the GitHub Actions to authenticate to Azure without the need for providing a <code>CLIENT_SECRET</code>. This would have already solved my requirement for not needing any secrets, but the problem is, that creating an Azure AD app registration requires elevated permissions and therefore often can&rsquo;t easily be done by regular developers.</p>
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title>Christian Weiss</title><link>https://www.chwe.at/</link><description>This is my cool site</description><generator>Hugo -- gohugo.io</generator><language>en</language><lastBuildDate>Wed, 26 Oct 2022 20:00:00 +0200</lastBuildDate><atom:link href="https://www.chwe.at/index.xml" rel="self" type="application/rss+xml"/><item><title>Deploy from GitHub to Azure without any secrets using managed identities</title><link>https://www.chwe.at/2022/10/github-actions-with-managed-identities/</link><pubDate>Wed, 26 Oct 2022 20:00:00 +0200</pubDate><author>xxxx</author><guid>https://www.chwe.at/2022/10/github-actions-with-managed-identities/</guid><description><![CDATA[<p>I&rsquo;ve been building <a href="https://github.com/cwe1ss/msa-template" target="_blank" rel="noopener noreffer ">a microservices template</a> as part of my master&rsquo;s thesis. It&rsquo;s using GitHub for code hosting and Microsoft Azure for hosting the resources. One key requirement of my template is to use <a href="https://learn.microsoft.com/en-us/azure/active-directory/managed-identities-azure-resources/" target="_blank" rel="noopener noreffer ">Managed identities for Azure</a> everywhere and not use any secrets when connecting to dependent resources.</p>
+<p>Managed identities are a great feature and very easy to use for built-in workloads like VMs, Azure Container Apps, App Services. However, until recently, managed identities could not be used for non-native workloads like GitHub Actions. We had to use an Azure AD app registration instead and store its credentials (including a <code>CLIENT_SECRET</code>) as GitHub secrets. With the introduction of <a href="https://learn.microsoft.com/en-us/azure/active-directory/develop/workload-identity-federation" target="_blank" rel="noopener noreffer ">workload identity federation</a> for app registrations, it was then possible to <a href="https://learn.microsoft.com/en-us/azure/active-directory/develop/workload-identity-federation-create-trust?pivots=identity-wif-apps-methods-azp#configure-a-federated-identity-credential-on-an-app" target="_blank" rel="noopener noreffer ">configure a trust relationship between GitHub and Azure</a> that allows the GitHub Actions to authenticate to Azure without the need for providing a <code>CLIENT_SECRET</code>. This would have already solved my requirement for not needing any secrets, but the problem is, that creating an Azure AD app registration requires elevated permissions and therefore often can&rsquo;t easily be done by regular developers.</p>
 <p>The good news is that <strong>Microsoft now also supports federated credentials for user-assigned managed identities</strong>! Managed identities only require regular Azure RBAC rights and can be created via Bicep templates and are therefore much easier to integrate into Infrastructure as Code-processes and CI/CD systems.</p>
-<p><a href="https://github.com/udayxhegde" target="_blank" rel="noopener noreffer">Uday Hegde</a> has written a good blog post explaining federated credentials for managed identities: <a href="https://blog.identitydigest.com/azuread-federate-mi/" target="_blank" rel="noopener noreffer">https://blog.identitydigest.com/azuread-federate-mi/</a></p>
-<p>The remainder of this blog post will focus on how federated credentials for managed identities are used in my microservices template. Have a look at the project&rsquo;s <a href="https://github.com/cwe1ss/msa-template/blob/main/README.md" target="_blank" rel="noopener noreffer">README.md</a> for more details.</p>
+<p><a href="https://github.com/udayxhegde" target="_blank" rel="noopener noreffer ">Uday Hegde</a> has written a good blog post explaining federated credentials for managed identities: <a href="https://blog.identitydigest.com/azuread-federate-mi/" target="_blank" rel="noopener noreffer ">https://blog.identitydigest.com/azuread-federate-mi/</a></p>
+<p>The remainder of this blog post will focus on how federated credentials for managed identities are used in my microservices template. Have a look at the project&rsquo;s <a href="https://github.com/cwe1ss/msa-template/blob/main/README.md" target="_blank" rel="noopener noreffer ">README.md</a> for more details.</p>
 <h2 id="overview">Overview</h2>
-<p>For my microservices template, the entire process for creating the Azure resources and connecting GitHub with Azure is automated via the <a href="https://github.com/cwe1ss/msa-template/blob/main/infrastructure/init-platform.ps1" target="_blank" rel="noopener noreffer">init-platform.ps1</a> script. The script must be executed <em>manually</em> once, since there&rsquo;s the &ldquo;chicken and egg&rdquo;-problem of already needing the managed identity to deploy Azure resources via a GitHub workflow.</p>
+<p>For my microservices template, the entire process for creating the Azure resources and connecting GitHub with Azure is automated via the <a href="https://github.com/cwe1ss/msa-template/blob/main/infrastructure/init-platform.ps1" target="_blank" rel="noopener noreffer ">init-platform.ps1</a> script. The script must be executed <em>manually</em> once, since there&rsquo;s the &ldquo;chicken and egg&rdquo;-problem of already needing the managed identity to deploy Azure resources via a GitHub workflow.</p>
 <p>The script will execute the following steps (among other things that are out of scope for this post):</p>
 <ul>
 <li>It will create a resource group in Azure that will host the managed identity.</li>
@@ -32,188 +32,102 @@
 <li>The necessary resource IDs (tenant id, subscription id, client id of our managed identity) will be created as GitHub secrets</li>
 </ul>
 <h2 id="deploying-the-managed-identity-and-its-federated-credentials-to-azure">Deploying the managed identity and its federated credentials to Azure</h2>
-<p>The template creates all Azure resources via <a href="https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/overview?tabs=bicep" target="_blank" rel="noopener noreffer">Bicep</a>-templates stored in the <a href="https://github.com/cwe1ss/msa-template/tree/main/infrastructure" target="_blank" rel="noopener noreffer">infrastructure</a> directory. The managed identity for GitHub is part of the <a href="https://github.com/cwe1ss/msa-template/tree/main/infrastructure/platform" target="_blank" rel="noopener noreffer">platform-resources</a> that are shared by all environments of my microservice template (e.g., development, production).</p>
+<p>The template creates all Azure resources via <a href="https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/overview?tabs=bicep" target="_blank" rel="noopener noreffer ">Bicep</a>-templates stored in the <a href="https://github.com/cwe1ss/msa-template/tree/main/infrastructure" target="_blank" rel="noopener noreffer ">infrastructure</a> directory. The managed identity for GitHub is part of the <a href="https://github.com/cwe1ss/msa-template/tree/main/infrastructure/platform" target="_blank" rel="noopener noreffer ">platform-resources</a> that are shared by all environments of my microservice template (e.g., development, production).</p>
 <p>To create the managed identity for GitHub, the following Bicep-template is used:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-bicep" data-lang="bicep"><span class="line"><span class="cl"><span class="kd">resource</span><span class="w"> </span>githubIdentity<span class="w"> </span><span class="s">&#39;Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview&#39;</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="py">name</span><span class="p">:</span><span class="w"> </span>githubIdentityName<span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="py">location</span><span class="p">:</span><span class="w"> </span>location<span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="py">tags</span><span class="p">:</span><span class="w"> </span>tags<span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
-</span></span></span></code></pre></td></tr></table>
-</div>
-</div><p><em>(<a href="https://github.com/cwe1ss/msa-template/blob/650565fb5be038ae737676ac3f87291763b082bd/infrastructure/platform/github-identity-resources.bicep#L37-L41" target="_blank" rel="noopener noreffer">Original source</a>)</em></p>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-bicep">
+        <span class="code-title"><i class="arrow fas fa-angle-right fa-fw" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h fa-fw" aria-hidden="true"></i></span>
+        <span class="copy" title="Copy to clipboard"><i class="far fa-copy fa-fw" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bicep" data-lang="bicep"><span class="line"><span class="cl"><span class="kd">resource</span><span class="w"> </span><span class="nv">githubIdentity</span><span class="w"> </span><span class="s">&#39;Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview&#39;</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nv">name</span><span class="p">:</span><span class="w"> </span><span class="nv">githubIdentityName</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nv">location</span><span class="p">:</span><span class="w"> </span><span class="nv">location</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nv">tags</span><span class="p">:</span><span class="w"> </span><span class="nv">tags</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span></span></span></code></pre></div></div>
+<p><em>(<a href="https://github.com/cwe1ss/msa-template/blob/650565fb5be038ae737676ac3f87291763b082bd/infrastructure/platform/github-identity-resources.bicep#L37-L41" target="_blank" rel="noopener noreffer ">Original source</a>)</em></p>
 <p>Creating the federated credentials via Bicep is more complex. Since I need federated credentials for the <code>main</code>-branch, the shared <code>platform</code>-environment, and each actual application environment (<code>development</code>, <code>production</code>), I&rsquo;m creating a list variable that holds the <code>name</code> and <code>subject</code> for each credential based on my global config-file:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-bicep" data-lang="bicep"><span class="line"><span class="cl"><span class="kd">var</span><span class="w"> </span>config<span class="w"> </span><span class="p">=</span><span class="w"> </span>loadJsonContent<span class="p">(</span><span class="s">&#39;./../config.json&#39;</span><span class="p">)</span><span class="w">
+<div class="code-block code-line-numbers" style="counter-reset: code-block 0">
+    <div class="code-header language-bicep">
+        <span class="code-title"><i class="arrow fas fa-angle-right fa-fw" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h fa-fw" aria-hidden="true"></i></span>
+        <span class="copy" title="Copy to clipboard"><i class="far fa-copy fa-fw" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bicep" data-lang="bicep"><span class="line"><span class="cl"><span class="kd">var</span><span class="w"> </span><span class="nv">config</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nf">loadJsonContent</span><span class="p">(</span><span class="s">&#39;./../config.json&#39;</span><span class="p">)</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">// All credentials must be in one list as concurrent writes to /federatedIdentityCredentials are not allowed.</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">var</span><span class="w"> </span>ghBranchCredentials<span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="py">name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;github-branch-${githubDefaultBranchName}&#39;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="py">subject</span><span class="p">:</span><span class="w"> </span><span class="py">&#39;repo</span><span class="p">:</span><span class="err">$</span><span class="p">{</span>githubRepoNameWithOwner<span class="p">}:</span><span class="py">ref</span><span class="p">:</span>refs<span class="o">/</span>heads<span class="o">/</span><span class="err">$</span><span class="p">{</span>githubDefaultBranchName<span class="p">}</span><span class="err">&#39;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">var</span><span class="w"> </span><span class="nv">ghBranchCredentials</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nv">name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;github-branch-</span><span class="si">${</span><span class="nv">githubDefaultBranchName</span><span class="si">}</span><span class="s">&#39;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nv">subject</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;repo:</span><span class="si">${</span><span class="nv">githubRepoNameWithOwner</span><span class="si">}</span><span class="s">:ref:refs/heads/</span><span class="si">${</span><span class="nv">githubDefaultBranchName</span><span class="si">}</span><span class="s">&#39;</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}]</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">var</span><span class="w"> </span>ghPlatformCredentials<span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="py">name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;github-env-platform&#39;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="py">subject</span><span class="p">:</span><span class="w"> </span><span class="py">&#39;repo</span><span class="p">:</span><span class="err">$</span><span class="p">{</span>githubRepoNameWithOwner<span class="p">}:</span><span class="py">environment</span><span class="p">:</span>platform<span class="err">&#39;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">var</span><span class="w"> </span><span class="nv">ghPlatformCredentials</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nv">name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;github-env-platform&#39;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nv">subject</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;repo:</span><span class="si">${</span><span class="nv">githubRepoNameWithOwner</span><span class="si">}</span><span class="s">:environment:platform&#39;</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}]</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">var</span><span class="w"> </span>ghEnvironmentCredentials<span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="k">for</span><span class="w"> </span>item<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="nf">items</span><span class="p">(</span>config<span class="p">.</span>environments<span class="p">):</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="py">name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;github-env-${item.key}&#39;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="py">subject</span><span class="p">:</span><span class="w"> </span><span class="py">&#39;repo</span><span class="p">:</span><span class="err">$</span><span class="p">{</span>githubRepoNameWithOwner<span class="p">}:</span><span class="py">environment</span><span class="p">:</span><span class="err">$</span><span class="p">{</span>item<span class="p">.</span>key<span class="p">}</span><span class="err">&#39;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">var</span><span class="w"> </span><span class="nv">ghEnvironmentCredentials</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="kd">for</span><span class="w"> </span><span class="nv">item</span><span class="w"> </span><span class="kd">in</span><span class="w"> </span><span class="nf">items</span><span class="p">(</span><span class="nv">config</span><span class="p">.</span><span class="nv">environments</span><span class="p">):</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nv">name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;github-env-</span><span class="si">${</span><span class="nv">item</span><span class="p">.</span><span class="nv">key</span><span class="si">}</span><span class="s">&#39;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nv">subject</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;repo:</span><span class="si">${</span><span class="nv">githubRepoNameWithOwner</span><span class="si">}</span><span class="s">:environment:</span><span class="si">${</span><span class="nv">item</span><span class="p">.</span><span class="nv">key</span><span class="si">}</span><span class="s">&#39;</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}]</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">var</span><span class="w"> </span>githubCredentials<span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nf">concat</span><span class="p">(</span>ghBranchCredentials<span class="err">,</span><span class="w"> </span>ghPlatformCredentials<span class="err">,</span><span class="w"> </span>ghEnvironmentCredentials<span class="p">)</span><span class="w">
-</span></span></span></code></pre></td></tr></table>
-</div>
-</div><p><em>(<a href="https://github.com/cwe1ss/msa-template/blob/650565fb5be038ae737676ac3f87291763b082bd/infrastructure/platform/github-identity-resources.bicep#L16-L31" target="_blank" rel="noopener noreffer">Original source</a>)</em></p>
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">var</span><span class="w"> </span><span class="nv">githubCredentials</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="nf">concat</span><span class="p">(</span><span class="nv">ghBranchCredentials</span><span class="p">,</span><span class="w"> </span><span class="nv">ghPlatformCredentials</span><span class="p">,</span><span class="w"> </span><span class="nv">ghEnvironmentCredentials</span><span class="p">)</span></span></span></code></pre></div></div>
+<p><em>(<a href="https://github.com/cwe1ss/msa-template/blob/650565fb5be038ae737676ac3f87291763b082bd/infrastructure/platform/github-identity-resources.bicep#L16-L31" target="_blank" rel="noopener noreffer ">Original source</a>)</em></p>
 <p>The credential resources are then created via a Bicep-loop. It&rsquo;s important that <code>batchSize(1)</code> is used because concurrent writes are not supported and will result in a deployment error.</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-bicep" data-lang="bicep"><span class="line"><span class="cl"><span class="p">@</span><span class="nd">batchSize</span><span class="p">(</span>1<span class="p">)</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">resource</span><span class="w"> </span>federatedCredentials<span class="w"> </span><span class="s">&#39;Microsoft.ManagedIdentity/userAssignedIdentities/federatedIdentityCredentials@2022-01-31-preview&#39;</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="k">for</span><span class="w"> </span>item<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="py">githubCredentials</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="py">name</span><span class="p">:</span><span class="w"> </span>item<span class="p">.</span>name<span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="py">parent</span><span class="p">:</span><span class="w"> </span>githubIdentity<span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="py">properties</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="py">audiences</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="py">&#39;api</span><span class="p">:</span><span class="c1">//AzureADTokenExchange&#39;</span><span class="w">
+<div class="code-block code-line-numbers" style="counter-reset: code-block 0">
+    <div class="code-header language-bicep">
+        <span class="code-title"><i class="arrow fas fa-angle-right fa-fw" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h fa-fw" aria-hidden="true"></i></span>
+        <span class="copy" title="Copy to clipboard"><i class="far fa-copy fa-fw" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bicep" data-lang="bicep"><span class="line"><span class="cl"><span class="p">@</span><span class="nf">batchSize</span><span class="p">(</span><span class="nv">1</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">resource</span><span class="w"> </span><span class="nv">federatedCredentials</span><span class="w"> </span><span class="s">&#39;Microsoft.ManagedIdentity/userAssignedIdentities/federatedIdentityCredentials@2022-01-31-preview&#39;</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="kd">for</span><span class="w"> </span><span class="nv">item</span><span class="w"> </span><span class="kd">in</span><span class="w"> </span><span class="nv">githubCredentials</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nv">name</span><span class="p">:</span><span class="w"> </span><span class="nv">item</span><span class="p">.</span><span class="nv">name</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nv">parent</span><span class="p">:</span><span class="w"> </span><span class="nv">githubIdentity</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nv">properties</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nv">audiences</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="s">&#39;api://AzureADTokenExchange&#39;</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">]</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="py">issuer</span><span class="p">:</span><span class="w"> </span><span class="py">&#39;https</span><span class="p">:</span><span class="c1">//token.actions.githubusercontent.com&#39;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="py">subject</span><span class="p">:</span><span class="w"> </span>item<span class="p">.</span>subject<span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nv">issuer</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;https://token.actions.githubusercontent.com&#39;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nv">subject</span><span class="p">:</span><span class="w"> </span><span class="nv">item</span><span class="p">.</span><span class="nv">subject</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="p">}</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}]</span><span class="w">
-</span></span></span></code></pre></td></tr></table>
-</div>
-</div><p><em>(<a href="https://github.com/cwe1ss/msa-template/blob/650565fb5be038ae737676ac3f87291763b082bd/infrastructure/platform/github-identity-resources.bicep#L43-L58" target="_blank" rel="noopener noreffer">Original source</a>)</em></p>
-<p>The fields <code>audiences</code>, <code>issuer</code> and <code>subject</code> are set according to <a href="https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-azure" target="_blank" rel="noopener noreffer">the requirements by GitHub</a>.</p>
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}]</span></span></span></code></pre></div></div>
+<p><em>(<a href="https://github.com/cwe1ss/msa-template/blob/650565fb5be038ae737676ac3f87291763b082bd/infrastructure/platform/github-identity-resources.bicep#L43-L58" target="_blank" rel="noopener noreffer ">Original source</a>)</em></p>
+<p>The fields <code>audiences</code>, <code>issuer</code> and <code>subject</code> are set according to <a href="https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-azure" target="_blank" rel="noopener noreffer ">the requirements by GitHub</a>.</p>
 <h2 id="assigning-rbac-roles-to-the-managed-identity">Assigning RBAC-roles to the managed identity</h2>
 <p>In order for my GitHub-worflows to be able to deploy resources to Azure, the managed identity must have the appropriate RBAC permissions. For my template, I&rsquo;m assigning the <code>Contributor</code>-role and <code>UserAccessAdministrator</code>-role at the subscription-scope to the identity. The <code>UserAccessAdministrator</code>-role is necessary to allow my GitHub workflows to create other managed identities and to assign RBAC-roles to them.</p>
-<p>To assign a RBAC-role, we must know its internal ID. For built-in roles, this ID can be found here: <a href="https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles" target="_blank" rel="noopener noreffer">https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles</a></p>
+<p>To assign a RBAC-role, we must know its internal ID. For built-in roles, this ID can be found here: <a href="https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles" target="_blank" rel="noopener noreffer ">https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles</a></p>
 <p>Here&rsquo;s the code to reference the <code>Contributor</code>-role:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-bicep" data-lang="bicep"><span class="line"><span class="cl"><span class="kd">resource</span><span class="w"> </span>contributorRoleDefinition<span class="w"> </span><span class="s">&#39;Microsoft.Authorization/roleDefinitions@2022-04-01&#39;</span><span class="w"> </span>existing<span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="py">scope</span><span class="p">:</span><span class="w"> </span><span class="nf">subscription</span><span class="p">()</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="py">name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;b24988ac-6180-42a0-ab88-20f7382dd24c&#39;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
-</span></span></span></code></pre></td></tr></table>
-</div>
-</div><p><em>(<a href="https://github.com/cwe1ss/msa-template/blob/650565fb5be038ae737676ac3f87291763b082bd/infrastructure/platform/github-identity.bicep#L16-L20" target="_blank" rel="noopener noreffer">Original source</a>)</em></p>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-bicep">
+        <span class="code-title"><i class="arrow fas fa-angle-right fa-fw" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h fa-fw" aria-hidden="true"></i></span>
+        <span class="copy" title="Copy to clipboard"><i class="far fa-copy fa-fw" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bicep" data-lang="bicep"><span class="line"><span class="cl"><span class="kd">resource</span><span class="w"> </span><span class="nv">contributorRoleDefinition</span><span class="w"> </span><span class="s">&#39;Microsoft.Authorization/roleDefinitions@2022-04-01&#39;</span><span class="w"> </span><span class="kd">existing</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nv">scope</span><span class="p">:</span><span class="w"> </span><span class="nf">subscription</span><span class="p">()</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nv">name</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;b24988ac-6180-42a0-ab88-20f7382dd24c&#39;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span></span></span></code></pre></div></div>
+<p><em>(<a href="https://github.com/cwe1ss/msa-template/blob/650565fb5be038ae737676ac3f87291763b082bd/infrastructure/platform/github-identity.bicep#L16-L20" target="_blank" rel="noopener noreffer ">Original source</a>)</em></p>
 <p>With the reference to the role definition, we can now create the actual role assignment for the managed identity:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-bicep" data-lang="bicep"><span class="line"><span class="cl"><span class="kd">resource</span><span class="w"> </span>githubIdentityContributor<span class="w"> </span><span class="s">&#39;Microsoft.Authorization/roleAssignments@2020-04-01-preview&#39;</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="py">name</span><span class="p">:</span><span class="w"> </span><span class="nf">guid</span><span class="p">(</span><span class="nf">subscription</span><span class="p">().</span>id<span class="err">,</span><span class="w"> </span><span class="si">&#39;github&#39;</span><span class="err">,</span><span class="w"> </span><span class="si">&#39;Contributor&#39;</span><span class="p">)</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="py">properties</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="py">roleDefinitionId</span><span class="p">:</span><span class="w"> </span>contributorRoleDefinition<span class="p">.</span>id<span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="py">principalId</span><span class="p">:</span><span class="w"> </span>githubIdentity<span class="p">.</span>outputs<span class="p">.</span>githubIdentityPrincipalId<span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="py">principalType</span><span class="p">:</span><span class="w"> </span><span class="si">&#39;ServicePrincipal&#39;</span><span class="w">
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-bicep">
+        <span class="code-title"><i class="arrow fas fa-angle-right fa-fw" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h fa-fw" aria-hidden="true"></i></span>
+        <span class="copy" title="Copy to clipboard"><i class="far fa-copy fa-fw" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-bicep" data-lang="bicep"><span class="line"><span class="cl"><span class="kd">resource</span><span class="w"> </span><span class="nv">githubIdentityContributor</span><span class="w"> </span><span class="s">&#39;Microsoft.Authorization/roleAssignments@2020-04-01-preview&#39;</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nv">name</span><span class="p">:</span><span class="w"> </span><span class="nf">guid</span><span class="p">(</span><span class="nf">subscription</span><span class="p">().</span><span class="nv">id</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;github&#39;</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;Contributor&#39;</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nv">properties</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nv">roleDefinitionId</span><span class="p">:</span><span class="w"> </span><span class="nv">contributorRoleDefinition</span><span class="p">.</span><span class="nv">id</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nv">principalId</span><span class="p">:</span><span class="w"> </span><span class="nv">githubIdentity</span><span class="p">.</span><span class="nv">outputs</span><span class="p">.</span><span class="nv">githubIdentityPrincipalId</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nv">principalType</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;ServicePrincipal&#39;</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="p">}</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
-</span></span></span></code></pre></td></tr></table>
-</div>
-</div><p><em>(<a href="https://github.com/cwe1ss/msa-template/blob/650565fb5be038ae737676ac3f87291763b082bd/infrastructure/platform/github-identity.bicep#L52-L59" target="_blank" rel="noopener noreffer">Original source</a>)</em></p>
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span></span></span></code></pre></div></div>
+<p><em>(<a href="https://github.com/cwe1ss/msa-template/blob/650565fb5be038ae737676ac3f87291763b082bd/infrastructure/platform/github-identity.bicep#L52-L59" target="_blank" rel="noopener noreffer ">Original source</a>)</em></p>
 <p><strong>NOTE:</strong> Azure does not automatically delete RBAC-role assignments when the managed identity is deleted. You must <em>manually</em> delete them or future re-deployments will fail with a conflict.</p>
 <h2 id="assigning-aad-permissions-to-the-managed-identity">Assigning AAD permissions to the managed identity</h2>
 <p>Some of my GitHub workflows need to be able to query the Azure AD graph for details about an Azure AD group and to do so, the managed identity must have the proper AAD permissions.</p>
-<p>Unfortunately, AAD resources and permissions can NOT be created via Bicep templates, so we need to either use the <a href="https://learn.microsoft.com/en-us/powershell/module/azuread" target="_blank" rel="noopener noreffer">AzureAD</a>-module (which is planned for deprecation), its successor-module <a href="https://learn.microsoft.com/en-us/powershell/microsoftgraph/overview" target="_blank" rel="noopener noreffer">Microsoft.Graph</a>, or use the Graph REST API.</p>
-<p>Since I&rsquo;m already using the <a href="https://learn.microsoft.com/en-us/powershell/azure/install-az-ps" target="_blank" rel="noopener noreffer">Az</a>-module to deploy my Bicep-templates, I didn&rsquo;t want to use another module and potentially deal with separate sign-in methods and tokens, so I decided to just call the Graph API directly:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span><span class="lnt">27
-</span><span class="lnt">28
-</span><span class="lnt">29
-</span><span class="lnt">30
-</span><span class="lnt">31
-</span><span class="lnt">32
-</span><span class="lnt">33
-</span><span class="lnt">34
-</span><span class="lnt">35
-</span><span class="lnt">36
-</span><span class="lnt">37
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-ps" data-lang="ps"><span class="line"><span class="cl"><span class="nf">#</span> <span class="nf">A</span> <span class="nf">list</span> <span class="nf">of</span> <span class="nf">all</span> <span class="nf">AAD</span> <span class="nf">permissions</span> <span class="nf">that</span> <span class="nf">should</span> <span class="nf">be</span> <span class="nf">granted</span> <span class="nf">for</span> <span class="nf">the</span> <span class="nf">managed</span> <span class="nf">identity</span>
+<p>Unfortunately, AAD resources and permissions can NOT be created via Bicep templates, so we need to either use the <a href="https://learn.microsoft.com/en-us/powershell/module/azuread" target="_blank" rel="noopener noreffer ">AzureAD</a>-module (which is planned for deprecation), its successor-module <a href="https://learn.microsoft.com/en-us/powershell/microsoftgraph/overview" target="_blank" rel="noopener noreffer ">Microsoft.Graph</a>, or use the Graph REST API.</p>
+<p>Since I&rsquo;m already using the <a href="https://learn.microsoft.com/en-us/powershell/azure/install-az-ps" target="_blank" rel="noopener noreffer ">Az</a>-module to deploy my Bicep-templates, I didn&rsquo;t want to use another module and potentially deal with separate sign-in methods and tokens, so I decided to just call the Graph API directly:</p>
+<div class="code-block code-line-numbers" style="counter-reset: code-block 0">
+    <div class="code-header language-ps">
+        <span class="code-title"><i class="arrow fas fa-angle-right fa-fw" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h fa-fw" aria-hidden="true"></i></span>
+        <span class="copy" title="Copy to clipboard"><i class="far fa-copy fa-fw" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ps" data-lang="ps"><span class="line"><span class="cl"><span class="nf">#</span> <span class="nf">A</span> <span class="nf">list</span> <span class="nf">of</span> <span class="nf">all</span> <span class="nf">AAD</span> <span class="nf">permissions</span> <span class="nf">that</span> <span class="nf">should</span> <span class="nf">be</span> <span class="nf">granted</span> <span class="nf">for</span> <span class="nf">the</span> <span class="nf">managed</span> <span class="nf">identity</span>
 </span></span><span class="line"><span class="cl"><span class="nf">#</span> <span class="nf">https:</span><span class="err">/</span><span class="nv">/learn.microsoft.com/en-us/graph/permissions-reference</span>
 </span></span><span class="line"><span class="cl"><span class="nf">$githubIdentityMsGraphPermissions</span> <span class="nf">=</span> <span class="nf">@</span><span class="s">(
 </span></span></span><span class="line"><span class="cl"><span class="s">    &#34;Group.Read.All&#34;
@@ -249,119 +163,84 @@
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl">        <span class="nf">Write-Success</span> <span class="nf">&#34;Permission</span> <span class="nf">&#39;$permissionName&#39;</span> <span class="nf">created&#34;</span>
 </span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p><em>(<a href="https://github.com/cwe1ss/msa-template/blob/main/infrastructure/init-platform.ps1#L204-L229" target="_blank" rel="noopener noreffer">Original source</a>)</em></p>
+</span></span><span class="line"><span class="cl"><span class="p">}</span></span></span></code></pre></div></div>
+<p><em>(<a href="https://github.com/cwe1ss/msa-template/blob/main/infrastructure/init-platform.ps1#L204-L229" target="_blank" rel="noopener noreffer ">Original source</a>)</em></p>
 <p><strong>NOTE:</strong> To execute this step, you must have elevated permissions in Azure AD.</p>
 <h2 id="creating-a-github-environment-for-the-platform">Creating a GitHub environment for the <code>platform</code></h2>
-<p>My template uses <a href="https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment" target="_blank" rel="noopener noreffer">GitHub environments</a> to protect deployments to Azure.</p>
-<p>As with all previous steps, this could be done manually via the UI, but I prefer automation and therefore create the environment via the script by using the <a href="https://github.com/cli/cli" target="_blank" rel="noopener noreffer">GitHub CLI</a>.</p>
+<p>My template uses <a href="https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment" target="_blank" rel="noopener noreffer ">GitHub environments</a> to protect deployments to Azure.</p>
+<p>As with all previous steps, this could be done manually via the UI, but I prefer automation and therefore create the environment via the script by using the <a href="https://github.com/cli/cli" target="_blank" rel="noopener noreffer ">GitHub CLI</a>.</p>
 <p>The GitHub CLI does not yet have support for environments, so we need to use <code>gh api</code> to call the GitHub REST API.</p>
-<p>The script also uses a custom <a href="https://github.com/cwe1ss/msa-template/blob/650565fb5be038ae737676ac3f87291763b082bd/infrastructure/_includes/helpers.ps1#L12" target="_blank" rel="noopener noreffer">Exec</a>-function (copied from <a href="https://github.com/psake/psake/blob/master/src/public/Exec.ps1" target="_blank" rel="noopener noreffer">psake</a>) to fail the PowerShell script if the invocation of the native EXE fails (you&rsquo;d have to always check <code>$LastExitCode</code> otherwise).</p>
+<p>The script also uses a custom <a href="https://github.com/cwe1ss/msa-template/blob/650565fb5be038ae737676ac3f87291763b082bd/infrastructure/_includes/helpers.ps1#L12" target="_blank" rel="noopener noreffer ">Exec</a>-function (copied from <a href="https://github.com/psake/psake/blob/master/src/public/Exec.ps1" target="_blank" rel="noopener noreffer ">psake</a>) to fail the PowerShell script if the invocation of the native EXE fails (you&rsquo;d have to always check <code>$LastExitCode</code> otherwise).</p>
 <p>To create a GitHub environment, I&rsquo;m using the following code:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-ps" data-lang="ps"><span class="line"><span class="cl"><span class="nf">$body</span> <span class="nf">=</span> <span class="nf">@</span><span class="p">{</span>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-ps">
+        <span class="code-title"><i class="arrow fas fa-angle-right fa-fw" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h fa-fw" aria-hidden="true"></i></span>
+        <span class="copy" title="Copy to clipboard"><i class="far fa-copy fa-fw" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ps" data-lang="ps"><span class="line"><span class="cl"><span class="nf">$body</span> <span class="nf">=</span> <span class="nf">@</span><span class="p">{</span>
 </span></span><span class="line"><span class="cl">  <span class="nf">reviewers</span> <span class="nf">=</span> <span class="nf">@</span><span class="s">(
 </span></span></span><span class="line"><span class="cl"><span class="s">    @{ type = &#34;User&#34;; id = $ghUser.id }
 </span></span></span><span class="line"><span class="cl"><span class="s">  )</span>
 </span></span><span class="line"><span class="cl"><span class="p">}</span> <span class="nf">|</span> <span class="nf">ConvertTo-Json</span> <span class="nf">-Compress</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="nf">$ghEnv</span> <span class="nf">=</span> <span class="nf">Exec</span> <span class="p">{</span> <span class="nf">$body</span> <span class="nf">|</span> <span class="nf">gh</span> <span class="nf">api</span> <span class="nf">&#34;</span><span class="nv">/repos/$</span><span class="s">($ghRepo.nameWithOwner)</span><span class="nv">/environments/$environment&#34;</span> <span class="nf">-X</span> <span class="nf">PUT</span> <span class="nf">-H</span> <span class="nf">&#34;Accept:</span> <span class="nf">application</span><span class="nv">/vnd.github+json&#34;</span> <span class="nf">--input</span> <span class="nf">-</span> <span class="p">}</span> <span class="nf">|</span> <span class="nf">ConvertFrom-Json</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p><em>(<a href="https://github.com/cwe1ss/msa-template/blob/650565fb5be038ae737676ac3f87291763b082bd/infrastructure/init-platform.ps1#L354-L360" target="_blank" rel="noopener noreffer">Original source</a>)</em></p>
+</span></span><span class="line"><span class="cl"><span class="nf">$ghEnv</span> <span class="nf">=</span> <span class="nf">Exec</span> <span class="p">{</span> <span class="nf">$body</span> <span class="nf">|</span> <span class="nf">gh</span> <span class="nf">api</span> <span class="nf">&#34;</span><span class="nv">/repos/$</span><span class="s">($ghRepo.nameWithOwner)</span><span class="nv">/environments/$environment&#34;</span> <span class="nf">-X</span> <span class="nf">PUT</span> <span class="nf">-H</span> <span class="nf">&#34;Accept:</span> <span class="nf">application</span><span class="nv">/vnd.github+json&#34;</span> <span class="nf">--input</span> <span class="nf">-</span> <span class="p">}</span> <span class="nf">|</span> <span class="err">ConvertFrom-Json</span></span></span></code></pre></div></div>
+<p><em>(<a href="https://github.com/cwe1ss/msa-template/blob/650565fb5be038ae737676ac3f87291763b082bd/infrastructure/init-platform.ps1#L354-L360" target="_blank" rel="noopener noreffer ">Original source</a>)</em></p>
 <h2 id="creating-the-resource-ids-as-secrets-in-github">Creating the resource IDs as secrets in GitHub</h2>
 <p>While there are no passwords to authenticate GitHub with Azure, we still need to tell GitHub about the managed identity and its target tenant &amp; subscription. We therefore need to store some IDs as GitHub secrets. These IDs will then be used by the GitHub workflows when running deployments to Azure.</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-ps" data-lang="ps"><span class="line"><span class="cl"><span class="nf">Exec</span> <span class="p">{</span> <span class="nf">gh</span> <span class="nf">secret</span> <span class="nf">set</span> <span class="nf">&#34;AZURE_CLIENT_ID&#34;</span> <span class="nf">-b</span> <span class="nf">$githubIdentity.AppId</span> <span class="p">}</span>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-ps">
+        <span class="code-title"><i class="arrow fas fa-angle-right fa-fw" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h fa-fw" aria-hidden="true"></i></span>
+        <span class="copy" title="Copy to clipboard"><i class="far fa-copy fa-fw" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ps" data-lang="ps"><span class="line"><span class="cl"><span class="nf">Exec</span> <span class="p">{</span> <span class="nf">gh</span> <span class="nf">secret</span> <span class="nf">set</span> <span class="nf">&#34;AZURE_CLIENT_ID&#34;</span> <span class="nf">-b</span> <span class="nf">$githubIdentity.AppId</span> <span class="p">}</span>
 </span></span><span class="line"><span class="cl"><span class="nf">Exec</span> <span class="p">{</span> <span class="nf">gh</span> <span class="nf">secret</span> <span class="nf">set</span> <span class="nf">&#34;AZURE_SUBSCRIPTION_ID&#34;</span> <span class="nf">-b</span> <span class="nf">$</span><span class="s">((Get-AzContext).Subscription.Id)</span> <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="nf">Exec</span> <span class="p">{</span> <span class="nf">gh</span> <span class="nf">secret</span> <span class="nf">set</span> <span class="nf">&#34;AZURE_TENANT_ID&#34;</span> <span class="nf">-b</span> <span class="nf">$</span><span class="s">((Get-AzContext).Subscription.TenantId)</span> <span class="p">}</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p><em>(<a href="https://github.com/cwe1ss/msa-template/blob/650565fb5be038ae737676ac3f87291763b082bd/infrastructure/init-platform.ps1#L372-L374" target="_blank" rel="noopener noreffer">Original source</a>)</em></p>
+</span></span><span class="line"><span class="cl"><span class="nf">Exec</span> <span class="p">{</span> <span class="nf">gh</span> <span class="nf">secret</span> <span class="nf">set</span> <span class="nf">&#34;AZURE_TENANT_ID&#34;</span> <span class="nf">-b</span> <span class="nf">$</span><span class="s">((Get-AzContext).Subscription.TenantId)</span> <span class="p">}</span></span></span></code></pre></div></div>
+<p><em>(<a href="https://github.com/cwe1ss/msa-template/blob/650565fb5be038ae737676ac3f87291763b082bd/infrastructure/init-platform.ps1#L372-L374" target="_blank" rel="noopener noreffer ">Original source</a>)</em></p>
 <h2 id="using-the-managed-identity-in-a-github-workflow">Using the managed identity in a GitHub workflow</h2>
 <p>With the preceding steps, the managed identity has been created, federated credentials have been assigned and GitHub has references to the required IDs as GitHub secrets. We&rsquo;re therefore finally ready to do any further deployments via GitHub workflows.</p>
-<p>My microservice template includes <a href="https://github.com/cwe1ss/msa-template/tree/main/.github/workflows" target="_blank" rel="noopener noreffer">multiple GitHub workflows</a>. There&rsquo;s a workflow for each service, for shared environment resources, and for the shared platform resources.</p>
-<p>We&rsquo;ll look at the <a href="https://github.com/cwe1ss/msa-template/blob/main/.github/workflows/platform.yml" target="_blank" rel="noopener noreffer">platform.yml</a> workflow as an example for the following steps.</p>
-<p>In order for GitHub-workflows to work with federated credentials, we <a href="https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-azure#updating-your-github-actions-workflow" target="_blank" rel="noopener noreffer">must add permissions for the token</a>:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-yml" data-lang="yml"><span class="line"><span class="cl"><span class="nt">permissions</span><span class="p">:</span><span class="w">
+<p>My microservice template includes <a href="https://github.com/cwe1ss/msa-template/tree/main/.github/workflows" target="_blank" rel="noopener noreffer ">multiple GitHub workflows</a>. There&rsquo;s a workflow for each service, for shared environment resources, and for the shared platform resources.</p>
+<p>We&rsquo;ll look at the <a href="https://github.com/cwe1ss/msa-template/blob/main/.github/workflows/platform.yml" target="_blank" rel="noopener noreffer ">platform.yml</a> workflow as an example for the following steps.</p>
+<p>In order for GitHub-workflows to work with federated credentials, we <a href="https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-azure#updating-your-github-actions-workflow" target="_blank" rel="noopener noreffer ">must add permissions for the token</a>:</p>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-yml">
+        <span class="code-title"><i class="arrow fas fa-angle-right fa-fw" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h fa-fw" aria-hidden="true"></i></span>
+        <span class="copy" title="Copy to clipboard"><i class="far fa-copy fa-fw" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yml" data-lang="yml"><span class="line"><span class="cl"><span class="nt">permissions</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">id-token</span><span class="p">:</span><span class="w"> </span><span class="l">write</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">contents</span><span class="p">:</span><span class="w"> </span><span class="l">read</span><span class="w">
-</span></span></span></code></pre></td></tr></table>
-</div>
-</div><p><em>(<a href="https://github.com/cwe1ss/msa-template/blob/650565fb5be038ae737676ac3f87291763b082bd/.github/workflows/platform.yml#L6-L8" target="_blank" rel="noopener noreffer">Original source</a>)</em></p>
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">contents</span><span class="p">:</span><span class="w"> </span><span class="l">read</span></span></span></code></pre></div></div>
+<p><em>(<a href="https://github.com/cwe1ss/msa-template/blob/650565fb5be038ae737676ac3f87291763b082bd/.github/workflows/platform.yml#L6-L8" target="_blank" rel="noopener noreffer ">Original source</a>)</em></p>
 <p>We can then use <code>azure/login</code> to authenticate with Azure (using the previously created GitHub secrets):</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-yml" data-lang="yml"><span class="line"><span class="cl"><span class="w">    </span>- <span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l">azure/login@v1</span><span class="w">
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-yml">
+        <span class="code-title"><i class="arrow fas fa-angle-right fa-fw" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h fa-fw" aria-hidden="true"></i></span>
+        <span class="copy" title="Copy to clipboard"><i class="far fa-copy fa-fw" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yml" data-lang="yml"><span class="line"><span class="cl"><span class="w">    </span>- <span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l">azure/login@v1</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">with</span><span class="p">:</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">client-id</span><span class="p">:</span><span class="w"> </span><span class="l">${{ secrets.AZURE_CLIENT_ID }}</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">tenant-id</span><span class="p">:</span><span class="w"> </span><span class="l">${{ secrets.AZURE_TENANT_ID }}</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">subscription-id</span><span class="p">:</span><span class="w"> </span><span class="l">${{ secrets.AZURE_SUBSCRIPTION_ID }}</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="c"># This allows us to use Azure PowerShell in addition to Azure CLI</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">enable-AzPSSession</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
-</span></span></span></code></pre></td></tr></table>
-</div>
-</div><p><em>(<a href="https://github.com/cwe1ss/msa-template/blob/650565fb5be038ae737676ac3f87291763b082bd/.github/workflows/platform.yml#L20-L25" target="_blank" rel="noopener noreffer">Original source</a>)</em></p>
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">enable-AzPSSession</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span></span></span></code></pre></div></div>
+<p><em>(<a href="https://github.com/cwe1ss/msa-template/blob/650565fb5be038ae737676ac3f87291763b082bd/.github/workflows/platform.yml#L20-L25" target="_blank" rel="noopener noreffer ">Original source</a>)</em></p>
 <p>That&rsquo;s it. Further calls via the <code>Az</code>-module should then be able to run successfully:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-ps" data-lang="ps"><span class="line"><span class="cl"><span class="nf">New-AzSubscriptionDeployment</span> <span class="nf">`</span>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-ps">
+        <span class="code-title"><i class="arrow fas fa-angle-right fa-fw" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h fa-fw" aria-hidden="true"></i></span>
+        <span class="copy" title="Copy to clipboard"><i class="far fa-copy fa-fw" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-ps" data-lang="ps"><span class="line"><span class="cl"><span class="nf">New-AzSubscriptionDeployment</span> <span class="nf">`</span>
 </span></span><span class="line"><span class="cl">    <span class="nf">-Location</span> <span class="nf">$config.location</span> <span class="nf">`</span>
 </span></span><span class="line"><span class="cl">    <span class="nf">-Name</span> <span class="s">(&#34;platform-&#34; + (Get-Date).ToString(&#34;yyyyMMddHHmmss&#34;))</span> <span class="nf">`</span>
 </span></span><span class="line"><span class="cl">    <span class="nf">-TemplateFile</span> <span class="nf">.\platform\main.bicep</span> <span class="nf">`</span>
 </span></span><span class="line"><span class="cl">    <span class="nf">-TemplateParameterObject</span> <span class="nf">@</span><span class="p">{</span>
 </span></span><span class="line"><span class="cl">        <span class="nf">deployGitHubIdentity</span> <span class="nf">=</span> <span class="nf">$false</span>
 </span></span><span class="line"><span class="cl">    <span class="p">}</span> <span class="nf">`</span>
-</span></span><span class="line"><span class="cl">    <span class="nf">-Verbose</span> <span class="nf">|</span> <span class="nf">Out-Null</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p><em>(<a href="https://github.com/cwe1ss/msa-template/blob/650565fb5be038ae737676ac3f87291763b082bd/infrastructure/deploy-platform.ps1#L16-L23" target="_blank" rel="noopener noreffer">Original source</a>)</em></p>
-<p>Feel free to start a discussion or create an issue in <a href="https://github.com/cwe1ss/msa-template" target="_blank" rel="noopener noreffer">cwe1ss/msa-template</a> if you have any feedback.</p>
-]]></description></item><item><title>Simple zero-downtime updates with ASP.NET Core and health checks</title><link>https://www.chwe.at/2020/10/zero-downtime-updates-with-aspnet-core/</link><pubDate>Thu, 22 Oct 2020 00:00:00 +0100</pubDate><author>Author</author><guid>https://www.chwe.at/2020/10/zero-downtime-updates-with-aspnet-core/</guid><description><![CDATA[<p>Do you use a load balancer that isn&rsquo;t tightly integrated with your orchestrator and therefore doesn&rsquo;t know upfront when the orchestrator has to stop an instance of your ASP.NET Core application for an upgrade / a scaling action / a restart?</p>
+</span></span><span class="line"><span class="cl">    <span class="nf">-Verbose</span> <span class="nf">|</span> <span class="err">Out-Null</span></span></span></code></pre></div></div>
+<p><em>(<a href="https://github.com/cwe1ss/msa-template/blob/650565fb5be038ae737676ac3f87291763b082bd/infrastructure/deploy-platform.ps1#L16-L23" target="_blank" rel="noopener noreffer ">Original source</a>)</em></p>
+<p>Feel free to start a discussion or create an issue in <a href="https://github.com/cwe1ss/msa-template" target="_blank" rel="noopener noreffer ">cwe1ss/msa-template</a> if you have any feedback.</p>
+]]></description></item><item><title>Simple zero-downtime updates with ASP.NET Core and health checks</title><link>https://www.chwe.at/2020/10/zero-downtime-updates-with-aspnet-core/</link><pubDate>Thu, 22 Oct 2020 00:00:00 +0100</pubDate><author>xxxx</author><guid>https://www.chwe.at/2020/10/zero-downtime-updates-with-aspnet-core/</guid><description><![CDATA[<p>Do you use a load balancer that isn&rsquo;t tightly integrated with your orchestrator and therefore doesn&rsquo;t know upfront when the orchestrator has to stop an instance of your ASP.NET Core application for an upgrade / a scaling action / a restart?</p>
 <p>Does this result in a few failing requests until the load balancer has finally figured out that the instance is gone?</p>
 <p>If so, this blog post might be for you!</p>
 <h2 id="problem-details">Problem details</h2>
@@ -370,7 +249,7 @@
 <p>Example: A stateless ASP.NET Core application <code>fabric:/MyBlog/MyBlogWebsite</code> is running in our Service Fabric cluster with a fixed port of <code>5000</code> and with <code>InstanceCount=-1</code> (so it runs on each node). To expose this application, Application Gateway is configured to forward all requests targeting <code>www.chwe.at</code> to the fixed <code>5000</code>-port on each node in the Service Fabric VMSS (virtual machine scale set).</p>
 <p>This works great. However, during application updates, Service Fabric will stop the existing process before it starts the new application version. This is required because the port <code>5000</code> has to be released before it can be bound again to the new version. Application Gateway isn&rsquo;t aware of this short termination, so any requests it forwards to the node during that time will fail.</p>
 <h2 id="health-checks-to-the-rescue">Health checks to the rescue</h2>
-<p>Azure Application Gateway (and probably any other load balancer) supports <a href="https://docs.microsoft.com/en-us/azure/application-gateway/application-gateway-probe-overview" target="_blank" rel="noopener noreffer">health probes</a> to decide if it should forward a request to a given node. In the simplest case, it will just periodically do a HTTP request to the root of your application and if it doesn&rsquo;t receive a response or if the response returns a server error, it will take the instance out of rotation after a few failed attempts.</p>
+<p>Azure Application Gateway (and probably any other load balancer) supports <a href="https://docs.microsoft.com/en-us/azure/application-gateway/application-gateway-probe-overview" target="_blank" rel="noopener noreffer ">health probes</a> to decide if it should forward a request to a given node. In the simplest case, it will just periodically do a HTTP request to the root of your application and if it doesn&rsquo;t receive a response or if the response returns a server error, it will take the instance out of rotation after a few failed attempts.</p>
 <p>So if one of your application instances gets shut down, the load balancer will stop forwarding traffic to it <strong>after some time</strong>.</p>
 <p><em>However, this still means that there will be failed requests until that has happened.</em></p>
 <p>How can we improve this?</p>
@@ -383,46 +262,26 @@
 <li>We can now delay the shutdown until the load balancer health-timeout has been reached.</li>
 <li>Until then, we&rsquo;ll just continue to serve any incoming requests.</li>
 </ul>
-<p><em>You can find the finished code for this post here: <a href="https://github.com/cwe1ss/blog-zero-downtime-with-health-checks" target="_blank" rel="noopener noreffer">https://github.com/cwe1ss/blog-zero-downtime-with-health-checks</a>. If you want to follow along step by step, look at the separate commits. They area also linked in each step below.</em></p>
+<p><em>You can find the finished code for this post here: <a href="https://github.com/cwe1ss/blog-zero-downtime-with-health-checks" target="_blank" rel="noopener noreffer ">https://github.com/cwe1ss/blog-zero-downtime-with-health-checks</a>. If you want to follow along step by step, look at the separate commits. They area also linked in each step below.</em></p>
 <h2 id="set-up-the-health-endpoint-in-aspnet-core">Set up the <code>/health</code>-endpoint in ASP.NET Core</h2>
-<p>ASP.NET Core has <a href="https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-3.1" target="_blank" rel="noopener noreffer">a built-in feature for health checks</a>.</p>
+<p>ASP.NET Core has <a href="https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-3.1" target="_blank" rel="noopener noreffer ">a built-in feature for health checks</a>.</p>
 <p>To enable it, we need to register the feature with the DI container by calling <code>services.AddHealhChecks()</code> in <code>Startup.ConfigureServices()</code> and we need to enable the endpoint on the request pipeline by calling <code>endpoints.MapHealthChecks(&quot;/health&quot;);</code> in the <code>app.UseEndpoints(...)</code>-block of <code>Startup.Configure()</code>.</p>
 <p>After this, we can run the app and navigate to <code>http://localhost:5000/health</code>. This will return the text &ldquo;Healthy&rdquo; and the status code 200.</p>
-<p><a href="https://github.com/cwe1ss/blog-zero-downtime-with-health-checks/commit/0014c70e68ac97e735572be12174d0f9ab3ff7c8" target="_blank" rel="noopener noreffer">See all changes from this step in the Git commit.</a></p>
+<p><a href="https://github.com/cwe1ss/blog-zero-downtime-with-health-checks/commit/0014c70e68ac97e735572be12174d0f9ab3ff7c8" target="_blank" rel="noopener noreffer ">See all changes from this step in the Git commit.</a></p>
 <h2 id="add-a-health-check-that-switches-to-unhealthy-once-the-application-shuts-down">Add a health check that switches to Unhealthy, once the application shuts down</h2>
-<p>We can <a href="https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-3.1#create-health-checks" target="_blank" rel="noopener noreffer">add our own health checks</a> to the ASP.NET Core health system by implementing the interface <code>Microsoft.Extensions.Diagnostics.HealthChecks.IHealthCheck</code>.</p>
+<p>We can <a href="https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-3.1#create-health-checks" target="_blank" rel="noopener noreffer ">add our own health checks</a> to the ASP.NET Core health system by implementing the interface <code>Microsoft.Extensions.Diagnostics.HealthChecks.IHealthCheck</code>.</p>
 <p>To get notified when the application is being shut down, we can use <code>Microsoft.Extensions.Hosting.IHostApplicationLifetime</code>. This interface provides a <code>ApplicationStopping</code>-hook that is triggered when the shutdown signal is received but before the application stops processing requests!</p>
 <p>When combined, we get the following first simple version of our <code>ShuttingDownHealthCheck</code>:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="k">public</span> <span class="k">class</span> <span class="nc">ShuttingDownHealthCheck</span> <span class="p">:</span> <span class="n">IHealthCheck</span>
+<div class="code-block code-line-numbers" style="counter-reset: code-block 0">
+    <div class="code-header language-csharp">
+        <span class="code-title"><i class="arrow fas fa-angle-right fa-fw" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h fa-fw" aria-hidden="true"></i></span>
+        <span class="copy" title="Copy to clipboard"><i class="far fa-copy fa-fw" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="kd">public</span> <span class="k">class</span> <span class="nc">ShuttingDownHealthCheck</span> <span class="p">:</span> <span class="n">IHealthCheck</span>
 </span></span><span class="line"><span class="cl"><span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="k">private</span> <span class="n">HealthStatus</span> <span class="n">_status</span> <span class="p">=</span> <span class="n">HealthStatus</span><span class="p">.</span><span class="n">Healthy</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">private</span> <span class="n">HealthStatus</span> <span class="n">_status</span> <span class="p">=</span> <span class="n">HealthStatus</span><span class="p">.</span><span class="n">Healthy</span><span class="p">;</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="k">public</span> <span class="n">ShuttingDownHealthCheck</span><span class="p">(</span><span class="n">IHostApplicationLifetime</span> <span class="n">appLifetime</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="n">ShuttingDownHealthCheck</span><span class="p">(</span><span class="n">IHostApplicationLifetime</span> <span class="n">appLifetime</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl">    <span class="p">{</span>
 </span></span><span class="line"><span class="cl">        <span class="n">appLifetime</span><span class="p">.</span><span class="n">ApplicationStopping</span><span class="p">.</span><span class="n">Register</span><span class="p">(()</span> <span class="p">=&gt;</span>
 </span></span><span class="line"><span class="cl">        <span class="p">{</span>
@@ -431,23 +290,21 @@
 </span></span><span class="line"><span class="cl">        <span class="p">});</span>
 </span></span><span class="line"><span class="cl">    <span class="p">}</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">    <span class="k">public</span> <span class="n">Task</span><span class="p">&lt;</span><span class="n">HealthCheckResult</span><span class="p">&gt;</span> <span class="n">CheckHealthAsync</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="n">Task</span><span class="p">&lt;</span><span class="n">HealthCheckResult</span><span class="p">&gt;</span> <span class="n">CheckHealthAsync</span><span class="p">(</span>
 </span></span><span class="line"><span class="cl">        <span class="n">HealthCheckContext</span> <span class="n">context</span><span class="p">,</span>
 </span></span><span class="line"><span class="cl">        <span class="n">CancellationToken</span> <span class="n">cancellationToken</span> <span class="p">=</span> <span class="k">default</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl">    <span class="p">{</span>
 </span></span><span class="line"><span class="cl">        <span class="kt">var</span> <span class="n">result</span> <span class="p">=</span> <span class="k">new</span> <span class="n">HealthCheckResult</span><span class="p">(</span><span class="n">_status</span><span class="p">);</span>
 </span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">Task</span><span class="p">.</span><span class="n">FromResult</span><span class="p">(</span><span class="n">result</span><span class="p">);</span>
 </span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>Our class also needs to be registered with the DI container by calling <code>.AddCheck&lt;ShuttingDownHealthCheck&gt;(&quot;shutting_down&quot;)</code> on the return object of <code>services.AddHealthChecks()</code>.</p>
+</span></span><span class="line"><span class="cl"><span class="p">}</span></span></span></code></pre></div></div>
+<p>Our class also needs to be registered with the DI container by calling <code>.AddCheck&lt;ShuttingDownHealthCheck&gt;(&quot;shutting_down&quot;)</code> on the return object of <code>services.AddHealthChecks()</code>.</p>
 <p>However, it&rsquo;s important to know that <strong>by default, ASP.NET Core initializes the class for every request</strong> to the health endpoint. This doesn&rsquo;t work for our scenario as we need the global <code>_status</code> variable and just a single <code>ApplicationStopping</code>-registration.</p>
 <p>To ensure the class is created only once, we have to add it as a singleton to the DI framework via <code>services.AddSingleton&lt;ShuttingDownHealthCheck&gt;();</code>.</p>
 <p>It&rsquo;s also important to know, that our <code>ShuttingDownHealthCheck</code>-class will only be initialized, when it is requested for the first time. So if we just run the app, navigate to http://localhost:5000 and press <code>CTRL+C</code>, our &ldquo;Shutting down&rdquo; message will NOT appear in the console.</p>
 <p>If we navigate to http://localhost:5000/health and press <code>CTRL+C</code> afterwards, the &ldquo;Shutting down&rdquo; message will appear on the console!</p>
 <p>This behavior is fine for our scenario as the load balancer will continuously invoke this endpoint anyway!</p>
-<p><a href="https://github.com/cwe1ss/blog-zero-downtime-with-health-checks/commit/bafd315f72a4555074db2bb4a4e5f15c8c1f0a9b" target="_blank" rel="noopener noreffer">See all changes from this step in the Git commit.</a></p>
+<p><a href="https://github.com/cwe1ss/blog-zero-downtime-with-health-checks/commit/bafd315f72a4555074db2bb4a4e5f15c8c1f0a9b" target="_blank" rel="noopener noreffer ">See all changes from this step in the Git commit.</a></p>
 <h2 id="delay-the-shutdown">Delay the shutdown</h2>
 <p>If you&rsquo;ve followed the steps so far, you will have noticed that the application still shuts down immediately after &ldquo;Shutting down&rdquo; has been printed to the console.</p>
 <p>To delay the shutdown, we can simply add a <code>Thread.Sleep()</code> to the code in our <code>ApplicationStopping</code>-handler. With this, the main thread is blocked but regular requests will still be processed on other threads.</p>
@@ -462,47 +319,23 @@
 <li>The shutdown delay is annoying during development as we now can&rsquo;t quickly close the app.</li>
 <li>Our &ldquo;Shutting down&rdquo; message is just printed to the console. It would be nice if it were sent to the regular logging system.</li>
 </ul>
-<p>To increase the <a href="https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/generic-host?view=aspnetcore-3.1#shutdowntimeout-1" target="_blank" rel="noopener noreffer">ASP.NET Core ShutdownTimeout</a>, we need to configure the <code>HostOptions</code> class in <code>Startup.ConfigureServices()</code>:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="n">services</span><span class="p">.</span><span class="n">Configure</span><span class="p">&lt;</span><span class="n">HostOptions</span><span class="p">&gt;(</span><span class="n">option</span> <span class="p">=&gt;</span>
+<p>To increase the <a href="https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/generic-host?view=aspnetcore-3.1#shutdowntimeout-1" target="_blank" rel="noopener noreffer ">ASP.NET Core ShutdownTimeout</a>, we need to configure the <code>HostOptions</code> class in <code>Startup.ConfigureServices()</code>:</p>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-csharp">
+        <span class="code-title"><i class="arrow fas fa-angle-right fa-fw" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h fa-fw" aria-hidden="true"></i></span>
+        <span class="copy" title="Copy to clipboard"><i class="far fa-copy fa-fw" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="n">services</span><span class="p">.</span><span class="n">Configure</span><span class="p">&lt;</span><span class="n">HostOptions</span><span class="p">&gt;(</span><span class="n">option</span> <span class="p">=&gt;</span>
 </span></span><span class="line"><span class="cl"><span class="p">{</span>
 </span></span><span class="line"><span class="cl">    <span class="n">option</span><span class="p">.</span><span class="n">ShutdownTimeout</span> <span class="p">=</span> <span class="n">System</span><span class="p">.</span><span class="n">TimeSpan</span><span class="p">.</span><span class="n">FromSeconds</span><span class="p">(</span><span class="m">30</span><span class="p">);</span>
-</span></span><span class="line"><span class="cl"><span class="p">});</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>To improve our health check, we&rsquo;ll introduce <code>IHostEnvironment</code> to detect if we&rsquo;re running in <code>Production</code>-mode and an <code>ILogger</code>. Our <code>ApplicationStopping</code>-registration will now look like this:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="n">appLifetime</span><span class="p">.</span><span class="n">ApplicationStopping</span><span class="p">.</span><span class="n">Register</span><span class="p">(()</span> <span class="p">=&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">});</span></span></span></code></pre></div></div>
+<p>To improve our health check, we&rsquo;ll introduce <code>IHostEnvironment</code> to detect if we&rsquo;re running in <code>Production</code>-mode and an <code>ILogger</code>. Our <code>ApplicationStopping</code>-registration will now look like this:</p>
+<div class="code-block code-line-numbers" style="counter-reset: code-block 0">
+    <div class="code-header language-csharp">
+        <span class="code-title"><i class="arrow fas fa-angle-right fa-fw" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h fa-fw" aria-hidden="true"></i></span>
+        <span class="copy" title="Copy to clipboard"><i class="far fa-copy fa-fw" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-csharp" data-lang="csharp"><span class="line"><span class="cl"><span class="n">appLifetime</span><span class="p">.</span><span class="n">ApplicationStopping</span><span class="p">.</span><span class="n">Register</span><span class="p">(()</span> <span class="p">=&gt;</span>
 </span></span><span class="line"><span class="cl"><span class="p">{</span>
 </span></span><span class="line"><span class="cl">    <span class="n">_status</span> <span class="p">=</span> <span class="n">HealthStatus</span><span class="p">.</span><span class="n">Unhealthy</span><span class="p">;</span>
 </span></span><span class="line"><span class="cl">
@@ -521,12 +354,10 @@
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl">        <span class="n">_logger</span><span class="p">.</span><span class="n">LogInformation</span><span class="p">(</span><span class="s">&#34;Shutdown delay completed&#34;</span><span class="p">);</span>
 </span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">});</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>Of course, it would also be possible to just skip the registration ouf our health check in the <code>Startup.ConfigureServices()</code>-method.</p>
+</span></span><span class="line"><span class="cl"><span class="p">});</span></span></span></code></pre></div></div>
+<p>Of course, it would also be possible to just skip the registration ouf our health check in the <code>Startup.ConfigureServices()</code>-method.</p>
 <p>The logic in our ASP.NET Core application is now finished!</p>
-<p><a href="https://github.com/cwe1ss/blog-zero-downtime-with-health-checks/commit/bb5dcecc68d20d5179b8d36fa22f468162e928b8" target="_blank" rel="noopener noreffer">See all changes from this step in the Git commit.</a></p>
+<p><a href="https://github.com/cwe1ss/blog-zero-downtime-with-health-checks/commit/bb5dcecc68d20d5179b8d36fa22f468162e928b8" target="_blank" rel="noopener noreffer ">See all changes from this step in the Git commit.</a></p>
 <h2 id="set-the-load-balancer-settings">Set the load balancer settings</h2>
 <p>It&rsquo;s important to understand that we&rsquo;ve set a 25 second shutdown delay. This means, the load balancer must take the instance out of rotation before that time. If it fails to do so, there will be failed requests again.</p>
 <p>We therefore need to set up our load balancing probes e.g. in the following way:</p>
@@ -561,43 +392,38 @@
 <li>We delay the shutdown for 25 seconds. Any regular requests will still be processed during that time.</li>
 <li>We make sure the load balancer takes the instance out of rotation before these 25 seconds are over.</li>
 </ul>
-<p>You can find the code for this blog here: <a href="https://github.com/cwe1ss/blog-zero-downtime-with-health-checks" target="_blank" rel="noopener noreffer">https://github.com/cwe1ss/blog-zero-downtime-with-health-checks</a>.</p>
-<p>Follow the commits to see the separate steps we&rsquo;ve taken.</p>]]></description></item><item><title>Using Flutter flavors to separate the DEV and LIVE environment</title><link>https://www.chwe.at/2020/10/flutter-flavors/</link><pubDate>Sat, 03 Oct 2020 00:00:00 +0100</pubDate><author>Author</author><guid>https://www.chwe.at/2020/10/flutter-flavors/</guid><description><![CDATA[<p>These are the requirements for our app:</p>
+<p>You can find the code for this blog here: <a href="https://github.com/cwe1ss/blog-zero-downtime-with-health-checks" target="_blank" rel="noopener noreffer ">https://github.com/cwe1ss/blog-zero-downtime-with-health-checks</a>.</p>
+<p>Follow the commits to see the separate steps we&rsquo;ve taken.</p>]]></description></item><item><title>Using Flutter flavors to separate the DEV and LIVE environment</title><link>https://www.chwe.at/2020/10/flutter-flavors/</link><pubDate>Sat, 03 Oct 2020 00:00:00 +0100</pubDate><author>xxxx</author><guid>https://www.chwe.at/2020/10/flutter-flavors/</guid><description><![CDATA[<p>These are the requirements for our app:</p>
 <ul>
 <li>Our Flutter app should target iOS and Android.</li>
 <li>We want a DEV version and a LIVE version of our app, each targeting a different API URL.</li>
 <li>Developers should never have to manually change any code to switch between the environments.</li>
 <li>We want to be able to have the DEV app and the LIVE app installed on the same device at the same time.</li>
 </ul>
-<p>The best way to solve these requirements in Flutter is to use <strong>flavors</strong>. There are also some other tutorials for this linked on the official <a href="https://flutter.dev/docs/deployment/flavors" target="_blank" rel="noopener noreffer">Flutter docs</a> which might be helpful.</p>
-<p>The <a href="https://github.com/cwe1ss/flutter-flavors-ci-cd" target="_blank" rel="noopener noreffer">code for this guide</a> is stored on GitHub and changes for each section are separate commits that are linked in the section below.</p>
+<p>The best way to solve these requirements in Flutter is to use <strong>flavors</strong>. There are also some other tutorials for this linked on the official <a href="https://flutter.dev/docs/deployment/flavors" target="_blank" rel="noopener noreffer ">Flutter docs</a> which might be helpful.</p>
+<p>The <a href="https://github.com/cwe1ss/flutter-flavors-ci-cd" target="_blank" rel="noopener noreffer ">code for this guide</a> is stored on GitHub and changes for each section are separate commits that are linked in the section below.</p>
 <p>As we need to change settings in XCode, we need a Mac with Android Studio and XCode for this tutorial.</p>
-<p>You also need to have Flutter installed already. Follow the <a href="https://flutter.dev/docs/get-started/install" target="_blank" rel="noopener noreffer">Getting started-docs</a> if you still need to install it.</p>
+<p>You also need to have Flutter installed already. Follow the <a href="https://flutter.dev/docs/get-started/install" target="_blank" rel="noopener noreffer ">Getting started-docs</a> if you still need to install it.</p>
 <p>I&rsquo;m using <code>Flutter v1.22.0</code> for this tutorial.</p>
 <h2 id="create-the-git-repository-and-clone-it-locally">Create the Git repository and clone it locally</h2>
-<p>Create a new Git repository. Mine is: <a href="https://github.com/cwe1ss/flutter-flavors-ci-cd" target="_blank" rel="noopener noreffer">https://github.com/cwe1ss/flutter-flavors-ci-cd</a></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-cmd" data-lang="cmd"><span class="line"><span class="cl">git clone https://github.com/cwe1ss/flutter-flavors-ci-cd.git
-</span></span><span class="line"><span class="cl"><span class="k">cd</span> flutter-flavors-ci-cd/
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h2 id="create-the-flutter-app">Create the Flutter app</h2>
+<p>Create a new Git repository. Mine is: <a href="https://github.com/cwe1ss/flutter-flavors-ci-cd" target="_blank" rel="noopener noreffer ">https://github.com/cwe1ss/flutter-flavors-ci-cd</a></p>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-cmd">
+        <span class="code-title"><i class="arrow fas fa-angle-right fa-fw" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h fa-fw" aria-hidden="true"></i></span>
+        <span class="copy" title="Copy to clipboard"><i class="far fa-copy fa-fw" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cmd" data-lang="cmd"><span class="line"><span class="cl">git clone https://github.com/cwe1ss/flutter-flavors-ci-cd.git
+</span></span><span class="line"><span class="cl"><span class="k">cd</span> flutter-flavors-ci-cd/</span></span></code></pre></div></div>
+<h2 id="create-the-flutter-app">Create the Flutter app</h2>
 <p>Let&rsquo;s get started by creating the Flutter app, named <code>flutter_flavors</code> via the Flutter CLI directly in the root folder of our repository:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-cmd" data-lang="cmd"><span class="line"><span class="cl">flutter create --project-name flutter_flavors .
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>Run the app on an Android device/emulator to ensure it works.</p>
-<p><a href="https://github.com/cwe1ss/flutter-flavors-ci-cd/commit/0819ce8b51ddc39d8b7aebf71aea4f2da36a187c" target="_blank" rel="noopener noreffer">See all changes from this step in the Git commit.</a></p>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-cmd">
+        <span class="code-title"><i class="arrow fas fa-angle-right fa-fw" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h fa-fw" aria-hidden="true"></i></span>
+        <span class="copy" title="Copy to clipboard"><i class="far fa-copy fa-fw" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cmd" data-lang="cmd"><span class="line"><span class="cl">flutter create --project-name flutter_flavors .</span></span></code></pre></div></div>
+<p>Run the app on an Android device/emulator to ensure it works.</p>
+<p><a href="https://github.com/cwe1ss/flutter-flavors-ci-cd/commit/0819ce8b51ddc39d8b7aebf71aea4f2da36a187c" target="_blank" rel="noopener noreffer ">See all changes from this step in the Git commit.</a></p>
 <h2 id="add-a-flutter-build-configuration-for-each-flavor-in-android-studio">Add a Flutter build configuration for each flavor in Android Studio</h2>
 <p>We want to have two flavors called <code>dev</code> and <code>live</code>.</p>
 <p>If you want to launch a flutter app with a flavor, you have to use the <code>--flavor NAME</code> parameter in the <em>Flutter CLI</em>. To automatically start the app with a flavor in <em>Android Studio</em> we need to change the build configurations:</p>
@@ -615,45 +441,27 @@
 <h3 id="add-the-build-configurations-to-git">Add the build configurations to Git</h3>
 <p>When you select &ldquo;Share through VCS&rdquo;, Android studio will create files in the <code>.idea/runConfigurations</code> folder, however they&rsquo;ll be ignored by the existing .gitignore file.</p>
 <p>We&rsquo;ll therefore add these files manually to Git, so that other users in the team can use it as well:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-cmd" data-lang="cmd"><span class="line"><span class="cl">git add .idea/runConfigurations/dev.xml -f
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-cmd">
+        <span class="code-title"><i class="arrow fas fa-angle-right fa-fw" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h fa-fw" aria-hidden="true"></i></span>
+        <span class="copy" title="Copy to clipboard"><i class="far fa-copy fa-fw" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cmd" data-lang="cmd"><span class="line"><span class="cl">git add .idea/runConfigurations/dev.xml -f
 </span></span><span class="line"><span class="cl">git add .idea/runConfigurations/live.xml -f
-</span></span><span class="line"><span class="cl">git commit -m &#39;Persist flutter build configurations&#39;
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p><a href="https://github.com/cwe1ss/flutter-flavors-ci-cd/commit/36e4eacccf68eb131cd1aa6ab1ac025df56aeb05" target="_blank" rel="noopener noreffer">See all changes from this step in the Git commit.</a></p>
+</span></span><span class="line"><span class="cl">git commit -m &#39;Persist flutter build configurations&#39;</span></span></code></pre></div></div>
+<p><a href="https://github.com/cwe1ss/flutter-flavors-ci-cd/commit/36e4eacccf68eb131cd1aa6ab1ac025df56aeb05" target="_blank" rel="noopener noreffer ">See all changes from this step in the Git commit.</a></p>
 <h2 id="set-up-flavors-for-android">Set up flavors for Android</h2>
 <p>In order to actually use different flavors, we need to set them up in the <code>lib</code>-folder and in each platform (<code>android</code>, <code>ios</code>).</p>
 <p>We&rsquo;ll start with the <code>android</code> part.</p>
 <h3 id="add-the-method-channel-in-android-code">Add the method channel in Android code</h3>
 <p>When the app starts, Flutter needs a way to ask the native platform which flavor it has been started with. To communicate with native code, Flutter uses <code>method channels</code>.</p>
 <p>Go to <code>android/app/src/main/kotlin/com.example.flutter_flavors</code> and replace everything except the first line (the package import) with the following code. This will set up the method channel that returns the <code>BuildConfig.FLAVOR</code> value, which is a built-in value of Android.</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-kotlin" data-lang="kotlin"><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">androidx.annotation.NonNull;</span>
+<div class="code-block code-line-numbers" style="counter-reset: code-block 0">
+    <div class="code-header language-kotlin">
+        <span class="code-title"><i class="arrow fas fa-angle-right fa-fw" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h fa-fw" aria-hidden="true"></i></span>
+        <span class="copy" title="Copy to clipboard"><i class="far fa-copy fa-fw" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-kotlin" data-lang="kotlin"><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">androidx.annotation.NonNull;</span>
 </span></span><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">io.flutter.embedding.android.FlutterActivity</span>
 </span></span><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">io.flutter.embedding.engine.FlutterEngine</span>
 </span></span><span class="line"><span class="cl"><span class="k">import</span> <span class="nn">io.flutter.plugin.common.MethodChannel</span>
@@ -667,37 +475,18 @@
 </span></span><span class="line"><span class="cl">            <span class="n">call</span><span class="p">,</span> <span class="n">result</span> <span class="o">-&gt;</span> <span class="n">result</span><span class="p">.</span><span class="n">success</span><span class="p">(</span><span class="nc">BuildConfig</span><span class="p">.</span><span class="n">FLAVOR</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl">        <span class="p">}</span>
 </span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h3 id="add-the-flavor-settings-to-the-android-build-config">Add the flavor-settings to the Android build config</h3>
+</span></span><span class="line"><span class="cl"><span class="p">}</span></span></span></code></pre></div></div>
+<h3 id="add-the-flavor-settings-to-the-android-build-config">Add the flavor-settings to the Android build config</h3>
 <p>In Android, the native flavor-specific values are stored in <code>android/app/src/build.gradle</code> via the <code>android.flavorDimensions</code> and <code>android.productFlavors</code> keys.</p>
 <p>We&rsquo;ll use these keys to set up the flavor-specific <code>applicationId</code> and the flavor-specific display name for the app. This is important because we want to be able to have both flavors of the app installed at the same time.</p>
 <p>The <code>applicationId</code> is the unique app id for each flavor in the Google Play store. Once deployed to Google Play, this can not be changed anymore!</p>
 <p>Therefore, add the following two things within the <code>android { ... }</code> section:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-gradle" data-lang="gradle"><span class="line"><span class="cl"><span class="n">android</span> <span class="o">{</span>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-gradle">
+        <span class="code-title"><i class="arrow fas fa-angle-right fa-fw" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h fa-fw" aria-hidden="true"></i></span>
+        <span class="copy" title="Copy to clipboard"><i class="far fa-copy fa-fw" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-gradle" data-lang="gradle"><span class="line"><span class="cl"><span class="n">android</span> <span class="o">{</span>
 </span></span><span class="line"><span class="cl">    <span class="c1">// ... all existing things like `sourceSets`, ...
 </span></span></span><span class="line"><span class="cl"><span class="c1"></span>
 </span></span><span class="line"><span class="cl">    <span class="n">flavorDimensions</span> <span class="s2">&#34;app&#34;</span>
@@ -714,10 +503,8 @@
 </span></span><span class="line"><span class="cl">            <span class="n">resValue</span> <span class="s2">&#34;string&#34;</span><span class="o">,</span> <span class="s2">&#34;app_name&#34;</span><span class="o">,</span> <span class="s2">&#34;Flutter Flavors&#34;</span>
 </span></span><span class="line"><span class="cl">        <span class="o">}</span>
 </span></span><span class="line"><span class="cl">    <span class="o">}</span>
-</span></span><span class="line"><span class="cl"><span class="o">}</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h3 id="use-the-app_name-in-the-androidmanifestxml">Use the app_name in the AndroidManifest.xml</h3>
+</span></span><span class="line"><span class="cl"><span class="o">}</span></span></span></code></pre></div></div>
+<h3 id="use-the-app_name-in-the-androidmanifestxml">Use the app_name in the AndroidManifest.xml</h3>
 <p>The <code>applicationId</code> is a well-known key that will already be used when the app is launched with a given flavor.</p>
 <p>However, we&rsquo;ll need to do some more work to get the app_name working: Open <code>android/app/src/main/AndroidManifest.xml</code> and replace the <code>&lt;application android:label=&quot;flutter_flavors&quot; /&gt;</code> key with <code>&lt;application android:label=&quot;@string/app_name&quot; /&gt;</code>.</p>
 <h3 id="run-the-app-again-on-android">Run the app again on Android</h3>
@@ -728,26 +515,16 @@
 <p>You&rsquo;ll now have both flavors of your app installed on your Android device!</p>
 <p></p>
 <p>Our native Android configuration is now complete.</p>
-<p><a href="https://github.com/cwe1ss/flutter-flavors-ci-cd/commit/099284216215e0a8578518399117d8e28db31b75" target="_blank" rel="noopener noreffer">See all changes from this step in the Git commit.</a></p>
+<p><a href="https://github.com/cwe1ss/flutter-flavors-ci-cd/commit/099284216215e0a8578518399117d8e28db31b75" target="_blank" rel="noopener noreffer ">See all changes from this step in the Git commit.</a></p>
 <h2 id="get-the-flavor-in-our-flutter-code">Get the flavor in our Flutter code</h2>
 <p>As described in our requirements, we want to target different API endpoints per flavor so we need a way to get the current flavor in our Flutter code.</p>
 <p>We&rsquo;ll first add a class called <code>FlavorSettings</code> in a new file called <code>lib/flavor_settings.dart</code> that will hold all of our flavor-specific settings that we only need in our Flutter code:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-dart" data-lang="dart"><span class="line"><span class="cl"><span class="c1">/// Contains the hard-coded settings per flavor.
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-dart">
+        <span class="code-title"><i class="arrow fas fa-angle-right fa-fw" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h fa-fw" aria-hidden="true"></i></span>
+        <span class="copy" title="Copy to clipboard"><i class="far fa-copy fa-fw" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dart" data-lang="dart"><span class="line"><span class="cl"><span class="c1">/// Contains the hard-coded settings per flavor.
 </span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">class</span> <span class="nc">FlavorSettings</span> <span class="p">{</span>
 </span></span><span class="line"><span class="cl">  <span class="kd">final</span> <span class="kt">String</span> <span class="n">apiBaseUrl</span><span class="p">;</span>
 </span></span><span class="line"><span class="cl">  <span class="c1">// TODO Add any additional flavor-specific settings here.
@@ -757,47 +534,15 @@
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl">  <span class="n">FlavorSettings</span><span class="p">.</span><span class="n">live</span><span class="p">()</span>
 </span></span><span class="line"><span class="cl">    <span class="o">:</span> <span class="n">apiBaseUrl</span> <span class="o">=</span> <span class="s1">&#39;https://flutter-flavors.chwe.at&#39;</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>Next, we&rsquo;ll use this in <code>main.dart</code>, where we&rsquo;ll read the flavor via our method channel from the native platform and we&rsquo;ll create the corresponding <code>FlavorSettings</code>-object. We&rsquo;ll also have to make our <code>main</code>-method async for that.</p>
+</span></span><span class="line"><span class="cl"><span class="p">}</span></span></span></code></pre></div></div>
+<p>Next, we&rsquo;ll use this in <code>main.dart</code>, where we&rsquo;ll read the flavor via our method channel from the native platform and we&rsquo;ll create the corresponding <code>FlavorSettings</code>-object. We&rsquo;ll also have to make our <code>main</code>-method async for that.</p>
 <p>When done, your <code>main.dart</code> should contain the following code before the <code>class MyApp extends StatelessWidget {</code> line:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span><span class="lnt">27
-</span><span class="lnt">28
-</span><span class="lnt">29
-</span><span class="lnt">30
-</span><span class="lnt">31
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-dart" data-lang="dart"><span class="line"><span class="cl"><span class="k">import</span> <span class="s1">&#39;package:flutter/material.dart&#39;</span><span class="p">;</span>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-dart">
+        <span class="code-title"><i class="arrow fas fa-angle-right fa-fw" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h fa-fw" aria-hidden="true"></i></span>
+        <span class="copy" title="Copy to clipboard"><i class="far fa-copy fa-fw" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-dart" data-lang="dart"><span class="line"><span class="cl"><span class="k">import</span> <span class="s1">&#39;package:flutter/material.dart&#39;</span><span class="p">;</span>
 </span></span><span class="line"><span class="cl"><span class="k">import</span> <span class="s1">&#39;package:flutter/services.dart&#39;</span><span class="p">;</span>
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl"><span class="k">import</span> <span class="s1">&#39;flavor_settings.dart&#39;</span><span class="p">;</span>
@@ -827,50 +572,38 @@
 </span></span><span class="line"><span class="cl">  <span class="p">}</span>
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1">// ... class MyApp extends StatelessWidget {
-</span></span></span></code></pre></td></tr></table>
-</div>
-</div><p>Run the app with <code>dev</code> build configuration and look at the console output. It will display the following statements:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">I/flutter ( 4458): STARTED WITH FLAVOR dev
-</span></span><span class="line"><span class="cl">I/flutter ( 4458): API URL https://dev.flutter-flavors.chwe.at
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>Switch to the <code>live</code> build configuration and run your app again. This time, the console will display the following statements:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">I/flutter ( 4615): STARTED WITH FLAVOR live
-</span></span><span class="line"><span class="cl">I/flutter ( 4615): API URL https://flutter-flavors.chwe.at
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>That&rsquo;s it! We can now access the current flavor from within Flutter and we can have flavor-specific settings.</p>
+</span></span><span class="line"><span class="cl"><span class="o">//</span> <span class="p">...</span> <span class="kd">class</span> <span class="nc">MyApp</span> <span class="kd">extends</span> <span class="n">StatelessWidget</span> <span class="p">{</span></span></span></code></pre></div></div>
+<p>Run the app with <code>dev</code> build configuration and look at the console output. It will display the following statements:</p>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-">
+        <span class="code-title"><i class="arrow fas fa-angle-right fa-fw" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h fa-fw" aria-hidden="true"></i></span>
+        <span class="copy" title="Copy to clipboard"><i class="far fa-copy fa-fw" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">I/flutter ( 4458): STARTED WITH FLAVOR dev
+</span></span><span class="line"><span class="cl">I/flutter ( 4458): API URL https://dev.flutter-flavors.chwe.at</span></span></code></pre></div></div>
+<p>Switch to the <code>live</code> build configuration and run your app again. This time, the console will display the following statements:</p>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-">
+        <span class="code-title"><i class="arrow fas fa-angle-right fa-fw" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h fa-fw" aria-hidden="true"></i></span>
+        <span class="copy" title="Copy to clipboard"><i class="far fa-copy fa-fw" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">I/flutter ( 4615): STARTED WITH FLAVOR live
+</span></span><span class="line"><span class="cl">I/flutter ( 4615): API URL https://flutter-flavors.chwe.at</span></span></code></pre></div></div>
+<p>That&rsquo;s it! We can now access the current flavor from within Flutter and we can have flavor-specific settings.</p>
 <p>You can pass the <code>FlavorSettings</code>-instance down to your widgets manually, or you can use e.g. the <code>provider</code>-package to access it via dependency injection in your widgets.</p>
-<p><a href="https://github.com/cwe1ss/flutter-flavors-ci-cd/commit/64ee8642551702dd4d36f15c5f788befe8c6bc9a" target="_blank" rel="noopener noreffer">See all changes from this step in the Git commit.</a></p>
+<p><a href="https://github.com/cwe1ss/flutter-flavors-ci-cd/commit/64ee8642551702dd4d36f15c5f788befe8c6bc9a" target="_blank" rel="noopener noreffer ">See all changes from this step in the Git commit.</a></p>
 <h2 id="set-up-flavors-for-ios">Set up flavors for iOS</h2>
 <p>Unfortunately, setting up flavors in iOS is more complex and we&rsquo;ll have to use XCode and its UI for most of the steps.</p>
 <p>Let&rsquo;s try building our app with a flavor for iOS now to see, what kind of error we get:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">flutter build ios --flavor dev
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-">
+        <span class="code-title"><i class="arrow fas fa-angle-right fa-fw" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h fa-fw" aria-hidden="true"></i></span>
+        <span class="copy" title="Copy to clipboard"><i class="far fa-copy fa-fw" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">flutter build ios --flavor dev
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">The Xcode project does not define custom schemes. You cannot use the --flavor option.
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>This means, that on iOS we have to rely on a feature called &ldquo;custom schemes&rdquo; to represent our flutter flavors. Setting them up requires multiple steps.</p>
+</span></span><span class="line"><span class="cl">The Xcode project does not define custom schemes. You cannot use the --flavor option.</span></span></code></pre></div></div>
+<p>This means, that on iOS we have to rely on a feature called &ldquo;custom schemes&rdquo; to represent our flutter flavors. Setting them up requires multiple steps.</p>
 <h3 id="create-custom-build-configurations-for-the-flavors">Create custom build configurations for the flavors</h3>
 <p>Let&rsquo;s open our <code>ios</code>-folder in XCode and start by creating our custom build configurations:</p>
 <ul>
@@ -918,47 +651,20 @@
 <p></p>
 <h3 id="adding-the-method-channel-for-ios">Adding the method channel for iOS</h3>
 <p>Building the app now shoud succeed, however when you try to run it, it will fail with the following error:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">[VERBOSE-2:ui_dart_state.cc(177)] Unhandled Exception: MissingPluginException(No implementation found for method getFlavor on channel flavor)
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>That&rsquo;s because we haven&rsquo;t yet implemented the method channel that Flutter uses to get the current flavor from the native platform.</p>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-">
+        <span class="code-title"><i class="arrow fas fa-angle-right fa-fw" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h fa-fw" aria-hidden="true"></i></span>
+        <span class="copy" title="Copy to clipboard"><i class="far fa-copy fa-fw" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">[VERBOSE-2:ui_dart_state.cc(177)] Unhandled Exception: MissingPluginException(No implementation found for method getFlavor on channel flavor)</span></span></code></pre></div></div>
+<p>That&rsquo;s because we haven&rsquo;t yet implemented the method channel that Flutter uses to get the current flavor from the native platform.</p>
 <p>To add this, we need to add some code to the <code>application()</code>-function of the <code>Runner/AppDelegate.swift</code>-file in XCode. The finished file should look like this:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-swift" data-lang="swift"><span class="line"><span class="cl"><span class="kd">import</span> <span class="nc">UIKit</span>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-swift">
+        <span class="code-title"><i class="arrow fas fa-angle-right fa-fw" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h fa-fw" aria-hidden="true"></i></span>
+        <span class="copy" title="Copy to clipboard"><i class="far fa-copy fa-fw" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-swift" data-lang="swift"><span class="line"><span class="cl"><span class="kd">import</span> <span class="nc">UIKit</span>
 </span></span><span class="line"><span class="cl"><span class="kd">import</span> <span class="nc">Flutter</span>
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl"><span class="kr">@UIApplicationMain</span>
@@ -983,10 +689,8 @@
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="kc">super</span><span class="p">.</span><span class="n">application</span><span class="p">(</span><span class="n">application</span><span class="p">,</span> <span class="n">didFinishLaunchingWithOptions</span><span class="p">:</span> <span class="n">launchOptions</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl">  <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>This will set up a method channel handler that reads the current flavor from a <code>Bundle.main.infoDictionary</code> with a key called <code>App - Flavor</code>.</p>
+</span></span><span class="line"><span class="cl"><span class="p">}</span></span></span></code></pre></div></div>
+<p>This will set up a method channel handler that reads the current flavor from a <code>Bundle.main.infoDictionary</code> with a key called <code>App - Flavor</code>.</p>
 <h3 id="set-up-the-flavor-value-per-scheme">Set up the flavor value per scheme</h3>
 <p>The <code>Bundle.main.infoDictionary</code> from before refers to the <code>Runner/Info.plist</code> file and <code>App - Flavor</code> is a custom key that we have to add there manually next.</p>
 <p>So open the <code>Runner/Info.plist</code> file in XCode and and add a new row with the following settings:</p>
@@ -1019,17 +723,14 @@
 <p>We should now be able to select the &ldquo;dev&rdquo;-scheme in the top navigation bar of XCode and run the app.</p>
 <p><em>NOTE: If you get weird build errors from XCode, try switching between the dev/live schemes or try restarting XCode or running the iOS app from Android Studio.</em></p>
 <p>You should now see similar console output like for the Android app:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">2020-10-03 14:44:05.525493+0200 Runner[26055:336596] flutter: STARTED WITH FLAVOR dev
-</span></span><span class="line"><span class="cl">2020-10-03 14:44:05.526672+0200 Runner[26055:336596] flutter: API URL https://dev.flutter-flavors.chwe.at
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p><a href="https://github.com/cwe1ss/flutter-flavors-ci-cd/commit/608246ea5f948f2a63dc1d7450a77468428a4fc4" target="_blank" rel="noopener noreffer">See all changes from this step in the Git commit.</a></p>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-">
+        <span class="code-title"><i class="arrow fas fa-angle-right fa-fw" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h fa-fw" aria-hidden="true"></i></span>
+        <span class="copy" title="Copy to clipboard"><i class="far fa-copy fa-fw" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">2020-10-03 14:44:05.525493+0200 Runner[26055:336596] flutter: STARTED WITH FLAVOR dev
+</span></span><span class="line"><span class="cl">2020-10-03 14:44:05.526672+0200 Runner[26055:336596] flutter: API URL https://dev.flutter-flavors.chwe.at</span></span></code></pre></div></div>
+<p><a href="https://github.com/cwe1ss/flutter-flavors-ci-cd/commit/608246ea5f948f2a63dc1d7450a77468428a4fc4" target="_blank" rel="noopener noreffer ">See all changes from this step in the Git commit.</a></p>
 <p>Great, we now have set up our flavors for iOS as well!</p>
 <h2 id="set-the-bundle-id-and-app-name-per-flavor-for-ios">Set the bundle id and app name per flavor for iOS</h2>
 <p>You might have noticed that the app name on the iPhone still is &ldquo;flutter_flavors&rdquo;. Also, when you run both flavors, you still only have one app on your phone:</p>
@@ -1083,49 +784,26 @@
 <h3 id="run-the-app-again-with-the-dev-and-live-flavors">Run the app again with the dev and live flavors</h3>
 <p>Delete the existing &ldquo;flutter_flavors&rdquo; app from your iPhone and run it again with each flavor. You should now have both apps with the correct name on your phone:</p>
 <p></p>
-<p><a href="https://github.com/cwe1ss/flutter-flavors-ci-cd/commit/6b4ead183f8b3f9128fa2b4d24b277056b747909" target="_blank" rel="noopener noreffer">See all changes from this step in the Git commit.</a></p>
+<p><a href="https://github.com/cwe1ss/flutter-flavors-ci-cd/commit/6b4ead183f8b3f9128fa2b4d24b277056b747909" target="_blank" rel="noopener noreffer ">See all changes from this step in the Git commit.</a></p>
 <h2 id="add-your-own-flavor-specific-settings">Add your own flavor-specific settings</h2>
 <p>If you need another flavor-specific setting, you have to know if it is a platform-specific setting, that needs to be integrated directly into the <code>android</code> and <code>ios</code> folders or if it is a setting that is only required in your Flutter code.</p>
 <p>For platform-specific settings, the above guides for setting the app name and bundle id should help.</p>
 <p>For settings that you only need in your Flutter-code, just add them to the <code>FlavorSettings</code>-class that we&rsquo;ve created above.</p>
 <h2 id="summary">Summary</h2>
-<p>We&rsquo;ve now set up our Flutter project to have multiple flavors. We use those flavors to separate our app environments (DEV &amp; LIVE). This way we don&rsquo;t need to e.g. manually comment out code to switch our API URL or any other settings. We can also have both versions installed side by side, which makes development and support much easier as we can develop on the DEV version while we still can use the LIVE version which is deployed to the stores.</p>]]></description></item><item><title>Find missing projects with PowerShell</title><link>https://www.chwe.at/2015/09/find-missing-projects-with-powershell/</link><pubDate>Wed, 30 Sep 2015 00:00:00 +0100</pubDate><author>Author</author><guid>https://www.chwe.at/2015/09/find-missing-projects-with-powershell/</guid><description><![CDATA[<p>In my last post, I showed you a C# script for finding projects which are not part of a SLN-file.
+<p>We&rsquo;ve now set up our Flutter project to have multiple flavors. We use those flavors to separate our app environments (DEV &amp; LIVE). This way we don&rsquo;t need to e.g. manually comment out code to switch our API URL or any other settings. We can also have both versions installed side by side, which makes development and support much easier as we can develop on the DEV version while we still can use the LIVE version which is deployed to the stores.</p>]]></description></item><item><title>Find missing projects with PowerShell</title><link>https://www.chwe.at/2015/09/find-missing-projects-with-powershell/</link><pubDate>Wed, 30 Sep 2015 00:00:00 +0100</pubDate><author>xxxx</author><guid>https://www.chwe.at/2015/09/find-missing-projects-with-powershell/</guid><description><![CDATA[<p>In my last post, I showed you a C# script for finding projects which are not part of a SLN-file.
 Since having to compile it is a bit of an overhead, I decided to migrate this code to a powershell script,
 which you can find here:</p>
-<p><a href="https://gist.github.com/cwe1ss/c1d623a24a8b7841b785" target="_blank" rel="noopener noreffer">ProjectsMissingInSolution.ps1</a></p>
-]]></description></item><item><title>Find projects which are missing in your "All Projects" solution</title><link>https://www.chwe.at/2014/08/find-projects-missing-in-visual-studio-solution/</link><pubDate>Thu, 21 Aug 2014 00:00:00 +0100</pubDate><author>Author</author><guid>https://www.chwe.at/2014/08/find-projects-missing-in-visual-studio-solution/</guid><description><![CDATA[<p>Do you use a Visual Studio solution which contains all of your projects to do daily builds? If you have lots of projects and if many people are involved it&rsquo;s very likely that somebody forgets to add his project to this solution.</p>
+<p><a href="https://gist.github.com/cwe1ss/c1d623a24a8b7841b785" target="_blank" rel="noopener noreffer ">ProjectsMissingInSolution.ps1</a></p>
+]]></description></item><item><title>Find projects which are missing in your "All Projects" solution</title><link>https://www.chwe.at/2014/08/find-projects-missing-in-visual-studio-solution/</link><pubDate>Thu, 21 Aug 2014 00:00:00 +0100</pubDate><author>xxxx</author><guid>https://www.chwe.at/2014/08/find-projects-missing-in-visual-studio-solution/</guid><description><![CDATA[<p>Do you use a Visual Studio solution which contains all of your projects to do daily builds? If you have lots of projects and if many people are involved it&rsquo;s very likely that somebody forgets to add his project to this solution.</p>
 <p>This small program helps you by showing you all csproj-files that are not part of your solution file!</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c#" data-lang="c#"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Program</span>
+<div class="code-block code-line-numbers open" style="counter-reset: code-block 0">
+    <div class="code-header language-c#">
+        <span class="code-title"><i class="arrow fas fa-angle-right fa-fw" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h fa-fw" aria-hidden="true"></i></span>
+        <span class="copy" title="Copy to clipboard"><i class="far fa-copy fa-fw" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c#" data-lang="c#"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Program</span>
 </span></span><span class="line"><span class="cl"><span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="k">static</span> <span class="k">void</span> <span class="n">Main</span><span class="p">(</span><span class="kt">string</span><span class="p">[]</span> <span class="n">args</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">static</span> <span class="k">void</span> <span class="n">Main</span><span class="p">(</span><span class="kt">string</span><span class="p">[]</span> <span class="n">args</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl">    <span class="p">{</span>
 </span></span><span class="line"><span class="cl">        <span class="c1">// Parameters</span>
 </span></span><span class="line"><span class="cl">        <span class="kt">string</span> <span class="n">baseFolder</span> <span class="p">=</span> <span class="s">@&#34;C:\path\to\solution\&#34;</span><span class="p">;</span>
@@ -1146,10 +824,8 @@ which you can find here:</p>
 </span></span><span class="line"><span class="cl">        <span class="n">Console</span><span class="p">.</span><span class="n">WriteLine</span><span class="p">(</span><span class="s">&#34;Details: &#34;</span> <span class="p">+</span> <span class="n">outputFile</span><span class="p">);</span>
 </span></span><span class="line"><span class="cl">        <span class="n">Console</span><span class="p">.</span><span class="n">ReadLine</span><span class="p">();</span>
 </span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div>]]></description></item><item><title>Feature Folders: Controllers and Views</title><link>https://www.chwe.at/2014/07/feature-folders-controllers-and-views/</link><pubDate>Wed, 02 Jul 2014 00:00:00 +0100</pubDate><author>Author</author><guid>https://www.chwe.at/2014/07/feature-folders-controllers-and-views/</guid><description><![CDATA[<p>The first step in our process to <a href="https://www.chwe.at/2014/04/introducing-the-asp.net-mvc-feature-folders-project-structure/" rel="">a better folder structure for our MVC projects</a> is to make sure, MVC can resolve our Controllers and Views. This is our target structure:</p>
+</span></span><span class="line"><span class="cl"><span class="p">}</span></span></span></code></pre></div></div>
+]]></description></item><item><title>Feature Folders: Controllers and Views</title><link>https://www.chwe.at/2014/07/feature-folders-controllers-and-views/</link><pubDate>Wed, 02 Jul 2014 00:00:00 +0100</pubDate><author>xxxx</author><guid>https://www.chwe.at/2014/07/feature-folders-controllers-and-views/</guid><description><![CDATA[<p>The first step in our process to <a href="https://www.chwe.at/2014/04/introducing-the-asp.net-mvc-feature-folders-project-structure/" rel="">a better folder structure for our MVC projects</a> is to make sure, MVC can resolve our Controllers and Views. This is our target structure:</p>
 <ul>
 <li>(Project Root)
 <ul>
@@ -1205,66 +881,14 @@ which you can find here:</p>
 <p>To support this structure for Controllers, you don&rsquo;t have to change anything in MVC since it does not force you to place them in a special folder! You can put Controllers into whatever folder you want. Resolving them is purely depended on your RouteConfig.</p>
 <h3 id="views">Views</h3>
 <p>To support this structure for Views, you have to create a custom ViewEngine. As you can see in the following example, this can also be done very easily. Please note, that this code only supports *.cshtml-files. If you want to use *.vbhtml-files as well, you just have to duplicate the paths and change the extension to *.vbhtml.</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span><span class="lnt">27
-</span><span class="lnt">28
-</span><span class="lnt">29
-</span><span class="lnt">30
-</span><span class="lnt">31
-</span><span class="lnt">32
-</span><span class="lnt">33
-</span><span class="lnt">34
-</span><span class="lnt">35
-</span><span class="lnt">36
-</span><span class="lnt">37
-</span><span class="lnt">38
-</span><span class="lnt">39
-</span><span class="lnt">40
-</span><span class="lnt">41
-</span><span class="lnt">42
-</span><span class="lnt">43
-</span><span class="lnt">44
-</span><span class="lnt">45
-</span><span class="lnt">46
-</span><span class="lnt">47
-</span><span class="lnt">48
-</span><span class="lnt">49
-</span><span class="lnt">50
-</span><span class="lnt">51
-</span><span class="lnt">52
-</span><span class="lnt">53
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-c#" data-lang="c#"><span class="line"><span class="cl"><span class="k">public</span> <span class="k">class</span> <span class="nc">FeatureFolderViewEngine</span> <span class="p">:</span> <span class="n">RazorViewEngine</span>
+<div class="code-block code-line-numbers" style="counter-reset: code-block 0">
+    <div class="code-header language-c#">
+        <span class="code-title"><i class="arrow fas fa-angle-right fa-fw" aria-hidden="true"></i></span>
+        <span class="ellipses"><i class="fas fa-ellipsis-h fa-fw" aria-hidden="true"></i></span>
+        <span class="copy" title="Copy to clipboard"><i class="far fa-copy fa-fw" aria-hidden="true"></i></span>
+    </div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-c#" data-lang="c#"><span class="line"><span class="cl"><span class="kd">public</span> <span class="k">class</span> <span class="nc">FeatureFolderViewEngine</span> <span class="p">:</span> <span class="n">RazorViewEngine</span>
 </span></span><span class="line"><span class="cl"><span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="k">public</span> <span class="n">FeatureFolderViewEngine</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">    <span class="kd">public</span> <span class="n">FeatureFolderViewEngine</span><span class="p">()</span>
 </span></span><span class="line"><span class="cl">    <span class="p">{</span>
 </span></span><span class="line"><span class="cl">        <span class="c1">// {0} ActionName</span>
 </span></span><span class="line"><span class="cl">        <span class="c1">// {1} ControllerName</span>
@@ -1314,15 +938,13 @@ which you can find here:</p>
 </span></span><span class="line"><span class="cl">                            <span class="s">&#34;cshtml&#34;</span><span class="p">,</span>
 </span></span><span class="line"><span class="cl">                        <span class="p">};</span>
 </span></span><span class="line"><span class="cl">    <span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>Of course, if you use this new structure, you lose some of the built-in templating- and navigation-support in Visual Studio since VS does not recognize these folders as &ldquo;Views&rdquo;-folders. Therefore, the following things no longer work:</p>
+</span></span><span class="line"><span class="cl"><span class="p">}</span></span></span></code></pre></div></div>
+<p>Of course, if you use this new structure, you lose some of the built-in templating- and navigation-support in Visual Studio since VS does not recognize these folders as &ldquo;Views&rdquo;-folders. Therefore, the following things no longer work:</p>
 <ul>
 <li>&ldquo;Go To View&rdquo; throws an error.</li>
 <li>&ldquo;Add View&rdquo; adds the view to the old &ldquo;Views&rdquo;-folder.</li>
 </ul>
-<p>Fortunately, ReSharper helps you with these issues since it contains built-in templates for views and also <a href="http://blog.jetbrains.com/dotnet/2013/01/29/resharper-and-custom-aspnet-mvc-view-location/" target="_blank" rel="noopener noreffer">supports our custom ViewEngine</a>!</p>]]></description></item><item><title>Introducing the ASP.NET MVC “Feature Folders” Project Structure</title><link>https://www.chwe.at/2014/04/introducing-the-asp.net-mvc-feature-folders-project-structure/</link><pubDate>Mon, 07 Apr 2014 00:00:00 +0100</pubDate><author>Author</author><guid>https://www.chwe.at/2014/04/introducing-the-asp.net-mvc-feature-folders-project-structure/</guid><description><![CDATA[<h3 id="whats-the-problem-with-the-default-aspnet-mvc-folder-structure">What’s the problem with the default ASP.NET MVC folder structure?</h3>
+<p>Fortunately, ReSharper helps you with these issues since it contains built-in templates for views and also <a href="http://blog.jetbrains.com/dotnet/2013/01/29/resharper-and-custom-aspnet-mvc-view-location/" target="_blank" rel="noopener noreffer ">supports our custom ViewEngine</a>!</p>]]></description></item><item><title>Introducing the ASP.NET MVC “Feature Folders” Project Structure</title><link>https://www.chwe.at/2014/04/introducing-the-asp.net-mvc-feature-folders-project-structure/</link><pubDate>Mon, 07 Apr 2014 00:00:00 +0100</pubDate><author>xxxx</author><guid>https://www.chwe.at/2014/04/introducing-the-asp.net-mvc-feature-folders-project-structure/</guid><description><![CDATA[<h3 id="whats-the-problem-with-the-default-aspnet-mvc-folder-structure">What’s the problem with the default ASP.NET MVC folder structure?</h3>
 <p>Which of these requirements is more common?</p>
 <ul>
 <li>Change something in every view, controller or model of your project</li>
@@ -1419,13 +1041,13 @@ which you can find here:</p>
 <p>In my opinion this is a very good thing! The traditional three-tier architecture (data, business logic, presentation) still is one of the most important concepts for structuring software systems. ASP.NET MVC clearly targets the presentation tier and shouldn&rsquo;t cover responsibilities from other tiers.</p>
 <p>For this reason, we have to move the files &ldquo;Customer.cs&rdquo; and &ldquo;CustomerRepository.cs&rdquo; into a separate library. However, everything else in our folder belongs to the presentation layer.</p>
 <h3 id="whats-next">What’s next?</h3>
-<p>I plan to do follow-up posts that address the challenges and also possible solutions for this structure, so stay tuned!</p>]]></description></item><item><title>Moving my BlogEngine.NET blog to Microsoft Azure</title><link>https://www.chwe.at/2014/03/moving-my-blogengine.net-blog-to-microsoft-azure/</link><pubDate>Sat, 29 Mar 2014 00:00:00 +0100</pubDate><author>Author</author><guid>https://www.chwe.at/2014/03/moving-my-blogengine.net-blog-to-microsoft-azure/</guid><description><![CDATA[<p>I thought, after 5 years since my last post it might be time to write a new one! But that&rsquo;s not so easy! When you login to the backend after such a long time, everything feels just wrong: The design is ugly, the blog engine is outdated, I&rsquo;m not sure if my hosting provider still is the best choice for me and I don&rsquo;t like my domain anymore! So, instead of just writing a post about something, I decided to change all of these things first and tell you about this process!</p>
+<p>I plan to do follow-up posts that address the challenges and also possible solutions for this structure, so stay tuned!</p>]]></description></item><item><title>Moving my BlogEngine.NET blog to Microsoft Azure</title><link>https://www.chwe.at/2014/03/moving-my-blogengine.net-blog-to-microsoft-azure/</link><pubDate>Sat, 29 Mar 2014 00:00:00 +0100</pubDate><author>xxxx</author><guid>https://www.chwe.at/2014/03/moving-my-blogengine.net-blog-to-microsoft-azure/</guid><description><![CDATA[<p>I thought, after 5 years since my last post it might be time to write a new one! But that&rsquo;s not so easy! When you login to the backend after such a long time, everything feels just wrong: The design is ugly, the blog engine is outdated, I&rsquo;m not sure if my hosting provider still is the best choice for me and I don&rsquo;t like my domain anymore! So, instead of just writing a post about something, I decided to change all of these things first and tell you about this process!</p>
 <h3 id="get-a-running-blogenginenet-instance-within-minutes">Get a running BlogEngine.NET instance within minutes</h3>
-<p>I was always interested in <strike>Windows Azure</strike> <a href="http://blogs.msdn.com/b/windowsazure/archive/2014/03/25/upcoming-name-change-for-windows-azure.aspx" target="_blank" rel="noopener noreffer">Microsoft Azure</a> but never really had the time to do something useful with it. Therefore I decided to take this opportunity and move my blog to it. I already had access to the Azure Management Portal, so I didn&rsquo;t have to go through some registration process. Since I also wanted to update my blog to the latest version of BlogEngine.NET I decided to start with a new installation and migrate my data afterwards (moving data from 6 posts is not so hard :-) ). Luckily, with Azure&rsquo;s Gallery, it&rsquo;s extremely easy to setup an instance of BlogEngine.Net. I just followed these instructions: <a href="http://blogs.msdn.com/b/webdev/archive/2012/10/12/blogengine-net-and-windows-azure-web-sites.aspx" target="_blank" rel="noopener noreffer">http://blogs.msdn.com/b/webdev/archive/2012/10/12/blogengine-net-and-windows-azure-web-sites.aspx</a></p>
+<p>I was always interested in <strike>Windows Azure</strike> <a href="http://blogs.msdn.com/b/windowsazure/archive/2014/03/25/upcoming-name-change-for-windows-azure.aspx" target="_blank" rel="noopener noreffer ">Microsoft Azure</a> but never really had the time to do something useful with it. Therefore I decided to take this opportunity and move my blog to it. I already had access to the Azure Management Portal, so I didn&rsquo;t have to go through some registration process. Since I also wanted to update my blog to the latest version of BlogEngine.NET I decided to start with a new installation and migrate my data afterwards (moving data from 6 posts is not so hard :-) ). Luckily, with Azure&rsquo;s Gallery, it&rsquo;s extremely easy to setup an instance of BlogEngine.Net. I just followed these instructions: <a href="http://blogs.msdn.com/b/webdev/archive/2012/10/12/blogengine-net-and-windows-azure-web-sites.aspx" target="_blank" rel="noopener noreffer ">http://blogs.msdn.com/b/webdev/archive/2012/10/12/blogengine-net-and-windows-azure-web-sites.aspx</a></p>
 <p>After that, I just had to go through a quick export/import process to move my data from my old blog to the new one. I started with a &ldquo;free&rdquo; web site but quickly scaled it up to a &ldquo;shared&rdquo; one because I wanted the site to be running on my custom domain.</p>
 <h3 id="deployment-with-git-and-the-app_data-folder">Deployment with Git and the App_Data folder</h3>
 <p>The default template of BlogEngine.NET 2.9 is quite nice, however I wanted to make some minor changes. Sounds like a good opportunity to test another great feature of Microsoft Azure: Git deployment.</p>
-<p><a href="http://www.windowsazure.com/en-us/documentation/articles/web-sites-publish-source-control/" target="_blank" rel="noopener noreffer">According to this tutorial</a>, I setup a Git repository for my web site within the Azure portal and cloned the repository to my notebook. Again, this was very straightforward and worked immediately. This also has the advantage that you now have a backup of your remote files on your home network.</p>
+<p><a href="http://www.windowsazure.com/en-us/documentation/articles/web-sites-publish-source-control/" target="_blank" rel="noopener noreffer ">According to this tutorial</a>, I setup a Git repository for my web site within the Azure portal and cloned the repository to my notebook. Again, this was very straightforward and worked immediately. This also has the advantage that you now have a backup of your remote files on your home network.</p>
 <p>But there&rsquo;s one important thing to take care of when you use Git deployment with BlogEngine.NET. BlogEngine.NET by default stores data in files within the App_Data folder. This is quite nice since you don&rsquo;t have to pay for a SQL Server database! However, if you use Git deployment it overwrites this folder, since it&rsquo;s now under source control. Therefore I added the &ldquo;App_Data&rdquo; folder to the .gitignore file. Unfortunately, the deployment still did overwrite changes. I guess this happened, because on the server, the App_Data folder was still a part of the git folder.</p>
 <p>To overcome this, I tried a different way: First, I copied my local App_Data folder to some backup directory on my notebook. Then I removed the .gitignore file and really deleted the App_Data folder from my local and remote repository (so if you do this as well, please note that you will have a downtime!). After that, I manually copied the App_Data folder back to Azure with FTP. As a last step, I re-created the .gitignore file with the App_Data-exclusion and also moved the App_Data folder back on my machine.</p>
 <p>As a result, the &ldquo;App_Data&rdquo; folder is no longer monitored by Git and will not be touched when Azure does a deployment. Of course, whenever you need a up-to-date version of your App_Data folder on your PC for development purposes, you have to manually download it from Azure.</p>
@@ -1435,10 +1057,10 @@ which you can find here:</p>
 <li>I&rsquo;m not sure if the current deployment behavior, which does not touch untracked folders will stay that way forever. I wouldn&rsquo;t be surprised if they do a real sync someday because actually, the git repository should be 100% consistent with the web folder.</li>
 </ul>
 <p>This means, <em>I do not recommend this for anything else than completely uncritical things</em>! If you want to do this, make sure you regularly backup your App_Data folder by e.g. doing a scheduled FTP download every day.</p>
-<p>For this blog, I&rsquo;m fine with those risks for now but if I happen to need a storage account anyway or if I will blog more in the future I will definitely move the data to a storage account.</p>]]></description></item><item><title>ASP.Net MVC 1.0 has been released!</title><link>https://www.chwe.at/2009/03/asp.net-mvc-1.0-has-been-released/</link><pubDate>Wed, 18 Mar 2009 00:00:00 +0100</pubDate><author>Author</author><guid>https://www.chwe.at/2009/03/asp.net-mvc-1.0-has-been-released/</guid><description><![CDATA[<p>The months of waiting are over! ASP.Net MVC 1.0 has finally been released. Get it while it&rsquo;s HOT!!</p>
-<p><a href="http://www.microsoft.com/downloads/details.aspx?FamilyID=53289097-73ce-43bf-b6a6-35e00103cb4b&amp;amp;displaylang=en" target="_blank" rel="noopener noreffer">http://www.microsoft.com/downloads/details.aspx?FamilyID=53289097-73ce-43bf-b6a6-35e00103cb4b&amp;displaylang=en</a></p>
-]]></description></item><item><title>Meet me @ BASTA! Spring 2009</title><link>https://www.chwe.at/2009/02/meet-me-at-basta-spring-2009/</link><pubDate>Fri, 20 Feb 2009 00:00:00 +0100</pubDate><author>Author</author><guid>https://www.chwe.at/2009/02/meet-me-at-basta-spring-2009/</guid><description><![CDATA[<p>Hello everyone!</p>
-<p>Next week, I will attend the biggest German .NET conference <a href="http://it-republik.de/dotnet/basta/" target="_blank" rel="noopener noreffer">BASTA! Spring 2009</a>. Feel free to contact me, if you’d like to chat with me &ldquo;offline&rdquo; there!</p>
+<p>For this blog, I&rsquo;m fine with those risks for now but if I happen to need a storage account anyway or if I will blog more in the future I will definitely move the data to a storage account.</p>]]></description></item><item><title>ASP.Net MVC 1.0 has been released!</title><link>https://www.chwe.at/2009/03/asp.net-mvc-1.0-has-been-released/</link><pubDate>Wed, 18 Mar 2009 00:00:00 +0100</pubDate><author>xxxx</author><guid>https://www.chwe.at/2009/03/asp.net-mvc-1.0-has-been-released/</guid><description><![CDATA[<p>The months of waiting are over! ASP.Net MVC 1.0 has finally been released. Get it while it&rsquo;s HOT!!</p>
+<p><a href="http://www.microsoft.com/downloads/details.aspx?FamilyID=53289097-73ce-43bf-b6a6-35e00103cb4b&amp;amp;displaylang=en" target="_blank" rel="noopener noreffer ">http://www.microsoft.com/downloads/details.aspx?FamilyID=53289097-73ce-43bf-b6a6-35e00103cb4b&amp;displaylang=en</a></p>
+]]></description></item><item><title>Meet me @ BASTA! Spring 2009</title><link>https://www.chwe.at/2009/02/meet-me-at-basta-spring-2009/</link><pubDate>Fri, 20 Feb 2009 00:00:00 +0100</pubDate><author>xxxx</author><guid>https://www.chwe.at/2009/02/meet-me-at-basta-spring-2009/</guid><description><![CDATA[<p>Hello everyone!</p>
+<p>Next week, I will attend the biggest German .NET conference <a href="http://it-republik.de/dotnet/basta/" target="_blank" rel="noopener noreffer ">BASTA! Spring 2009</a>. Feel free to contact me, if you’d like to chat with me &ldquo;offline&rdquo; there!</p>
 <h3 id="whats-next-on-my-blog">What’s next on my blog?</h3>
 <p>I&rsquo;m working on an ASP.Net MVC application right now and I plan to post about some of the techniques I&rsquo;ve used, so expect to read from me after the conference!</p>
 <p>Thanks for reading,<br>
